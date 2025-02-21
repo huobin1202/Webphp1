@@ -1,0 +1,345 @@
+<!DOCTYPE php>
+<php lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='img/logo.png' rel='icon' type='image/x-icon' />
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link href="../assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="../assets/css/admin-responsive.css">
+    <title>Quản lý cửa hàng</title>
+</head>
+
+<body>
+    <header class="header">
+        <button class="menu-icon-btn">
+            <div class="menu-icon">
+                <i class="fa-regular fa-bars"></i>
+            </div>
+        </button>
+    </header>
+    <div class="container">
+        <aside class="sidebar open">
+            <div class="top-sidebar">
+                <a href="#" class="channel-logo"><img src="../img/logo.png" alt="Channel Logo"></a>
+                <div class="hidden-sidebar your-channel"><img src="" style="height: 30px;" alt="">
+                </div>
+            </div>
+            <div class="middle-sidebar">
+                <ul class="sidebar-list">
+                    <li class="sidebar-list-item tab-content ">
+                        <a href="/admin.php" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-light fa-house"></i></div>
+                            <div class="hidden-sidebar">Trang tổng quan</div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item tab-content">
+                        <a href="/sanpham/sanpham.php" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-thin fa-motorcycle"></i></div>
+                            <div class="hidden-sidebar">Sản phẩm</div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item tab-content">
+                        <a href="/khachhang/khachhang.php" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-light fa-users"></i></div>
+                            <div class="hidden-sidebar">Khách hàng</div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item tab-content active">
+                        <a href="/donhang/donhang.php" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-light fa-basket-shopping"></i></div>
+                            <div class="hidden-sidebar">Đơn hàng</div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item tab-content">
+                        <a href="/thongkesp/thongke.php" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
+                            <div class="hidden-sidebar">Thống kê sản phẩm </div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item tab-content">
+                        <a href="/thongkekh/thongkekh.php" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
+                            <div class="hidden-sidebar">Thống kê khách hàng</div>
+                        </a>
+                    </li>
+
+                    <div class="spacer" style="height:50px;width:1px"></div>
+                    <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
+                        <a href="index.php" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-thin fa-circle-chevron-left"></i></div>
+                            <div class="hidden-sidebar">Trang chủ</div>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-list-item user-logout">
+                        <a href="#" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-light fa-circle-user"></i></div>
+                            <div class="hidden-sidebar" id="name-acc">Admin</div>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item user-logout">
+                        <a href="#" class="sidebar-link" >
+                            <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
+                            <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </aside>
+        <main class="content">
+            <!-- Order  -->
+            <div class="section">
+                <div class="admin-control">
+                    <div class="admin-control-left">
+                        <select name="tinh-trang" id="tinh-trang">
+                            <option value="2">Tất cả</option>
+                            <option value="1">Đã xử lý</option>
+                            <option value="0">Chưa xử lý</option>
+                        </select>
+                    </div>
+                    <div class="admin-control-center">
+                        <form action="" class="form-search">
+                            <span class="search-btn"><i class="fa-light fa-magnifying-glass"></i></span>
+                            <input id="form-search-order" type="text" class="form-search-input"
+                                placeholder="Tìm kiếm mã đơn, mã khách hàng, tên khách hàng...">
+                        </form>
+                    </div>
+                    <div class="admin-control-right">
+                        <form action="" class="fillter-date">
+                            <div>
+                                <label for="time-start">Từ</label>
+                                <input type="date" class="form-control-date" id="time-start" value="2024-02-27">
+                            </div>
+                            <div>
+                                <label for="time-end">Đến</label>
+                                <input type="date" class="form-control-date" id="time-end" value="2024-12-30">
+                            </div>
+                        </form>
+                        <button class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></button>
+                    </div>
+                </div>
+                <div class="table">
+                    <table width="100%">
+                        <thead>
+                            <tr>
+                                <td>Mã DH</td>
+                                <td>Mã KH</td>
+
+                                <td>Tên khách hàng</td>
+                                <td>Ngày đặt</td>   
+                                <td>Tổng tiền</td>
+                                <td>Trạng thái</td>
+                                <td>Thao tác</td>
+                            </tr>
+                        </thead>
+                        <tbody id="showOrder">
+                            <tr>
+                                <td>DH1</td>
+                                <td>KH003</td>
+                                <td>Nhật Tiến</td>
+                                <td>02/06/2024</td>
+                                <td>420.000.000đ</td>
+                                <td><span class="status-complete">Đã xử lý</span></td>
+                                <td class="control">
+                                    <a href="chitietdonhang1.php"><button class="btn-detail" id=""><i
+                                                class="fa-regular fa-eye"></i> Chi tiết</button></a>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td>DH2</td>
+                                <td>KH004</td>
+                                <td>Nguyễn Minh</td>
+                                <td>23/07/2024</td>
+                                <td>560.000.000đ</td>
+                                <td><span class="status-complete">Đã xử lý</span></td>
+                                <td class="control">
+                                    <a href="chitietdonhang2.php"><button class="btn-detail" id=""><i
+                                                class="fa-regular fa-eye"></i> Chi tiết</button></a>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td>DH3</td>
+                                <td>KH006</td>
+                                <td>Nguyễn Văn A</td>
+                                <td>28/10/2024</td>
+                                <td>960.000.000đ</td>
+                                <td><span class="status-complete">Đã xử lý</span></td>
+                                <td class="control">
+                                    <a href="chitietdonhang3.php"><button class="btn-detail" id=""><i
+                                                class="fa-regular fa-eye"></i> Chi tiết</button></a>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td>DH4</td>
+                                <td>KH002</td>
+                                <td>Huỳnh Thành</td>
+                                <td>30/10/2024</td>
+                                <td>490.000.000đ</td>
+                                <td><span class="status-complete">Đã xử lý</span></td>
+                                <td class="control">
+                                    <a href="chitietdonhang4.php"><button class="btn-detail" id=""><i
+                                                class="fa-regular fa-eye"></i> Chi tiết</button></a>
+                                </td>
+                            </tr>
+                            <tr>
+
+                                <td>DH5</td>
+                                <td>KH008</td>
+                                <td>Nguyễn Thị Bánh Bèo</td>
+                                <td>22/11/2024</td>
+                                <td>840.000.000đ</td>
+                                <td><span class="status-complete">Đã xử lý</span></td>
+                                <td class="control">
+                                    <a href="chitietdonhang5.php"><button class="btn-detail" id=""><i
+                                                class="fa-regular fa-eye"></i> Chi tiết</button></a>
+                                </td>
+                            </tr>
+                            <tr>    
+
+                                <td>DH6</td>
+                                <td>KH003</td>
+                                <td>Nhật Tiến</td>
+                                <td>25/12/2024</td>
+                                <td>560.000.000đ</td>
+                                <td><span class="status-complete">Đã xử lý</span></td>
+                                <td class="control">
+                                    <a href="chitietdonhang6.php"><button class="btn-detail" id=""><i
+                                                class="fa-regular fa-eye"></i> Chi tiết</button></a>
+                                </td>
+                            </tr>
+                            <tr>    
+
+                                <td>DH7</td>
+                                <td>KH007</td>
+                                <td>Trần Thị C</td>
+                                <td>28/12/2024</td>
+                                <td>120.000.000đ</td>
+                                <td><span class="status-no-complete">Chưa xử lý</span></td>
+                                <td class="control">
+                                    <a href="chitietdonhang7.php"><button class="btn-detail" id=""><i
+                                                class="fa-regular fa-eye"></i> Chi tiết</button></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+    <div class="modal detail-order open">
+        <div class="modal-container">
+            <h3 class="modal-container-title">CHI TIẾT ĐƠN HÀNG</h3>
+            <a href="donhang.php"><button class="modal-close"><i class="fa-regular fa-xmark"></i></button></a>
+            <div class="modal-detail-order">
+                <div class="modal-detail-left">
+                    <div class="order-item-group">
+                        <div class="order-product">
+                            <div class="order-product-left">
+                                <img src="../img/z650rs.png" alt="">
+                                <div class="order-product-info">
+                                    <h4>Z650RS</h4>
+                                    <p class="order-product-quantity">SL: 1
+                                    <p>
+                                </div>
+                            </div>
+                            <div class="order-product-right">
+                                <div class="order-product-price">
+                                    <span class="order-product-current-price">150.000.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-product">
+                            <div class="order-product-left">
+                                <img src="../img/klx-230.png" alt="">
+                                <div class="order-product-info">
+                                    <h4>KLX®230</h4>
+                                    <p class="order-product-quantity">SL: 2
+                                    <p>
+                                </div>
+                            </div>
+                            <div class="order-product-right">
+                                <div class="order-product-price">
+                                    <span class="order-product-current-price">60.000.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-product">
+                            <div class="order-product-left">
+                                <img src="../img/ninja-650.png" alt="">
+                                <div class="order-product-info">
+                                    <h4>NINJA® 650</h4>
+                                    <p class="order-product-quantity">SL: 1
+                                    <p>
+                                </div>
+                            </div>
+                            <div class="order-product-right">
+                                <div class="order-product-price">
+                                    <span class="order-product-current-price">210.000.000đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-detail-right">
+                    <ul class="detail-order-group">
+                        <li class="detail-order-item">
+                            <span class="detail-order-item-left"><i class="fa-light fa-calendar-days"></i> Ngày đặt
+                                hàng</span>
+                            <span class="detail-order-item-right">02/06/2024</span>
+                        </li>
+                        <li class="detail-order-item">
+                            <span class="detail-order-item-left"><i class="fa-light fa-truck"></i> Hình thức giao</span>
+                            <span class="detail-order-item-right">Giao tận nơi</span>
+                        </li>
+                        <li class="detail-order-item">
+                            <span class="detail-order-item-left"><i class="fa-thin fa-person"></i> Người nhận</span>
+                            <span class="detail-order-item-right">Nhật Tiến</span>
+                        </li>
+                        <li class="detail-order-item">
+                            <span class="detail-order-item-left"><i class="fa-light fa-phone"></i> Số điện thoại</span>
+                            <span class="detail-order-item-right">0902123876</span>
+                        </li>
+                        <li class="detail-order-item tb">
+                            <span class="detail-order-item-left"><i class="fa-light fa-clock"></i> Thời gian giao</span>
+                            <p class="detail-order-item-b">8:00 - 12:00 05/06/2024</p>
+                        </li>
+                        <li class="detail-order-item tb">
+                            <span class="detail-order-item-t"><i class="fa-light fa-location-dot"></i> Địa chỉ
+                                nhận</span>
+                            <p class="detail-order-item-b">123 An Dương Vương</p>
+                        </li>
+                        <li class="detail-order-item tb">
+                            <span class="detail-order-item-t"><i class="fa-light fa-note-sticky"></i> Ghi chú</span>
+                            <p class="detail-order-item-b">
+                                Không có ghi chú
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+                </form>
+            </div>
+            <div class="modal-detail-bottom">
+                <div class="modal-detail-bottom-left">
+                    <div class="price-total">
+                        <span class="thanhtien">Thành tiền</span>
+                        <span class="price">420.000.000đ</span>
+                    </div>
+                </div>
+                <div class="modal-detail-bottom-right">
+                    <button class="modal-detail-btn btn-daxuly">Đã xử lý</button>
+                </div>
+
+            </div>
+        </div>
+        <script src="../assets/js/admin.js"></script>
+</body>
+
+</php>

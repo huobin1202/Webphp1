@@ -1,0 +1,289 @@
+.mua:hover {
+    background-color: #ccc;
+}
+.mua{
+    font-size: 15px;
+    width: 100%;
+    height: 35px;
+}
+.cart{
+    width: 50%;
+    margin: auto;
+    text-align: center;
+    padding-top: 30px;
+}
+.cart h2{
+    margin-bottom: 20px;
+}
+.cart table{
+    width: 100%;
+}
+.cart table thead tr th:first-child{
+    text-align: left;
+}
+.cart table tr td{
+border-bottom: 1px solid #ddd;
+padding: 12px 0;
+}
+.cart table thead tr th:last-child{
+    text-align: right;
+}
+.cart table tbody tr td:last-child  {
+    text-align: right;
+}
+
+/* .cart{
+    position:fixed ;
+    height: 100vh;
+    width: 400px;
+    right: 0;
+    top: 0;
+    background-color: #ddd;
+    padding: 12px 20px;
+    right:-100%;
+    transition: all 0.3 ease;
+}
+.thanhtoan{
+    margin-top: 12px;
+    height: 30px;
+    padding: 0 20px;
+    cursor: pointer;
+    border: #090808;
+    border-radius: 10px;
+    font-weight: bold;
+    background-color: rgb(25, 207, 98);
+}
+.ravao{
+    cursor: pointer;
+} *//* Giỏ hàng */
+.cart {
+    position: fixed;
+    top: 0;
+    right: -100%; /* Giỏ hàng sẽ trượt từ phải ra */
+    width: 435px;
+    height: 100%;
+    background-color: white; /* Nền trắng */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+    transition: right 0.3s ease-in-out; /* Hiệu ứng trượt mượt mà */
+    z-index: 1000;
+    padding: 20px;
+}
+
+/* Khi giỏ hàng mở */
+.cart.open {
+    right: 0;
+}
+
+/* Nút đóng */
+/* Nút đóng - thiết kế vuông vức */
+.dong {
+    position: absolute;
+    top: 10px;
+    left: 10px; /* Đặt nút ở góc trên bên trái */
+    background-color: #139b3a; /* Màu xanh lá */
+    color: white; /* Chữ màu trắng */
+    border: none; /* Không có viền */
+    width: 40px; /* Độ rộng của nút */
+    height: 40px; /* Độ cao của nút */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; /* Kích thước chữ phù hợp */
+    border-radius: 50%; /* Bo tròn hoàn toàn */
+    cursor: pointer; /* Con trỏ chỉ tay khi di chuột qua */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Hiệu ứng khi hover và click */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+}
+
+/* Hiệu ứng hover cho nút đóng */
+.dong:hover {
+    background-color: #139b3a; /* Màu xanh lá đậm hơn khi hover */
+    transform: scale(1.05); /* Phóng to nhẹ khi hover */
+}
+
+/* Hiệu ứng khi nhấn nút (click) */
+.dong:active {
+    transform: scale(0.95); /* Co lại một chút khi click */
+}
+
+
+
+
+/* Các nội dung bên trong giỏ hàng */
+.cart h3 {
+    text-align: center;
+    color: #139b3a; /* Tiêu đề màu xanh lá */
+    margin: 20px 0;
+}
+
+/* Thanh toán */
+.thanhtoan {
+    display: inline-block; /* Hiển thị như một khối nhưng không chiếm toàn bộ chiều ngang */
+    padding: 10px 20px; /* Tạo khoảng cách bên trong nút */
+    background-color: #139b3a; /* Màu nền xanh lá */
+    color: white; /* Màu chữ trắng */
+    text-align: center; /* Căn giữa chữ */
+    text-decoration: none; /* Bỏ gạch chân */
+    border-radius: 5px; /* Bo góc */
+    font-size: 16px; /* Kích thước chữ */
+    font-weight: bold; /* Chữ đậm */
+    transition: background-color 0.3s ease; /* Hiệu ứng khi di chuột */
+  }
+  
+  .thanhtoan:hover {
+    background-color: #139b3a; /* Màu xanh lá đậm hơn khi hover */
+  }
+  
+
+.price-total span {
+    font-weight: bold;
+}
+
+
+/* Nút mở giỏ hàng */
+.ravao {
+    top: 20px;
+    right: 20px;
+    background-color: #139b3a;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+
+.ravao:hover {
+    background-color: darkgreen;
+}
+.hd {
+    top: 20px;
+    right: 20px;
+    background-color: #139b3a;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+
+.hd:hover {
+    background-color:darkgreen;
+}
+.hoadon {
+    text-align: center; /* Đặt canh giữa các phần tử con nếu muốn */
+    position: absolute;
+    right:-388px;
+}
+
+.ravao, .hd {
+    display: inline-block; /* Đặt các phần tử theo dạng khối ngang */
+    margin: 0 17px; /* Tạo khoảng cách giữa hai phần tử */
+    padding: 10px;
+    font-size: 16px;
+    vertical-align: middle; /* Đặt các phần tử ngang hàng theo chiều dọc */
+    height: 40px;
+}
+
+.hoadon {
+    display: flex; /* Sử dụng flexbox để sắp xếp các phần tử ngang nhau */
+    justify-content: space-between; /* Khoảng cách giữa hai phần tử được giãn đều */
+    align-items: center; /* Căn giữa theo trục dọc (chiều cao) */
+}
+
+.ravao, .hd {
+    padding: 5px; /* Tạo khoảng cách bên trong */
+    font-size: 19px; /* Điều chỉnh kích thước chữ */
+}
+
+.hd {
+    cursor: pointer; /* Đặt con trỏ thành bàn tay khi rê vào hóa đơn */
+}
+
+.hoadon .hd:hover {
+    text-decoration:none ; /* Thêm gạch chân khi rê chuột qua hóa đơn */
+}
+
+.text-dx {
+    color: white; /* Màu chữ trắng */
+    background-color: #139b3a; /* Màu nền xanh lá */
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    display: inline-block;
+}
+.text-tk {
+    color: white; /* Màu chữ trắng */
+    background-color: #139b3a; /* Màu nền xanh lá */
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.text-dx:hover {
+    background-color: #139b3a; /* Màu xanh đậm hơn khi hover */
+}
+.user-info {
+    display: flex; /* Sử dụng Flexbox để căn chỉnh theo hàng ngang */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    gap: 20px; /* Khoảng cách giữa tiêu đề và nút */
+}
+
+.welcome {
+    font-size: 24px;
+    color: #139b3a;
+}
+#userDisplayName{
+    color:black;
+}
+
+.logout-btn {
+    background-color: #139b3a;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+.logout-btn:hover {
+    background-color:darkgreen;
+}
+
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  .dropdown span{
+    color:white;
+    font-weight: 600;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #454548;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+  }
+  
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+
