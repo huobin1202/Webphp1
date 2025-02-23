@@ -15,44 +15,37 @@ if ($conn->connect_error) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo "<script>if (!confirm('Bạn có chắc chắn muốn sửa sản phẩm này?')) { window.location.href = 'sanpham.php'; }</script>";
+    
     $productId = intval($_POST['product-id']);
     $tenXe = $conn->real_escape_string($_POST['ten-mon']);
     $dongXe = $conn->real_escape_string($_POST['category']);
-    $mauXe = $conn->real_escape_string($_POST['mau-xe']);
     $giaBan = floatval($_POST['gia-ban']);
     $thongTinSP = $conn->real_escape_string($_POST['thong-tin-sp']);
     $thongSoKT = $conn->real_escape_string($_POST['thong-so-ky-thuat']);
 
-    // Ask for confirmation before updating
-    echo "<script>
-        if (confirm('Bạn có chắc chắn muốn chỉnh sửa sản phẩm này?')) {
-            document.forms[0].submit();
-        } else {
-            alert('Hủy chỉnh sửa sản phẩm.');
-        }
-    </script>";
+    // Fetch current images from database
+    $sqlGetImages = "SELECT hinhanh, hinhanh2, hinhanh3 FROM products WHERE id = $productId";
+    $result = $conn->query($sqlGetImages);
+    $row = $result->fetch_assoc();
 
-    // Handle image upload
-    $targetFile = "";
+    // Handle main image upload
+    $targetFile = !empty($_FILES['up-hinh-anh']['name']) ? "uploads/" . basename($_FILES['up-hinh-anh']['name']) : $row['hinhanh'];
     if (!empty($_FILES['up-hinh-anh']['name'])) {
-        $targetDir = "uploads/";
-        $targetFile = $targetDir . basename($_FILES['up-hinh-anh']['name']);
+        move_uploaded_file($_FILES['up-hinh-anh']['tmp_name'], $targetFile);
+    }
 
-        // Upload the file
-        if (!move_uploaded_file($_FILES['up-hinh-anh']['tmp_name'], $targetFile)) {
-            echo "Lỗi khi upload hình ảnh.";
-            exit;
-        }
-    } else {
-        // If no new image, retain the old image
-        $sqlGetImage = "SELECT hinhanh FROM products WHERE id = $productId";
-        $result = $conn->query($sqlGetImage);
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $targetFile = $row['hinhanh'];
+    // Handle additional images upload
+    $imageFields = ['up-hinh-anh2' => 'hinhanh2', 'up-hinh-anh3' => 'hinhanh3'];
+    $additionalImages = [];
+    
+    foreach ($imageFields as $field => $dbColumn) {
+        if (!empty($_FILES[$field]['name'])) {
+            $imagePath = "uploads/" . basename($_FILES[$field]['name']);
+            move_uploaded_file($_FILES[$field]['tmp_name'], $imagePath);
+            $additionalImages[$dbColumn] = $imagePath;
         } else {
-            echo "Không tìm thấy sản phẩm.";
-            exit;
+            $additionalImages[$dbColumn] = $row[$dbColumn] ?? 'default-image.jpg';
         }
     }
 
@@ -60,18 +53,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sqlUpdate = "UPDATE products SET 
                     tensp = '$tenXe', 
                     dongsp = '$dongXe', 
-                    mauxe = '$mauXe', 
                     giaban = $giaBan, 
                     thongtinsp = '$thongTinSP', 
                     thongsokt = '$thongSoKT', 
-                    hinhanh = '$targetFile' 
+                    hinhanh = '$targetFile',
+                    hinhanh2 = '{$additionalImages['hinhanh2']}',
+                    hinhanh3 = '{$additionalImages['hinhanh3']}'
                   WHERE id = $productId";
-
+    
     if ($conn->query($sqlUpdate) === TRUE) {
-        echo "<script>alert('Cập nhật sản phẩm thành công!');
-        window.location.href = 'sanpham.php';</script>";
-        // Redirect to product list page (if necessary)
-        //header("Location: sanpham.php");
+        echo "<script>alert('Cập nhật sản phẩm thành công!'); window.location.href = 'sanpham.php';</script>";
     } else {
         echo "Lỗi cập nhật sản phẩm: " . $conn->error;
     }
@@ -86,14 +77,13 @@ if ($productId > 0) {
     if ($result->num_rows > 0) {
         $product = $result->fetch_assoc();
     } else {
-        echo "<script>
-        alert('Không thể thêm sản phẩm! Lỗi: " . $conn->error . "');
-        window.location.href = 'newproduct.php'; // Redirect to the form page
-      </script>";
+        echo "<script>alert('Không thể tìm thấy sản phẩm!'); window.location.href = 'sanpham.php';</script>";
     }
     $conn->close();
 }
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -289,6 +279,16 @@ if ($productId > 0) {
                             <label for="up-hinh-anh" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
                             <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh" name="up-hinh-anh" type="file" class="form-control">
                         </div>
+                        <img src="<?php echo $product['hinhanh2']; ?>" alt="<?php echo $product['tensp']; ?>" class="upload-image-preview">
+                        <div class="form-group file">
+                            <label for="up-hinh-anh2" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
+                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh2" name="up-hinh-anh2" type="file" class="form-control">
+                        </div>
+                        <img src="<?php echo $product['hinhanh3']; ?>" alt="<?php echo $product['tensp']; ?>" class="upload-image-preview">
+                        <div class="form-group file">
+                            <label for="up-hinh-anh3" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
+                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh3" name="up-hinh-anh3" type="file" class="form-control">
+                        </div>
                     </div>
                     <div class="modal-content-right">
                         <div class="form-group">
@@ -302,10 +302,6 @@ if ($productId > 0) {
                                 <option value="Dòng Z" <?php echo ($product['dongsp'] == 'Dòng Z') ? 'selected' : ''; ?>>Dòng Z</option>
                                 <option value="Dòng KLX" <?php echo ($product['dongsp'] == 'Dòng KLX') ? 'selected' : ''; ?>>Dòng KLX</option>
                             </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="mau-xe" class="form-label">Mẫu xe</label>
-                            <input id="mau-xe" name="mau-xe" type="text" placeholder="Nhập mẫu xe" value="<?php echo $product['mauxe']; ?>" class="form-control">
                         </div>
                         <div class="form-group">
                             <label for="gia-ban" class="form-label">Giá bán</label>

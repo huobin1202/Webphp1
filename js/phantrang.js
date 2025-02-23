@@ -1,85 +1,70 @@
-let currentPage = 1;
-const totalPages = 3;
+document.addEventListener("DOMContentLoaded", function() {
+    const itemsPerPage = 6; // Maximum products per page
+    let currentPage = 1;
 
-function showPage(page) {
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
-        card.style.display = 'none';
-    });
+    // Get all product cards
+    const productCards = document.querySelectorAll("#product-list .card");
+    const totalItems = productCards.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-    // Show only the cards for the current page
-    const pageCards = document.querySelectorAll(`.page-${page}`);
-    pageCards.forEach(card => {
-        card.style.display = 'block';
-    });
+    // Function to display the current page
+    function showPage(page) {
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
 
-    // Update page number display
-    renderPageNumbers();
-}
+        // Hide all products
+        productCards.forEach((card, index) => {
+            if (index >= startIndex && index < endIndex) {
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+        });
 
-function changePage(step) {
-    currentPage += step;
-    showPage(currentPage);
-
-    // Disable buttons based on the current page
-    document.getElementById('prevBtn').disabled = (currentPage === 1);
-    document.getElementById('nextBtn').disabled = (currentPage === totalPages);
-}
-
-function goToPage(page) {
-    currentPage = page;
-    showPage(currentPage);
-
-    // Disable buttons based on the current page
-    document.getElementById('prevBtn').disabled = (currentPage === 1);
-    document.getElementById('nextBtn').disabled = (currentPage === totalPages);
-}
-
-function renderPageNumbers() {
-    const pageNumbersContainer = document.getElementById('pageNumbers');
-    pageNumbersContainer.innerHTML = '';  // Clear previous page numbers
-
-    for (let i = 1; i <= totalPages; i++) {
-        const pageButton = document.createElement('button');
-        pageButton.innerText = i;
-        pageButton.classList.add('page-btn');
-        
-        // Highlight the current page
-        if (i === currentPage) {
-            pageButton.classList.add('active');
-        }
-        
-        // Change to the selected page when clicked
-        pageButton.onclick = () => goToPage(i);
-        pageNumbersContainer.appendChild(pageButton);
+        // Update pagination controls
+        document.getElementById("prevBtn").disabled = (page === 1);
+        document.getElementById("nextBtn").disabled = (page === totalPages);
     }
-}
 
-// Initialize the first page
-showPage(currentPage);
+    // Generate page numbers dynamically
+    function createPageNumbers() {
+        const pageNumbersContainer = document.getElementById("pageNumbers");
+        pageNumbersContainer.innerHTML = ""; // Clear any existing page numbers
 
-function searchProductsByName() {
-    const searchInput = document.getElementById('search-input').value.toLowerCase();
-    const products = document.querySelectorAll('.card');
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement("button");
+            pageButton.innerText = i;
+            pageButton.classList.add("page-btn");
 
-    products.forEach(product => {
-        const productName = product.querySelector('h3').textContent.toLowerCase();
-        product.style.display = productName.includes(searchInput) ? '' : 'none';
+            // Prevent page refresh on click
+            pageButton.addEventListener("click", function(event) {
+                event.preventDefault(); // Prevents page reload
+                currentPage = i;
+                showPage(currentPage);
+            });
+
+            pageNumbersContainer.appendChild(pageButton);
+        }
+    }
+
+    // Change page when clicking next/prev buttons
+    document.getElementById("prevBtn").addEventListener("click", function(event) {
+        event.preventDefault(); // Prevents page reload
+        if (currentPage > 1) {
+            currentPage--;
+            showPage(currentPage);
+        }
     });
-}
 
-// Function to reset the search
-function resetSearchByName() {
-    document.getElementById('search-input').value = '';
-    const products = document.querySelectorAll('.card');
-
-    products.forEach(product => {
-        product.style.display = '';
+    document.getElementById("nextBtn").addEventListener("click", function(event) {
+        event.preventDefault(); // Prevents page reload
+        if (currentPage < totalPages) {
+            currentPage++;
+            showPage(currentPage);
+        }
     });
-}
 
-
-
-
-
-
+    // Initial setup
+    createPageNumbers();
+    showPage(currentPage); // Show the first page
+});

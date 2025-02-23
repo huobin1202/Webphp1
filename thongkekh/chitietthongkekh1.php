@@ -48,19 +48,19 @@
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="/donhang/donhang.html" class="sidebar-link">
+                        <a href="/donhang/donhang.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-basket-shopping"></i></div>
                             <div class="hidden-sidebar">Đơn hàng</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="/thongkesp/thongke.html" class="sidebar-link">
+                        <a href="/thongkesp/thongke.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
                             <div class="hidden-sidebar">Thống kê sản phẩm</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content active">
-                        <a href="/thongkekh/thongkekh.html" class="sidebar-link">
+                        <a href="/thongkekh/thongkekh.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
                             <div class="hidden-sidebar">Thống kê khách hàng</div>
                         </a>

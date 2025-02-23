@@ -114,6 +114,8 @@
     <div class="register-container">
         <h2 style="color:#f2f6f3; text-align: center;">Đăng ký</h2>
         <input type="text" id="newUsername" placeholder="Tên đăng nhập" required>
+        <input type="text" id="newContact" placeholder="Số điện thoại" required>
+
         <input type="password" id="newPassword" placeholder="Mật khẩu" required>
         <input type="password" id="confirmPassword" placeholder="Xác nhận mật khẩu" required>
         <button onclick="register()">Đăng ký</button>

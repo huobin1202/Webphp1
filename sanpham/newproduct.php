@@ -13,62 +13,51 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Check if form is submitted
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Capture form data
-    $tenMon = $_POST['ten-mon'];
-    $category = $_POST['category'];
-    $mauXe = $_POST['mau-xe'];
-    $giaBan = $_POST['gia-ban'];
-    $thongTinSP = $_POST['thong-tin-sp'];
-    $thongSoKT = $_POST['thong-so-ky-thuat'];
+    echo "<script>if (!confirm('Bạn có muốn thêm sản phẩm này?')) { window.location.href = 'sanpham.php'; }</script>";
+    
+    $tenXe = $conn->real_escape_string($_POST['ten-mon']);
+    $dongXe = $conn->real_escape_string($_POST['category']);
+    $giaBan = floatval($_POST['gia-ban']);
+    $thongTinSP = $conn->real_escape_string($_POST['thong-tin-sp']);
+    $thongSoKT = $conn->real_escape_string($_POST['thong-so-ky-thuat']);
 
-    // Handle file upload
-    $imagePath = "";
-    if (isset($_FILES['up-hinh-anh']) && $_FILES['up-hinh-anh']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = 'uploads/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true); // Create upload directory if it doesn't exist
-        }
-
-        $fileName = basename($_FILES['up-hinh-anh']['name']);
-        $targetFilePath = $uploadDir . $fileName;
-
-        // Move uploaded file to the target directory
-        if (move_uploaded_file($_FILES['up-hinh-anh']['tmp_name'], $targetFilePath)) {
-            $imagePath = $targetFilePath;
-        }
-    }
-
-    // Sanitize inputs to prevent SQL injection
-    $tenMon = $conn->real_escape_string($tenMon);
-    $category = $conn->real_escape_string($category);
-    $mauXe = $conn->real_escape_string($mauXe);
-    $giaBan = $conn->real_escape_string($giaBan);
-    $thongTinSP = $conn->real_escape_string($thongTinSP);
-    $thongSoKT = $conn->real_escape_string($thongSoKT);
+    // Handle image uploads
+    $uploadDir = "uploads/";
+    $mainImage = isset($_FILES['up-hinh-anh']['name']) && $_FILES['up-hinh-anh']['name'] !== '' ? $uploadDir . basename($_FILES['up-hinh-anh']['name']) : '';
+    $image2 = isset($_FILES['up-hinh-anh2']['name']) && $_FILES['up-hinh-anh2']['name'] !== '' ? $uploadDir . basename($_FILES['up-hinh-anh2']['name']) : '';
+    $image3 = isset($_FILES['up-hinh-anh3']['name']) && $_FILES['up-hinh-anh3']['name'] !== '' ? $uploadDir . basename($_FILES['up-hinh-anh3']['name']) : '';
+    
+    // Move uploaded files
+    if ($mainImage) move_uploaded_file($_FILES['up-hinh-anh']['tmp_name'], $mainImage);
+    if ($image2) move_uploaded_file($_FILES['up-hinh-anh2']['tmp_name'], $image2);
+    if ($image3) move_uploaded_file($_FILES['up-hinh-anh3']['tmp_name'], $image3);
 
     // Insert data into the database
-    $sql = "INSERT INTO products (tensp, dongsp, mauxe, giaban, thongtinsp, thongsokt, hinhanh)
-            VALUES ('$tenMon', '$category', '$mauXe', '$giaBan', '$thongTinSP', '$thongSoKT', '$imagePath')";
-
+    $sql = "INSERT INTO products (tensp, dongsp, giaban, thongtinsp, thongsokt, hinhanh, hinhanh2, hinhanh3) 
+            VALUES ('$tenXe', '$dongXe', '$giaBan', '$thongTinSP', '$thongSoKT', '$mainImage', '$image2', '$image3')";
 
     if ($conn->query($sql) === TRUE) {
         echo "<script>
-                        alert('Thêm thông tin sản phẩm thành công!');
-                        window.location.href = 'sanpham.php'; // Redirect to the product list page
-                      </script>";
+                alert('Thêm thông tin sản phẩm thành công!');
+                window.location.href = 'sanpham.php';
+              </script>";
     } else {
         echo "<script>
-                        alert('Không thể thêm sản phẩm! Lỗi: " . $conn->error . "');
-                        window.location.href = 'newproduct.php'; // Redirect to the form page
-                      </script>";
+                alert('Không thể thêm sản phẩm! Lỗi: " . $conn->error . "');
+                window.location.href = 'newproduct.php';
+              </script>";
     }
 
     // Close connection
     $conn->close();
 }
 ?>
+
+
+
+
 
 
 
@@ -263,6 +252,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label for="up-hinh-anh" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
                             <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh" name="up-hinh-anh" type="file" class="form-control">
                         </div>
+                        <img src="../img/blank-image.png" alt="" class="upload-image-preview">
+                        <div class="form-group file">
+                            <label for="up-hinh-anh2" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
+                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh2" name="up-hinh-anh2" type="file" class="form-control">
+                        </div>
+                        <img src="../img/blank-image.png" alt="" class="upload-image-preview">
+                        <div class="form-group file">
+                            <label for="up-hinh-anh3" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
+                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh3" name="up-hinh-anh3" type="file" class="form-control">
+                        </div>
                     </div>
                     <div class="modal-content-right">
                         <div class="form-group">
@@ -277,10 +276,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <option value="Dòng KLX">Dòng KLX</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="mau-xe" class="form-label">Mẫu xe</label>
-                            <input id="mau-xe" name="mau-xe" type="text" placeholder="Nhập mẫu xe" class="form-control" required>
-                        </div>
+                      
                         <div class="form-group">
                             <label for="gia-ban" class="form-label">Giá bán</label>
                             <input id="gia-ban" name="gia-ban" type="text" placeholder="Nhập giá bán" class="form-control" required>

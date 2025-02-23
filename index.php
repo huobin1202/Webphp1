@@ -206,8 +206,7 @@
             <div class="page-nav">
                 <ul class="page-nav-list">
                     <div class="grid-container" id="product-list">
-                        
-                        <!-- Page 1 Products -->
+
                         <?php
                         $servername = "localhost";
                         $username = "root";
@@ -225,12 +224,12 @@
                             while ($row = $result->fetch_assoc()) {
                                 echo '
                                 <div class="card page-1" id="invoiceModal">
-                                <a href="">
+                                <a href="thongtinsp.php?id=' . $row["id"] . '">                                
                                 <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
                                 <h3>' . $row["tensp"] . '</h4>
                                 <div class="greenSpacer"></div>
                                 <div class="price">' . $row["giaban"] . 'đ</div>
-                                <button class="mua" onclick="addToCart(\'' . $row["tensp"] . '\', ' . $row["giaban"] . ', \'image/' . $row["hinhanh"] . '\')">Thêm vào giỏ hàng </button>
+                                <button type="button" class="mua" onclick="addToCart(\'' . $row["tensp"] . '\', ' . $row["giaban"] . ', \'image/' . $row["hinhanh"] . '\')">Thêm vào giỏ hàng </button>
                                 </div>';
                             }
                         }
@@ -466,9 +465,6 @@
         // Kiểm tra nếu có người dùng đã đăng nhập, hiển thị tên
         if (loggedInUser) {
             document.getElementById('userDisplayName').textContent = loggedInUser;
-        } else {
-            // Nếu không có người dùng, chuyển hướng về trang đăng nhập
-            window.location.href = 'dk.php';
         }
 
         // Hàm đăng xuất
@@ -482,9 +478,7 @@
     </script>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
-    <script src="js/main.js"></script>
     <script src="js/phantrang.js"></script>
-    <script src="js/searchProducts.js"></script>
     <script src="js/ssbutton.js"></script>
 
 </body>

@@ -1,16 +1,20 @@
-    const btn = document.querySelectorAll(".mua");
-    btn.forEach(function(mua, index) {
-        mua.addEventListener("click", function(event) {
-            var btnItem = event.target;
-            var product = btnItem.parentElement;
-            var productImg = product.querySelector("img").src;
-            var productName = product.querySelector("h3").innerText;
-            var productPrice = product.querySelector(".price").innerText;
+const btn = document.querySelectorAll(".mua");
+btn.forEach(function(mua) {
+    mua.addEventListener("click", function(event) {
+        event.preventDefault(); // 🔹 Chặn hành vi mặc định của button
+        event.stopPropagation(); // 🔹 Ngăn chặn sự kiện lan ra các phần tử cha
+        
+        var product = event.target.closest(".card"); // 🔹 Tìm phần tử cha chứa sản phẩm
+        var productImg = product.querySelector("img").src;
+        var productName = product.querySelector("h3").innerText;
+        var productPrice = product.querySelector(".price").innerText.replace(/[^0-9]/g, ''); // Lọc giá
 
-            // Truyền tham số vào hàm addCart
-            addCart(productImg, productName, productPrice);
-        });
+        console.log("Thêm vào giỏ hàng:", productName, productPrice); // Kiểm tra giá trị
+        
+        addCart(productImg, productName, parseInt(productPrice));
     });
+});
+
 
     function addCart(productImg, productName, productPrice) {
         var cartTable = document.querySelector("tbody");
