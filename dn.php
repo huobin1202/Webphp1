@@ -34,7 +34,7 @@
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
-        }
+        }   
 
         .login-container button {
             width: 100%;
