@@ -197,8 +197,7 @@ padding: 12px 0;
 }
 
 .ravao, .hd {
-    padding: 5px; /* Tạo khoảng cách bên trong */
-    font-size: 19px; /* Điều chỉnh kích thước chữ */
+    font-size: 17px; /* Điều chỉnh kích thước chữ */
 }
 
 .hd {
@@ -270,7 +269,6 @@ padding: 12px 0;
   }
   .dropdown span{
     color:white;
-    font-weight: 600;
   }
   
   .dropdown-content {

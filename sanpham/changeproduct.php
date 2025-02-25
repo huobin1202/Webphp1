@@ -293,7 +293,7 @@ if ($productId > 0) {
                     <div class="modal-content-right">
                         <div class="form-group">
                             <label for="ten-mon" class="form-label">Tên xe</label>
-                            <input id="ten-mon" name="ten-mon" type="text" placeholder="Nhập tên xe" value="<?php echo $product['tensp']; ?>" class="form-control">
+                            <input id="ten-mon" name="ten-mon" type="text" placeholder="Nhập tên xe" value="<?php echo htmlspecialchars($product['tensp']); ?>" class="form-control">
                         </div>
                         <div class="form-group">
                             <label for="category" class="form-label">Chọn dòng</label>
@@ -305,15 +305,15 @@ if ($productId > 0) {
                         </div>
                         <div class="form-group">
                             <label for="gia-ban" class="form-label">Giá bán</label>
-                            <input id="gia-ban" name="gia-ban" type="text" placeholder="Nhập giá bán" value="<?php echo $product['giaban']; ?>" class="form-control">
+                            <input id="gia-ban" name="gia-ban" type="text" placeholder="Nhập giá bán" value="<?php echo htmlspecialchars($product['giaban']); ?>" class="form-control">
                         </div>
                         <div class="form-group">
                             <label for="thong-tin-sp" class="form-label">Thông tin sản phẩm</label>
-                            <textarea class="product-desc" name="thong-tin-sp" id="thong-tin-sp" placeholder="Nhập thông tin sản phẩm" style="width:100%;height:100%;"><?php echo $product['thongtinsp']; ?></textarea>
+                            <textarea class="product-desc" name="thong-tin-sp" id="thong-tin-sp" placeholder="Nhập thông tin sản phẩm" style="width:100%;height:100%;"><?php echo htmlspecialchars($product['thongtinsp']); ?></textarea>
                         </div>
                         <div class="form-group">
                             <label for="thong-so-ky-thuat" class="form-label">Thông số kỹ thuật</label>
-                            <textarea class="product-desc" name="thong-so-ky-thuat" id="thong-so-ky-thuat" placeholder="Nhập thông số kỹ thuật" style="width:100%;height:185px;"><?php echo $product['thongsokt']; ?></textarea>
+                            <textarea class="product-desc" name="thong-so-ky-thuat" id="thong-so-ky-thuat" placeholder="Nhập thông số kỹ thuật" style="width:100%;height:185px;"><?php echo htmlspecialchars($product['thongsokt']); ?></textarea>
                         </div>
                         <button class="form-submit btn-add-product-form add-product-e" id="change-product-button">
                             <i class="fa-regular fa-plus"></i>

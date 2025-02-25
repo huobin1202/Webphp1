@@ -16,12 +16,12 @@ if ($conn->connect_error) {
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "<script>if (!confirm('Bạn có muốn thêm sản phẩm này?')) { window.location.href = 'sanpham.php'; }</script>";
-    
-    $tenXe = $conn->real_escape_string($_POST['ten-mon']);
-    $dongXe = $conn->real_escape_string($_POST['category']);
+    $tenXe = $conn->real_escape_string(htmlspecialchars($_POST['ten-mon'], ENT_QUOTES, 'UTF-8'));
+    $dongXe = $conn->real_escape_string(htmlspecialchars($_POST['category'], ENT_QUOTES, 'UTF-8'));
     $giaBan = floatval($_POST['gia-ban']);
-    $thongTinSP = $conn->real_escape_string($_POST['thong-tin-sp']);
-    $thongSoKT = $conn->real_escape_string($_POST['thong-so-ky-thuat']);
+    $thongTinSP = $conn->real_escape_string(htmlspecialchars($_POST['thong-tin-sp'], ENT_QUOTES, 'UTF-8'));
+    $thongSoKT = $conn->real_escape_string(htmlspecialchars($_POST['thong-so-ky-thuat'], ENT_QUOTES, 'UTF-8'));
+    
 
     // Handle image uploads
     $uploadDir = "uploads/";
@@ -266,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="modal-content-right">
                         <div class="form-group">
                             <label for="ten-mon" class="form-label">Tên xe</label>
-                            <input id="ten-mon" name="ten-mon" type="text" placeholder="Nhập tên xe" class="form-control" required>
+                            <input id="ten-mon" name="ten-mon" type="text" placeholder="Nhập tên xe"  class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="category" class="form-label">Chọn dòng</label>
@@ -282,7 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input id="gia-ban" name="gia-ban" type="text" placeholder="Nhập giá bán" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="thong-tin-sp" class="form-label">Thông tin sản phẩm</label>
+                            <label for="thong-tin-sp" class="f  orm-label">Thông tin sản phẩm</label>
                             <textarea name="thong-tin-sp" class="product-desc" id="thong-tin-sp" placeholder="Nhập thông tin sản phẩm" style="width:100%;height:100%;"></textarea>
                         </div>
                         <div class="form-group">

@@ -251,23 +251,23 @@ $conn->close();
                 <a href="khachhang.php"><button class="modal-close"><i class="fa-regular fa-xmark"></i></button></a>
                 <div class="form-content sign-up">
                     <form action="" method="POST" class="signup-form">
-                        <input type="hidden" name="id" value="<?php echo $product['id']; ?>">
+                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($product['id']); ?>">
                         <div class="form-group">
                             <label for="fullname" class="form-label">Tên đầy đủ</label>
                             <input id="fullname" name="fullname" type="text" placeholder="VD: Nhật Sinh"
-                                class="form-control" value="<?php echo $product['name']; ?>">
+                                class="form-control" value="<?php echo htmlspecialchars($product['name']); ?>">
                             <span class="form-message-name form-message"></span>
                         </div>
                         <div class="form-group">
                             <label for="phone" class="form-label">Số điện thoại</label>
                             <input id="phone" name="phone" type="text" placeholder="Nhập số điện thoại"
-                                class="form-control" value="<?php echo $product['contact']; ?>">
+                                class="form-control" value="<?php echo htmlspecialchars($product['contact']); ?>">
                             <span class="form-message-phone form-message"></span>
                         </div>
                         <div class="form-group">
                             <label for="password" class="form-label">Mật khẩu</label>
                             <input id="password" name="password" type="text" placeholder="Nhập mật khẩu"
-                                class="form-control" value="<?php echo $product['password']; ?>">
+                                class="form-control" value="<?php echo htmlspecialchars($product['password']); ?>">
                             <span class="form-message-password form-message"></span>
                         </div>
                         <div class="form-group edit-account-e">

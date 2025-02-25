@@ -30,7 +30,7 @@
                 <div class="header-middle-center">
                     <form action="" class="form-search">
                         <span class="search-btn">
-                            <a href="timthay.php">
+                            <a href="">
                                 <i class="fa-light fa-magnifying-glass"></i>
                             </a>
                         </span>
@@ -87,7 +87,7 @@
                 <input type="number" placeholder="tối thiểu" id="min-price" onchange="searchProducts()">
                 <span>đến</span>
                 <input type="number" placeholder="tối đa" id="max-price" onchange="searchProducts()">
-                <button id="advanced-search-price-btn"><a href="timthay2.php"><i class="fa-light fa-magnifying-glass-dollar"></i></a></button>
+                <button id="advanced-search-price-btn"><a href=""><i class="fa-light fa-magnifying-glass-dollar"></i></a></button>
             </div>
             <div class="advanced-search-control">
                 <button id="sort-ascending" onclick="searchProducts(1)"><i
@@ -226,7 +226,8 @@
                                 <div class="card page-1" id="invoiceModal">
                                 <a href="thongtinsp.php?id=' . $row["id"] . '">                                
                                 <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
-                                <h3>' . $row["tensp"] . '</h4>
+                                </a>
+                                <h3>' . $row["tensp"] . '</h3>
                                 <div class="greenSpacer"></div>
                                 <div class="price">' . $row["giaban"] . 'đ</div>
                                 <button type="button" class="mua" onclick="addToCart(\'' . $row["tensp"] . '\', ' . $row["giaban"] . ', \'image/' . $row["hinhanh"] . '\')">Thêm vào giỏ hàng </button>
@@ -248,7 +249,7 @@
 
     </main>
     <section class="cart">
-        <button class="dong">Đóng</button>
+        <button class="dong"><i class="fa-regular fa-xmark"></i></button>
         <!-- <div>Đóng</div> -->
         <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
         <form action="">
@@ -480,6 +481,7 @@
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
+    <script src="js/main.js"></script>
 
 </body>
 

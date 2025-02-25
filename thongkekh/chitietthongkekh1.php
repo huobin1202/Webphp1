@@ -215,7 +215,7 @@
                             <td>4</td>
                             <td>420.000.000đ</td>
                             <td>02/06/2024</td>
-                              <td><button class="btn-detail product-order-detail"><a href="hoadon.html"><i
+                              <td><button class="btn-detail product-order-detail"><a href="hoadon.php"><i
                                                 class="fa-regular fa-eye"></i> Chi tiết</a></button></td>
                           
                         </tr>
@@ -228,7 +228,7 @@
                             <td>6</td>
                             <td>560.000.000đ</td>
                             <td>25/12/2024</td>
-                            <td><button class="btn-detail product-order-detail"><a href="hoadon.html"><i
+                            <td><button class="btn-detail product-order-detail"><a href="hoadon.php"><i
                                 class="fa-regular fa-eye"></i> Chi tiết</a></button></td>
                   
                         </tr>

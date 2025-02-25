@@ -1,5 +1,5 @@
-<!DOCTYPE php>
-<php lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/reset.css ">
     <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/responsive.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="./assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css">
     <script src="https://fontawesome.com/v6/search" crossorigin="anonymous"></script>
@@ -14,7 +15,7 @@
 </head>
 
 <body>
-    <header>    
+    <header>
 
         <div class="header-middle">
             <div class="container">
@@ -41,6 +42,7 @@
                         </button>
                     </form>
                 </div>
+
                 <div class="header-middle-right">
                     <ul class="header-middle-right-list">
                         <li class="header-middle-right-item dropdown open">
@@ -63,10 +65,6 @@
                                     </a>
 
                                 </div>
-
-
-
-
                             </div>
                     </ul>
                 </div>
@@ -103,11 +101,12 @@
         </div>
     </div>
     <div class="green-line-header"></div>
+
     <nav class="header-bottom">
         <div class="container">
             <ul class="menu-list">
                 <li class="menu-list-item"><a href="index.php" class="menu-link">Trang chủ</a></li>
-               
+
                 <div class="dropdown">
                     <span>Sản phẩm</span>
                     <div class="dropdown-content">
@@ -122,7 +121,6 @@
             </ul>
         </div>
     </nav>
-
 
 
     <main class="main-wrapper">
@@ -208,72 +206,43 @@
             <div class="page-nav">
                 <ul class="page-nav-list">
                     <div class="grid-container" id="product-list">
-                        <!-- Page 1 Products -->
 
-                        <div class="card page-1" id="invoiceModal">
-                            <a href="nj650.php">
-                                <img src="image/ninja-650.png" alt="KLX 110 R"></a>
-                            <h4>MỚI 2023</h4>
-                            <h3>NINJA 650</h3>
-                            <div class="greenSpacer"></div>
-                            <div class="price">210.000.000đ</div>
-                            <button class="mua" onclick="addToCart('NINJA 650', 210000000, 'image/ninja-650.png')">Thêm
-                                vào giỏ hàng </button>
-                        </div>
+                        <?php
+                        $servername = "localhost";
+                        $username = "root";
+                        $password = "";
+                        $dbname = "admindoan";
 
-                        <div class="card page-1" id="invoiceModal">
-                            <a href="nj1000sx.php">
-                                <img src="image/ninja-1000sx.png" alt="KLX 110 R"></a>
-                            <h4>MỚI 2023</h4>
-                            <h3>NINJA 1000SX</h3>
-                            <div class="greenSpacer"></div>
-                            <div class="price"> 330.000.000đ</div>
-                            <button class="mua"
-                                onclick="addToCart('NINJA 1000SX', 330000000, 'image/ninja-1000sx.png')">Thêm vào giỏ
-                                hàng </button>
-                        </div>
+                        $conn = new mysqli($servername, $username, $password, $dbname);
+                        if ($conn->connect_error) {
+                            die("Kết nối thất bại" . $conn->connect_error);
+                        }
 
-                        <div class="card page-1" id="invoiceModal">
-                            <a href="njzx4r.php">
-                                <img src="image/ninja-zx4r.png" alt="KLX 110 R"></a>
-                            <h4>MỚI 2022</h4>
-                            <h3>NINJA® ZX-4R</h3>
-                            <div class="greenSpacer"></div>
+                        $sql = "SELECT id, tensp, giaban, hinhanh FROM products WHERE dongsp='Dòng Ninja'";
+                        $result = $conn->query($sql);
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo '
+                                <div class="card page-1" id="invoiceModal">
+                                <a href="thongtinsp.php?id=' . $row["id"] . '">                                
+                                <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
+                                <h3>' . $row["tensp"] . '</h4>
+                                <div class="greenSpacer"></div>
+                                <div class="price">' . $row["giaban"] . 'đ</div>
+                                <button type="button" class="mua" onclick="addToCart(\'' . $row["tensp"] . '\', ' . $row["giaban"] . ', \'image/' . $row["hinhanh"] . '\')">Thêm vào giỏ hàng </button>
+                                </div>';
+                            }
+                        }     else {                echo "<div class='no-products'>Không có sản phẩm nào!</div>";                }
 
-                            <div class="price">150.000.000đ</div>
-                            <button class="mua"
-                                onclick="addToCart('NINJA® ZX-4R', 150000000, 'image/ninja-zx4r.png')">Thêm vào giỏ hàng
-                            </button>
-
-                        </div>
-
-                        <div class="card page-1" id="invoiceModal">
-                            <a href="njh2r.php">
-                                <img src="image/ninja-h2r.png" alt="KLX 110 R"></a>
-                            <h4>MỚI 2022</h4>
-                            <h3>NINJA H2R</h3>
-                            <div class="greenSpacer"></div>
-                            <div class="price">1.400.000.000đ</div>
-                            <button class="mua"
-                                onclick="addToCart('NINJA H2R', 1.400000000, 'image/ninja-h2r.png')">Thêm vào giỏ hàng
-                            </button>
-                        </div>
-                        <div class="card page-1" id="invoiceModal">
-                            <a href="nje1.php">
-                                <img src="image/ninja-e1.png" alt="KLX 110 R"></a>
-                            <h4>HOÀN TOÀN MỚI 2024</h4>
-                            <h3>NINJA e-1</h3>
-                            <div class="greenSpacer"></div>
-
-                            <div class="price"> 490.000.000đ</div>
-                            <button class="mua" onclick="addToCart('NINJA e-1', 490000000, 'image/ninja-e1.png')">Thêm
-                                vào giỏ hàng </button>
-                        </div>
-
+                        ?>
 
                     </div>
                     </tbody>
-
+                    <div class="pagination">
+                        <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
+                        <div id="pageNumbers" class="page-numbers"></div>
+                        <button id="nextBtn" onclick="changePage(1)">&#10095;</button>
+                    </div>
                 </ul>
             </div>
         </div>
@@ -340,11 +309,29 @@
             <div class="container">
                 <div class="widget-row">
                     <div class="widget-row-col-1">
-                        <h3 class="widget-title">Về chúng tôi</h3>
-                        <div class="widget-row-col-content">
-                            <p>BMT là thương hiệu được thành lập năm 2024 với
-                                tiêu chí đặt chất lượng sản phẩm lên hàng đầu </p>
-                        </div>
+                        <h3 class="widget-title">Giới thiệu về BMTShop</h3>
+                        <ul class="widget-contact">
+                            <li class="widget-contact-item">
+                                <a href="">
+                                    <i class="fa-regular fa-arrow-right"></i>
+                                    <span>Về chúng tôi</span>
+                                </a>
+                            </li>
+                            <li class="widget-contact-item">
+                                <a href="">
+                                    <i class="fa-regular fa-arrow-right"></i>
+                                    <span>Tư vấn mua hàng</span>
+                                </a>
+                            </li>
+                            <li class="widget-contact-item">
+                                <a href="">
+                                    <i class="fa-regular fa-arrow-right"></i>
+                                    <span>Tuyển dụng </span>
+                                </a>
+                            </li>
+
+
+                        </ul>
                         <div class="widget-social">
                             <div class="widget-social-item">
                                 <a href="">
@@ -374,30 +361,43 @@
                     </div>
 
                     <div class="widget-row-col">
+                        <h3 class="widget-title">Chính sách chung</h3>
+                        <ul class="widget-contact">
+                            <li class="widget-contact-item">
+                                <a href="">
+                                    <i class="fa-regular fa-arrow-right"></i>
+                                    <span>Chính sách trả góp</span>
+                                </a>
+                            </li>
+                            <li class="widget-contact-item">
+                                <a href="">
+                                    <i class="fa-regular fa-arrow-right"></i>
+                                    <span>Chính sách bảo mật</span>
+                                </a>
+                            </li>
+                            <li class="widget-contact-item">
+                                <a href="">
+                                    <i class="fa-regular fa-arrow-right"></i>
+                                    <span>Chính sách khiếu nại </span>
+                                </a>
+                            </li>
+
+                            <li class="widget-contact-item">
+                                <a href="">
+                                    <i class="fa-regular fa-arrow-right"></i>
+                                    <span>Chính sách vận chuyển</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="widget-row-col">
                         <h3 class="widget-title">Liên kết</h3>
                         <ul class="widget-contact">
                             <li class="widget-contact-item">
                                 <a href="">
                                     <i class="fa-regular fa-arrow-right"></i>
-                                    <span>Về chúng tôi</span>
-                                </a>
-                            </li>
-                            <li class="widget-contact-item">
-                                <a href="">
-                                    <i class="fa-regular fa-arrow-right"></i>
                                     <span>Sản phẩm</span>
-                                </a>
-                            </li>
-                            <li class="widget-contact-item">
-                                <a href="">
-                                    <i class="fa-regular fa-arrow-right"></i>
-                                    <span>Điều khoản</span>
-                                </a>
-                            </li>
-                            <li class="widget-contact-item">
-                                <a href="">
-                                    <i class="fa-regular fa-arrow-right"></i>
-                                    <span>Liên hệ</span>
+
                                 </a>
                             </li>
                             <li class="widget-contact-item">
@@ -406,30 +406,13 @@
                                     <span>Tin tức</span>
                                 </a>
                             </li>
-                        </ul>
-                    </div>
-                    <div class="widget-row-col">
-                        <h3 class="widget-title">Sản phẩm</h3>
-                        <ul class="widget-contact">
                             <li class="widget-contact-item">
                                 <a href="">
                                     <i class="fa-regular fa-arrow-right"></i>
-                                    <span>Dòng Ninja</span>
+                                    <span>Điều khoản</span>
+                                </a>
+                            </li>
 
-                                </a>
-                            </li>
-                            <li class="widget-contact-item">
-                                <a href="">
-                                    <i class="fa-regular fa-arrow-right"></i>
-                                    <span>Dòng Z</span>
-                                </a>
-                            </li>
-                            <li class="widget-contact-item">
-                                <a href="">
-                                    <i class="fa-regular fa-arrow-right"></i>
-                                    <span>Dòng KLX</span>
-                                </a>
-                            </li>
                         </ul>
                     </div>
                     <div class="widget-row-col-1">
@@ -468,7 +451,13 @@
             </div>
         </div>
     </footer>
-
+    <div class="copyright-wrap">
+        <div class="container">
+            <div class="copyright-content">
+                <p>Copyright 2024 BMTShop. All Rights Reserved.</p>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Lấy tên người dùng từ localStorage
@@ -477,9 +466,6 @@
         // Kiểm tra nếu có người dùng đã đăng nhập, hiển thị tên
         if (loggedInUser) {
             document.getElementById('userDisplayName').textContent = loggedInUser;
-        } else {
-            // Nếu không có người dùng, chuyển hướng về trang đăng nhập
-            window.location.href = 'dk.php';
         }
 
         // Hàm đăng xuất
@@ -493,10 +479,9 @@
     </script>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/searchProducts.js"></script>
+    <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
 
 </body>
 
-</php>
+</html>

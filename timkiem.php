@@ -1,5 +1,6 @@
-<!DOCTYPE php>
-<php lang="en">
+
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -10,6 +11,7 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="./assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css">
+    <script src="https://fontawesome.com/v6/search" crossorigin="anonymous"></script>
     <title>BMT </title>
 </head>
 
@@ -20,7 +22,7 @@
             <div class="container">
                 <div class="header-middle-left">
                     <div class="header-logo">
-                        <a href="index.php" id="logo">
+                        <a href="" id="logo">
                             <img src="image/logo.png" alt="BMT">
                         </a>
 
@@ -29,19 +31,16 @@
                 <div class="header-middle-center">
                     <form action="" class="form-search">
                         <span class="search-btn">
-                            <a href="timthay.php">
+                            <a href="">
                                 <i class="fa-light fa-magnifying-glass"></i>
                             </a>
                         </span>
                         <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
-                        <button class="filter-btn">
-                            <i class="fa-light fa-filter-list"></i>
-                            <span style="font-size: 14px;">Lọc</span>
-                        </button>
+
                     </form>
                 </div>
-                
+
                 <div class="header-middle-right">
                     <ul class="header-middle-right-list">
                         <li class="header-middle-right-item dropdown open">
@@ -60,7 +59,7 @@
                                         <div class="hd">Hóa đơn</div>
                                     </a>
                                     <a href="admin.php">
-                                        <div class="hd">Quan ly</div>
+                                        <div class="hd">Quản lý</div>
                                     </a>
 
                                 </div>
@@ -72,206 +71,139 @@
     </header>
     <div class="advanced-search">
         <div class="container">
-            <div class="advanced-search-category">
-                <span>Phân loại </span>
-                <select name="" id="advanced-search-category-select" onchange="searchProducts()">
-                    <option>Tất cả</option>
-                    <option>Dòng Ninja</option>
-                    <option>Dòng Z</option>
-                    <option>Dòng KLX</option>
-                </select>
-            </div>
-            <div class="advanced-search-price">
-                <span>Giá từ</span>
-                <input type="number" placeholder="tối thiểu" id="min-price" onchange="searchProducts()">
-                <span>đến</span>
-                <input type="number" placeholder="tối đa" id="max-price" onchange="searchProducts()">
-                <button id="advanced-search-price-btn"><a href="timthay2.php"><i class="fa-light fa-magnifying-glass-dollar"></i></a></button>
-            </div>
-            <div class="advanced-search-control">
-                <button id="sort-ascending" onclick="searchProducts(1)"><i
-                        class="fa-regular fa-arrow-up-short-wide"></i></button>
-                <button id="sort-descending" onclick="searchProducts(2)"><i
-                        class="fa-regular fa-arrow-down-wide-short"></i></button>
-                <button id="reset-search" onclick="searchProducts(0)"><i
-                        class="fa-light fa-arrow-rotate-right"></i></button>
-                <button onclick="closeSearchAdvanced()"><i class="fa-light fa-xmark"></i></button>
-            </div>
+
         </div>
     </div>
     <div class="green-line-header"></div>
 
-        <nav class="header-bottom">
-            <div class="container">
-                <ul class="menu-list">
-                    <li class="menu-list-item"><a href="index.php" class="menu-link">Trang chủ</a></li>
-                
-                    <div class="dropdown">
-                        <span>Sản phẩm</span>
-                        <div class="dropdown-content">
-                            <li class="menu-list-item"><a href="NINJA.php" class="menu-link">Dòng Ninja</a></li>
-                            <li class="menu-list-item"><a href="Z.php" class="menu-link">Dòng Z</a></li>
-                            <li class="menu-list-item"><a href="KLX.php" class="menu-link">Dòng KLX</a></li>
-                        </div>
-                    </div>
-                    <li class="menu-list-item"><a href="index.php" class="menu-link">Tin tức </a></li>
-                    <li class="menu-list-item"><a href="index.php" class="menu-link">Điều khoản</a></li>
+    <nav class="header-bottom">
+        <div class="container">
 
-                </ul>
-            </div>
-        </nav>
+        </div>
+    </nav>
 
 
     <main class="main-wrapper">
-        <div class="slideshow-container">
-            <div class="mySlides fade">
 
-                <img src="image/web1.jpg">
-
-            </div>
-            <div class="mySlides fade">
-
-                <img src="image/web2.jpg">
-
-            </div>
-            <div class="mySlides fade">
-
-                <img src="image/web3.png">
-
-            </div>
-            <div class="mySlides fade">
-
-                <img src="image/web4.jpg">
-
-            </div>
-            <div class="dot-wrapper">
-
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-
-            </div>
-            <a class="prev" onclick="prevSlide()">&#10094;</a>
-            <a class="next" onclick="showSlides()">&#10095;</a>
-        </div>
         <div class="container" id="trangchu">
 
 
             <div class="home-service" id="home-service">
-                <div class="home-service-item">
-                    <div class="home-service-item-icon">
-                        <i class="fa-light fa-person-carry-box"></i>
-                    </div>
-                    <div class="home-service-item-content">
-                        <h4 class="home-service-item-content-h">GIAO HÀNG NHANH</h4>
-                        <p class="home-service-item-content-desc">Cho tất cả đơn hàng</p>
-                    </div>
-                </div>
-                <div class="home-service-item">
-                    <div class="home-service-item-icon">
-                        <i class="fa-light fa-shield-heart"></i>
-                    </div>
-                    <div class="home-service-item-content">
-                        <h4 class="home-service-item-content-h">SẢN PHẨM AN TOÀN</h4>
-                        <p class="home-service-item-content-desc">Cam kết chất lượng</p>
-                    </div>
-                </div>
-                <div class="home-service-item">
-                    <div class="home-service-item-icon">
-                        <i class="fa-light fa-headset"></i>
-                    </div>
-                    <div class="home-service-item-content">
-                        <h4 class="home-service-item-content-h">HỖ TRỢ 24/7</h4>
-                        <p class="home-service-item-content-desc">Tất cả ngày trong tuần</p>
-                    </div>
-                </div>
-                <div class="home-service-item">
-                    <div class="home-service-item-icon">
-                        <i class="fa-light fa-circle-dollar"></i>
-                    </div>
-                    <div class="home-service-item-content">
-                        <h4 class="home-service-item-content-h">HOÀN LẠI TIỀN</h4>
-                        <p class="home-service-item-content-desc">Nếu không hài lòng</p>
-                    </div>
-                </div>
+
             </div>
             <div class="home-title-block" id="home-title">
-                <h2 class="home-title">ĐÃ TÌM THẤY 4 SẢN PHẨM</h2>
+                <h2 class="home-title">KẾT QUẢ TÌM KIẾM</h2>
+
                 <div class="border-line"></div>
+
             </div>
+            <form action="" class="form-search">
+                <span class="search-btn">
+                    <a href="">
+                        <i class="fa-light fa-magnifying-glass"></i>
+                    </a>
+                </span>
+                <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
+                    onkeyup="searchProducts()">
+
+            </form>
 
 
             <div class="page-nav">
                 <ul class="page-nav-list">
-                    <div class="grid-container" id="product-list">
-                        <!-- Page 1 Products -->
+                    <div class="filter-row">
+                        <div class="filter">
+                            <div class="filter-box">
+                                <div class="container">
+                                    <h3 class="advanced-title">Bộ lọc tìm kiếm</h3>
+                                    <div class="advanced-search-container">
+                                        <legend class="advanced-search-header">Theo danh mục</legend>
 
-                        <div class="card page-1" id="invoiceModal">
-                            <a href="nj650.php">
-                                <img src="image/ninja-650.png" alt="KLX 110 R"></a>
-                            <h4>MỚI 2023</h4>
-                            <h3>NINJA 650</h3>
-                            <div class="greenSpacer"></div>
-                            <div class="price">210.000.000đ</div>
-                            <button class="mua" onclick="addToCart('NINJA 650', 210000000, 'image/ninja-650.png')">Thêm
-                                vào giỏ hàng </button>
+                                        <div class="advanced-search-category">
+                                            <label class="checkbox">
+                                                <div class="checkbox_box">
+                                                    <input type="checkbox" name="" value="">
+                                                    <span class="checkbox_label">Dòng Z (3)</span>
+                                                </div>
+                                                <div class="checkbox_box">
+                                                    <input type="checkbox" name="" value="">
+                                                    <span class="checkbox_label">Dòng KLX (2)</span>
+                                                </div>
+                                                <div class="checkbox_box">
+                                                    <input type="checkbox" name="" value="">
+                                                    <span class="checkbox_label">Dòng Z (4)</span>
+                                                </div>
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+                                    <div class="advanced-search-container">
+                                        <legend class="advanced-search-header">Khoảng giá</legend>
+                                        <div class="advanced-search-price">
+                                          
+                                            <input type="number" placeholder="₫ TỪ" id="min-price" onchange="searchProducts()">
+                                            <span>-</span>
+                                            <input type="number" placeholder="₫ ĐẾN" id="max-price" onchange="searchProducts()">
+                                        </div>
+                                        <button id="advanced-price-btn" style="" aria-label="">Áp dụng <i class="fa-light fa-magnifying-glass-dollar"></i></button>
+                                    
+                                    </div>
+                                    <div class="advanced-search-control">
+                                        <button id="sort-ascending" onclick="searchProducts(1)"><i
+                                                class="fa-regular fa-arrow-up-short-wide"></i></button>
+                                        <button id="sort-descending" onclick="searchProducts(2)"><i
+                                                class="fa-regular fa-arrow-down-wide-short"></i></button>
+                                        <button id="reset-search" onclick="searchProducts(0)"><i
+                                                class="fa-light fa-arrow-rotate-right"></i></button>
+                                        <button onclick="closeSearchAdvanced()"><i class="fa-light fa-xmark"></i></button>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
+                        <div class="product-right" id="product-list">
 
-                      
-                        <div class="card page-1" id="invoiceModal">
-                            <a href="njh2r.php">
-                                <img src="image/ninja-h2r.png" alt="KLX 110 R"></a>
-                            <h4>MỚI 2022</h4>
-                            <h3>NINJA H2R</h3>
-                            <div class="greenSpacer"></div>
-                            <div class="price">1.400.000.000đ</div>
-                            <button class="mua"
-                                onclick="addToCart('NINJA H2R', 1.400000000, 'image/ninja-h2r.png')">Thêm vào giỏ hàng
-                            </button>
+                            <?php
+                            $servername = "localhost";
+                            $username = "root";
+                            $password = "";
+                            $dbname = "admindoan";
+
+                            $conn = new mysqli($servername, $username, $password, $dbname);
+                            if ($conn->connect_error) {
+                                die("Kết nối thất bại" . $conn->connect_error);
+                            }
+
+                            $sql = "SELECT id, tensp, giaban, hinhanh FROM products";
+                            $result = $conn->query($sql);
+                            if ($result->num_rows > 0) {
+                                while ($row = $result->fetch_assoc()) {
+                                    echo '
+                                    <div class="card page-1" id="invoiceModal">
+                                    <a href="thongtinsp.php?id=' . $row["id"] . '">                                
+                                    <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
+                                    </a>
+                                    <h3>' . $row["tensp"] . '</h3>
+                                    <div class="greenSpacer"></div>
+                                    <div class="price">' . $row["giaban"] . 'đ</div>
+                                    <button type="button" class="mua" onclick="addToCart(\'' . $row["tensp"] . '\', ' . $row["giaban"] . ', \'image/' . $row["hinhanh"] . '\')">Thêm vào giỏ hàng </button>
+                                    </div>';
+                                }
+                            }
+                            ?>
+
                         </div>
-                     
-                        <div class="card page-1" id="invoiceModal">
-                            <a href="zh2.php">
-                                <img src="image/z-h2.png" alt="KLX 110 R"></a>
-                            <h4>MỚI 2022</h4>
-                            <h3>Z H2</h3>
-                            <div class="greenSpacer"></div>
-
-                            <div class="price">210.000.000đ</div>
-                            <button class="mua" onclick="addToCart('Z H2', 210000000, 'image/z-h2.png')">Thêm vào giỏ
-                                hàng </button>
-                        </div>
-
-                      
-
-
-                        <!-- Page 3 Products -->
-                        <div class="card page-3" id="invoiceModal">
-                            <a href="klx230r.php">
-                                <img src="image/klx-230r.png" alt="KLX 110 R"></a>
-                            <h4>MỚI 2022</h4>
-
-                            <h3>KLX®230R</h3>
-
-                            <div class="greenSpacer"></div>
-                            <div class="price">65.000.000đ</div>
-                            <button class="mua" onclick="addToCart('KLX®230R', 65000000, 'image/klx-230r.png')">Thêm vào
-                                giỏ hàng </button>
-                        </div>
-                 
-
+                        </tbody>
 
                     </div>
-                    </tbody>
-                
                 </ul>
             </div>
         </div>
 
     </main>
     <section class="cart">
-        <button class="dong">Đóng</button>
+        <button class="dong"><i class="fa-regular fa-xmark"></i></button>
         <!-- <div>Đóng</div> -->
         <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
         <form action="">
@@ -488,9 +420,6 @@
         // Kiểm tra nếu có người dùng đã đăng nhập, hiển thị tên
         if (loggedInUser) {
             document.getElementById('userDisplayName').textContent = loggedInUser;
-        } else {
-            // Nếu không có người dùng, chuyển hướng về trang đăng nhập
-            window.location.href = 'dk.php';
         }
 
         // Hàm đăng xuất
@@ -504,11 +433,10 @@
     </script>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
-    <script src="js/main.js"></script>
     <script src="js/phantrang.js"></script>
-    <script src="js/searchProducts.js"></script>
     <script src="js/ssbutton.js"></script>
+    <script src="js/main.js"></script>
 
 </body>
 
-</php>
+</html>

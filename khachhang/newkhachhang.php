@@ -16,15 +16,16 @@ if ($conn->connect_error) {
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Capture form data
-    $tenMon = $_POST['fullname'];
-    $category = $_POST['phone'];
-    $mauXe = $_POST['password'];
+    $tenMon = htmlspecialchars($_POST['fullname'], ENT_QUOTES, 'UTF-8');
+    $category = htmlspecialchars($_POST['phone'], ENT_QUOTES, 'UTF-8');
+    $mauXe = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
     $giaBan = isset($_POST['user-status']) && $_POST['user-status'] == '1' ? 1 : 0; // Default to 0 if not set
-
+    
     // Sanitize inputs to prevent SQL injection
     $tenMon = $conn->real_escape_string($tenMon);
     $category = $conn->real_escape_string($category);
     $mauXe = $conn->real_escape_string($mauXe);
+    
 
     // Insert data into the database
     $sql = "INSERT INTO customer (name, contact, password, status)

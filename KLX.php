@@ -1,6 +1,5 @@
-<!DOCTYPE php>
-
-<php lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -43,7 +42,7 @@
                         </button>
                     </form>
                 </div>
-                
+
                 <div class="header-middle-right">
                     <ul class="header-middle-right-list">
                         <li class="header-middle-right-item dropdown open">
@@ -103,25 +102,25 @@
     </div>
     <div class="green-line-header"></div>
 
-        <nav class="header-bottom">
-            <div class="container">
-                <ul class="menu-list">
-                    <li class="menu-list-item"><a href="index.php" class="menu-link">Trang chủ</a></li>
-                
-                    <div class="dropdown">
-                        <span>Sản phẩm</span>
-                        <div class="dropdown-content">
-                            <li class="menu-list-item"><a href="NINJA.php" class="menu-link">Dòng Ninja</a></li>
-                            <li class="menu-list-item"><a href="Z.php" class="menu-link">Dòng Z</a></li>
-                            <li class="menu-list-item"><a href="KLX.php" class="menu-link">Dòng KLX</a></li>
-                        </div>
-                    </div>
-                    <li class="menu-list-item"><a href="index.php" class="menu-link">Tin tức </a></li>
-                    <li class="menu-list-item"><a href="index.php" class="menu-link">Điều khoản</a></li>
+    <nav class="header-bottom">
+        <div class="container">
+            <ul class="menu-list">
+                <li class="menu-list-item"><a href="index.php" class="menu-link">Trang chủ</a></li>
 
-                </ul>
-            </div>
-        </nav>
+                <div class="dropdown">
+                    <span>Sản phẩm</span>
+                    <div class="dropdown-content">
+                        <li class="menu-list-item"><a href="NINJA.php" class="menu-link">Dòng Ninja</a></li>
+                        <li class="menu-list-item"><a href="Z.php" class="menu-link">Dòng Z</a></li>
+                        <li class="menu-list-item"><a href="KLX.php" class="menu-link">Dòng KLX</a></li>
+                    </div>
+                </div>
+                <li class="menu-list-item"><a href="index.php" class="menu-link">Tin tức </a></li>
+                <li class="menu-list-item"><a href="index.php" class="menu-link">Điều khoản</a></li>
+
+            </ul>
+        </div>
+    </nav>
 
 
     <main class="main-wrapper">
@@ -207,81 +206,43 @@
             <div class="page-nav">
                 <ul class="page-nav-list">
                     <div class="grid-container" id="product-list">
-                        <!-- Page 1 Products -->
 
-                       
+                        <?php
+                        $servername = "localhost";
+                        $username = "root";
+                        $password = "";
+                        $dbname = "admindoan";
 
-                        <div class="card page-2" id="invoiceModal">
-                            <a href="klx110r.php">
-                                <img src="image/klx-110r.png" alt="Z 500"></a>
-                            <h4>2023</h4>
-                            <h3>KLX®110R</h3>
-                            <div class="greenSpacer"></div>
-                            <div class="price"> 50.000.000đ</div>
-                            <button class="mua" onclick="addToCart('KLX®110R', 50000000, 'image/klx-110r.png')">Thêm vào
-                                giỏ hàng </button>
-                        </div>
+                        $conn = new mysqli($servername, $username, $password, $dbname);
+                        if ($conn->connect_error) {
+                            die("Kết nối thất bại" . $conn->connect_error);
+                        }
 
-                        <div class="card page-2" id="invoiceModal">
-                            <a href="klx230.php">
-                                <img src="image/klx-230.png" alt="Z 500"></a>
-                            <h4>2021</h4>
-                            <h3>KLX®230</h3>
-                            <div class="greenSpacer"></div>
-                            <div class="price">30.000.000đ</div>
-                            <button class="mua" onclick="addToCart('KLX®230', 30000000, 'image/klx-230.png')">Thêm vào
-                                giỏ hàng </button>
-                        </div>
-                        <!-- Page 3 Products -->
-                        <div class="card page-3" id="invoiceModal">
-                            <a href="klx230r.php">
-                                <img src="image/klx-230r.png" alt="KLX 110 R"></a>
-                            <h4>MỚI 2022</h4>
+                        $sql = "SELECT id, tensp, giaban, hinhanh FROM products WHERE dongsp='Dòng KLX'";
+                        $result = $conn->query($sql);
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo '
+                                <div class="card page-1" id="invoiceModal">
+                                <a href="thongtinsp.php?id=' . $row["id"] . '">                                
+                                <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
+                                <h3>' . $row["tensp"] . '</h4>
+                                <div class="greenSpacer"></div>
+                                <div class="price">' . $row["giaban"] . 'đ</div>
+                                <button type="button" class="mua" onclick="addToCart(\'' . $row["tensp"] . '\', ' . $row["giaban"] . ', \'image/' . $row["hinhanh"] . '\')">Thêm vào giỏ hàng </button>
+                                </div>';
+                            }
+                        }     else {                echo "<div class='no-products'>Không có sản phẩm nào!</div>";                }
 
-                            <h3>KLX®230R</h3>
-
-                            <div class="greenSpacer"></div>
-                            <div class="price">65.000.000đ</div>
-                            <button class="mua" onclick="addToCart('KLX®230R', 65000000, 'image/klx-230r.png')">Thêm vào
-                                giỏ hàng </button>
-                        </div>
-                        <div class="card page-3">
-                            <a href="klx230sm.php">
-                                <img src="image/klx-230sm.png" alt="KLX 110 R"></a>
-                            <h4>MỚI 2023</h4>
-                            <h3>KLX®230SM</h3>
-                            <div class="greenSpacer"></div>
-                            <div class="price"> 80.000.000đ</div>
-                            <button class="mua" onclick="addToCart('KLX®230SM', 80000000, 'image/klx-230sm.png')">Thêm
-                                vào giỏ hàng </button>
-                        </div>
-
-                        <div class="card page-3">
-                            <a href="klx300.php">
-                                <img src="image/klx-300.png" alt="KLX 110 R" href="klx300.php"></a>
-                            <h4>2022</h4>
-                            <h3>KLX®300</h3>
-                            <div class="greenSpacer"></div>
-
-                            <div class="price"> 73.000.000đ</div>
-                            <button class="mua" onclick="addToCart('KLX®300', 73000000, 'image/klx-300.png')">Thêm vào
-                                giỏ hàng </button>
-                        </div>
-
-                        <div class="card page-3" id="invoiceModal">
-                            <a href="klx300sm.php"><img src="image/klx-300sm.png" alt="KLX 110 R"></a>
-                            <h4>2023</h4>
-                            <h3>KLX®300SM</h3>
-                            <div class="greenSpacer"></div>
-
-                            <div class="price"> 85.000.000đ</div>
-                            <button class="mua" onclick="addToCart('KLX®300SM', 85000000, 'image/klx-300sm.png')">Thêm
-                                vào giỏ hàng </button>
-                        </div>
+                        ?>
 
                     </div>
                     </tbody>
-                  
+                    <div class="pagination">
+                        <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
+                        <div id="pageNumbers" class="page-numbers"></div>
+                        <button id="nextBtn" onclick="changePage(1)">&#10095;</button>
+                    </div>
                 </ul>
             </div>
         </div>
@@ -505,9 +466,6 @@
         // Kiểm tra nếu có người dùng đã đăng nhập, hiển thị tên
         if (loggedInUser) {
             document.getElementById('userDisplayName').textContent = loggedInUser;
-        } else {
-            // Nếu không có người dùng, chuyển hướng về trang đăng nhập
-            window.location.href = 'dk.php';
         }
 
         // Hàm đăng xuất
@@ -521,10 +479,9 @@
     </script>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/searchProducts.js"></script>
+    <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
 
 </body>
 
-</php>
+</html>
