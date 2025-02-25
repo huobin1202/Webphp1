@@ -51,7 +51,7 @@
 
                                 <div class="user-info">
                                     <h1 class="welcome"> <span id="userDisplayName"></span></h1>
-                                    <a href="dk.php"><button class="logout-btn" onclick="logout()"
+                                    <a href="dk.php"><button class=""
                                             style="font-size: 17px;">Đăng xuất</button></a>
                                 </div>
 
@@ -220,7 +220,7 @@
 
                         $sql = "SELECT id, tensp, giaban, hinhanh FROM products";
                         $result = $conn->query($sql);
-                        if ($result->num_rows > 0) {
+                        if ($result->num_rows > 0) {    
                             while ($row = $result->fetch_assoc()) {
                                 echo '
                                 <div class="card page-1" id="invoiceModal">
