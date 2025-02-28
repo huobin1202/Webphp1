@@ -47,13 +47,51 @@
                     <ul class="header-middle-right-list">
                         <li class="header-middle-right-item dropdown open">
 
-                            <div class="auth-container">
+                            <div class="auth-container" method="POST">
 
-                                <div class="user-info">
-                                    <h1 class="welcome"> <span id="userDisplayName"></span></h1>
-                                    <a href="dk.php"><button class=""
-                                            style="font-size: 17px;">Đăng xuất</button></a>
-                                </div>
+                                <?php
+                                session_start();
+
+                                // Ngăn chặn cache để tránh hiển thị sai thông tin cũ
+                                header("Cache-Control: no-cache, must-revalidate");
+                                header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+
+                                $servername = "localhost";
+                                $username = "root";
+                                $password = "";
+                                $dbname = "admindoan";
+
+                                $conn = new mysqli($servername, $username, $password, $dbname);
+                                if ($conn->connect_error) {
+                                    die("Kết nối thất bại" . $conn->connect_error);
+                                }
+                                if (!isset($_SESSION["username"])) {
+                                    header("Location: dn.php");
+                                    exit;
+                                }
+
+                                $username = $_SESSION["username"];
+
+                                $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
+                                $stmt->bind_param("s", $username);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+
+                                if ($result->num_rows > 0) {
+                                    $row = $result->fetch_assoc();
+                                    echo '
+    <div class="user-info">
+        <h1 class="welcome"><span style="color:green;">' . htmlspecialchars($row["name"]) . '</span></h1>
+        <a href="dn.php"><button class="logout-btn" style="font-size: 17px;">Đăng xuất</button></a>
+    </div>';
+                                } else {
+                                    echo "Không tìm thấy tài khoản!";
+                                }
+
+                                $stmt->close();
+                                $conn->close();
+                                ?>
+
 
                                 <div class="hoadon">
                                     <span class="ravao">Giỏ hàng</span>
@@ -61,7 +99,7 @@
                                         <div class="hd">Hóa đơn</div>
                                     </a>
                                     <a href="admin.php">
-                                        <div class="hd">Quan ly</div>
+                                        <div class="hd">Quản lý</div>
                                     </a>
 
                                 </div>
@@ -220,7 +258,7 @@
 
                         $sql = "SELECT id, tensp, giaban, hinhanh FROM products";
                         $result = $conn->query($sql);
-                        if ($result->num_rows > 0) {    
+                        if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo '
                                 <div class="card page-1" id="invoiceModal">
@@ -252,7 +290,7 @@
         <button class="dong"><i class="fa-regular fa-xmark"></i></button>
         <!-- <div>Đóng</div> -->
         <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
-        <form action="">
+        <form action="" method="POST">
             <table>
                 <thead>
                     <tr>
@@ -266,11 +304,7 @@
                 </thead>
                 <tbody>
 
-                    <!-- <td style="display: flex;align-items: center;"><img style ="width: 120px;"src="image/ninja-1000sx.png"alt ="">Ninja</td>
-                        <td><p><span>1500</span><sup>đ</sup></p></td>
-                         <td><input style="width: 40px; outline: none;" type="number"value ="1"min="1""max="2""></td>
-                         <td style="cursor: pointer;">Xóa </td>
-                     -->
+
                 </tbody>
             </table>
             <div style="text-align: center;" class="price-total">
@@ -458,25 +492,6 @@
             </div>
         </div>
     </div>
-
-    <script>
-        // Lấy tên người dùng từ localStorage
-        const loggedInUser = localStorage.getItem('loggedInUser');
-
-        // Kiểm tra nếu có người dùng đã đăng nhập, hiển thị tên
-        if (loggedInUser) {
-            document.getElementById('userDisplayName').textContent = loggedInUser;
-        }
-
-        // Hàm đăng xuất
-        function logout() {
-            // Xóa thông tin người dùng khỏi localStorage
-            localStorage.removeItem('loggedInUser');
-
-            // Chuyển hướng về trang đăng nhập
-            window.location.href = 'index.php';
-        }
-    </script>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>

@@ -1,4 +1,5 @@
 <?php
+session_start(); // Bắt đầu session
 
 $servername = "localhost";
 $username = "root";
@@ -14,16 +15,16 @@ $error_message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['register'])) {
-        $name = htmlspecialchars($_POST['name']);
-        $contact = htmlspecialchars($_POST['contact']);
-        $password = htmlspecialchars($_POST['password']);
-        $password_confirm = htmlspecialchars($_POST['password_confirm']);
+        $name = trim($_POST['name']);
+        $contact = trim($_POST['contact']);
+        $password = trim($_POST['password']);
+        $password_confirm = trim($_POST['password_confirm']);
 
         if ($password !== $password_confirm) {
             $error_message = "Mật khẩu xác nhận không khớp!";
         } else {
             // Kiểm tra xem tài khoản hoặc số điện thoại đã tồn tại chưa
-            $check_sql = "SELECT * FROM customer WHERE name = ? OR contact = ?";
+            $check_sql = "SELECT id FROM customer WHERE name = ? OR contact = ?";
             $check_stmt = $conn->prepare($check_sql);
             $check_stmt->bind_param("ss", $name, $contact);
             $check_stmt->execute();
@@ -32,13 +33,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($result->num_rows > 0) {
                 $error_message = "Tài khoản hoặc số điện thoại đã tồn tại, vui lòng chọn thông tin khác!";
             } else {
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                // Thêm tài khoản mới vào CSDL
                 $sql = "INSERT INTO customer (name, contact, joindate, status, password) VALUES (?, ?, NOW(), 'active', ?)";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("sss", $name, $contact, $hashedPassword);
+                $stmt->bind_param("sss", $name, $contact, $password);
                 
                 if ($stmt->execute()) {
-                    header("Location: index.php"); // Chuyển hướng đến trang index.php
+                    // Lấy ID vừa tạo
+                    $user_id = $stmt->insert_id;
+
+                    // Lưu thông tin vào session
+                    $_SESSION['user_id'] = $user_id;
+                    $_SESSION['username'] = $name;
+
+                    // Chuyển hướng về trang index.php
+                    header("Location: index.php");
                     exit();
                 } else {
                     $error_message = "Lỗi: " . $stmt->error;
@@ -51,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="vi">

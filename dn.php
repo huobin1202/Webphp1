@@ -64,69 +64,74 @@
         </style>
     </head>
     <?php
-
-    $servername="localhost" ;
-    $username="root" ;
-    $password="" ;
-    $dbname="admindoan" ;
+    session_start();
+    $servername="localhost";
+    $username="root";
+    $password="";
+    $dbname="admindoan";
 
     $conn=new mysqli($servername, $username, $password, $dbname);
     if ($conn->connect_error) {
-    die("Kết nối thất bại" . $conn->connect_error);
+        die("Kết nối thất bại" . $conn->connect_error);
     }
 
-   
-    if($_SERVER["REQUEST_METHOD"] == "POST"){
-
-    if (isset($_POST['login'])) {
-        $name = htmlspecialchars($_POST['name']);
-        $password = htmlspecialchars($_POST['password']);
-        
-        $sql = "SELECT id, password FROM customer WHERE name = ?";
-        $result = $conn->prepare($sql);
-        $result->bind_param("s", $name);
-        $result->execute();
-        $result->store_result();
-        
-        if ($result->num_rows > 0) {
-            $result->bind_result($id, $hashed_password);
-            $result->fetch();
-            if (password_verify($password, $hashed_password)) {
-                $_SESSION['user_id'] = $id;
-                $_SESSION['username'] = $name;
-                header("Location: index.php?name");
-                exit();
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if (isset($_POST['login'])) {
+            $name = trim($_POST['name']);
+            $input_password = trim($_POST['password']); // Đổi tên biến
+            
+            $sql = "SELECT id, password FROM customer WHERE name = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $name);
+            $stmt->execute();
+            $stmt->store_result();
+    
+            if ($stmt->num_rows > 0) {
+                $stmt->bind_result($id, $hashed_password);
+                $stmt->fetch();
+                if (password_verify($input_password, $hashed_password)) { // Sử dụng biến mới
+                    // Xóa session cũ nếu có
+                    session_unset();
+                    session_destroy();
+                    session_start(); // Bắt đầu session mới
+                    
+                    $_SESSION['user_id'] = $id;
+                    $_SESSION['username'] = $name;
+                    
+                    header("Location: index.php");
+                    exit();
+                } else {
+                    echo "<script>alert('Sai mật khẩu!');</script>";
+                }
             } else {
-                echo "Sai mật khẩu!";
+                echo "<script>alert('Tài khoản không tồn tại!');</script>";
             }
-        } else {
-            echo "Tài khoản không tồn tại!";
+            $stmt->close();
         }
-        $result->close();
     }
-}
+    
     ?>
 
-    <body>
-    <form method="post"
 
-        <div class="login-container">
-                <h2 style="color:#f2f6f3;">Đăng nhập</h2>
-                <input type="text" id="username" name="name" placeholder="Tên đăng nhập" required>
-                <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
-                <button type="submit" name="login">Đăng nhập</button>
-                <p id="error-message" class="error-message"></p>
-                <p class="back-to-login"style="color:#f2f6f3;">Chưa có tài khoản? <a href=dk.php> Đăng ký ngay!</a></p>
+        <body>
+        <form method="post">
 
-        </div>
+            <div class="login-container">
+                    <h2 style="color:#f2f6f3;">Đăng nhập</h2>
+                    <input type="text" id="username" name="name" placeholder="Tên đăng nhập" required>
+                    <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
+                    <button type="submit" name="login">Đăng nhập</button>
+                    <p id="error-message" class="error-message"></p>
+                    <p class="back-to-login"style="color:#f2f6f3;">Chưa có tài khoản? <a href=dk.php> Đăng ký ngay!</a></p>
+
+            </div>
         </form>
 
 
 
-        <div id="mainPage" class="main-page" style="display: none;">
-            <h1 style="color:#f2f6f3;">Chào mừng, <span id="userDisplayName"></span>!</h1>
-        </div>
+            <div id="mainPage" class="main-page" style="display: none;">
+                <h1 style="color:#f2f6f3;">Chào mừng, <span id="userDisplayName"></span>!</h1>
+            </div>
 
-    </body>
-
-    </html>
+        </body>
+</html>
