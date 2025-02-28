@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> bruh
 <html lang="en">
 
 <head>
