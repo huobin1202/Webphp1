@@ -1,4 +1,4 @@
-<!DOCTYPE html> haha
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
