@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     if ($conn->query($sql) === TRUE) {
         echo "<script>
                 alert('Sản phẩm đã được xóa thành công!');
-                window.location.href = 'http://localhost/Webphp/sanpham/sanpham.php';
+                window.location.href = 'sanpham.php';
               </script>";
     } else {
         echo "<script>
@@ -68,37 +68,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             <div class="middle-sidebar">
                 <ul class="sidebar-list">
                     <li class="sidebar-list-item tab-content">
-                        <a href="http://localhost/Webphp/admin.php" class="sidebar-link">
+                        <a href="/admin.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-house"></i></div>
                             <div class="hidden-sidebar">Trang tổng quan</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content active">
-                        <a href="http://localhost/Webphp/sanpham/sanpham.php" class="sidebar-link">
+                        <a href="/sanpham/sanpham.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-thin fa-motorcycle"></i></div>
                             <div class="hidden-sidebar">Sản phẩm</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="http://localhost/Webphp/khachhang/khachhang.php" class="sidebar-link">
+                        <a href="/khachhang/khachhang.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-users"></i></div>
                             <div class="hidden-sidebar">Khách hàng</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="http://localhost/Webphp/donhang/donhang.php" class="sidebar-link">
+                        <a href="/donhang/donhang.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-basket-shopping"></i></div>
                             <div class="hidden-sidebar">Đơn hàng</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="http://localhost/Webphp/thongkesp/thongke.php" class="sidebar-link">
+                        <a href="/thongkesp/thongke.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
                             <div class="hidden-sidebar">Thống kê sản phẩm</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                    <a href="http://localhost/Webphp/thongkekh/thongkekh.php" class="sidebar-link">
+                    <a href="/thongkekh/thongkekh.php" class="sidebar-link">
                     <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
                             <div class="hidden-sidebar">Thống kê khách hàng</div>
                         </a>
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 
                     <div class="spacer" style="height:50px;width:1px"></div>
                     <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
-                        <a href="index.php" class="sidebar-link">
+                        <a href="/index.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-thin fa-circle-chevron-left"></i></div>
                             <div class="hidden-sidebar">Trang chủ</div>
                         </a>

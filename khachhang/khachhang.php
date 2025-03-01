@@ -31,37 +31,37 @@
             <div class="middle-sidebar">
                 <ul class="sidebar-list">
                     <li class="sidebar-list-item tab-content ">
-                        <a href="http://localhost/Webphp/admin.php" class="sidebar-link">
+                        <a href="/admin.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-house"></i></div>
                             <div class="hidden-sidebar">Trang tổng quan</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="http://localhost/Webphp/sanpham/sanpham.php" class="sidebar-link">
+                        <a href="/sanpham/sanpham.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-thin fa-motorcycle"></i></div>
                             <div class="hidden-sidebar">Sản phẩm</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content active">
-                        <a href="http://localhost/Webphp/khachhang/khachhang.php" class="sidebar-link">
+                        <a href="/khachhang/khachhang.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-users"></i></div>
                             <div class="hidden-sidebar">Khách hàng</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="http://localhost/Webphp/donhang/donhang.php" class="sidebar-link">
+                        <a href="/donhang/donhang.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-basket-shopping"></i></div>
                             <div class="hidden-sidebar">Đơn hàng</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="http://localhost/Webphp/thongkesp/thongke.php" class="sidebar-link">
+                        <a href="/thongkesp/thongke.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
                             <div class="hidden-sidebar">Thống kê sản phẩm</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="http://localhost/Webphp/thongkekh/thongkekh.php" class="sidebar-link">
+                        <a href="/thongkekh/thongkekh.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
                             <div class="hidden-sidebar">Thống kê khách hàng</div>
                         </a>
@@ -168,7 +168,7 @@
                                     echo "<td>".$row["joindate"]."</td>";
                                     echo "<td><span class='status-".($row["status"]==1?"complete":"no-complete")."'>".($row["status"]==1?"Hoạt động":"Bị khóa")."</span></td>";
                                     echo "<td class='control control-table'>";
-                                    echo "<a href='http://localhost/Webphp/khachhang/changekhachhang.php?id=".$row["id"]."'><button class='btn-edit' id='edit-account'  >";
+                                    echo "<a href='changekhachhang.php?id=".$row["id"]."'><button class='btn-edit' id='edit-account'  >";
                                     echo "<i class='fa-light fa-pen-to-square'></i></button></a>";
                                     echo "</td>";
                                     echo "</tr>";
