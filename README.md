@@ -2,7 +2,7 @@
         địa chỉ đã lưu không hiện lên (nhập d/c mới thì hiện), 
         trang thanh toán (thanhtoan.tc), 
         chi tiết hóa đơn (hoadon.php),
-        tìm kiếm sp,
+        tìm kiếm sp, trang xấu
         
 **Admin thiếu:** đơn hàng + chi tiết dh,
              thống kế sp + chi tiết,
