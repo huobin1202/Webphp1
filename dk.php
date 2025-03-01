@@ -82,6 +82,7 @@ $conn->close();
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: white;
         }
         .error-message {
             color: red;
@@ -128,7 +129,7 @@ $conn->close();
             <input type="password" id="confirmPassword" placeholder="Xác nhận mật khẩu" name="password_confirm" required>
             <button name="register">Đăng ký</button>
         </form>
-        <p class="back-to-login" onclick="window.location.href='dn.php'">Quay lại trang đăng nhập</p>
-    </div>
+        <p class="back-to-login"style="color:#28a745; text-align:center" >Quay lại trang <a href=dn.php style="color:#28a745;  " > đăng nhập!</a></p>
+        </div>
 </body>
 </html>

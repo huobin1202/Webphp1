@@ -22,6 +22,7 @@
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background: white;
         }
 
         .login-container h2 {
@@ -117,12 +118,12 @@
         <form method="post">
 
             <div class="login-container">
-                    <h2 style="color:#f2f6f3;">Đăng nhập</h2>
+                    <h2 style="">Đăng nhập</h2>
                     <input type="text" id="username" name="name" placeholder="Tên đăng nhập" required>
                     <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
                     <button type="submit" name="login">Đăng nhập</button>
                     <p id="error-message" class="error-message"></p>
-                    <p class="back-to-login"style="color:#f2f6f3;">Chưa có tài khoản? <a href=dk.php> Đăng ký ngay!</a></p>
+                    <p class="back-to-login"style="color:#28a745; text-align:center" >Chưa có tài khoản? <a href=dk.php style="color:#28a745;  " > Đăng ký ngay!</a></p>
 
             </div>
         </form>
