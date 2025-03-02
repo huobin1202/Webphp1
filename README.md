@@ -1,10 +1,12 @@
-**Index thiếu:**  lưu sản phẩm đã thêm vào giỏ hàng, 
+**https://www.youtube.com/watch?v=U2Fjfqm-7g8**
+
+**Index thiếu:**  **lưu sản phẩm đã thêm vào giỏ hàng (mỗi tk khác nhau)** , 
         địa chỉ đã lưu không hiện lên (nhập d/c mới thì hiện), 
         trang thanh toán (thanhtoan.tc), 
         chi tiết hóa đơn (hoadon.php),
         tìm kiếm sp, trang edit thông tin kh
         
-**Index lỗi:** đăng xuất nhưng tk vẫn còn
+**Index lỗi:** **đăng xuất nhưng tk vẫn còn**
         
 **Admin thiếu:** đơn hàng + chi tiết dh,
              thống kế sp + chi tiết,
