@@ -1,14 +1,12 @@
-
-
 <!DOCTYPE html>
-    <html lang="vi">
+<html lang="vi">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Đăng nhập</title>
-        <style>
-             body {
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
+    <style>
+        body {
             font-family: Arial, sans-serif;
             background-size: cover;
             background-position-y: -170px;
@@ -35,7 +33,7 @@
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
-        }   
+        }
 
         .login-container button {
             width: 100%;
@@ -60,79 +58,79 @@
             text-align: center;
             margin-top: 50px;
         }
+    </style>
+</head>
+<?php
+session_start();
 
-        
-        </style>
-    </head>
-    <?php
-    session_start();
-    $servername="localhost";
-    $username="root";
-    $password="";
-    $dbname="admindoan";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = trim($_POST['name']);
+    $password = trim($_POST['password']); // Đổi tên biến để tránh trùng lặp
 
-    $conn=new mysqli($servername, $username, $password, $dbname);
+    $servername = "localhost";
+    $username = "root";
+    $password_db = "";
+    $dbname = "admindoan";
+
+    $conn = new mysqli($servername, $username, $password_db, $dbname);
+
     if ($conn->connect_error) {
-        die("Kết nối thất bại" . $conn->connect_error);
+        die("Kết nối thất bại: " . $conn->connect_error);
     }
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['login'])) {
-            $name = trim($_POST['name']);
-            $input_password = trim($_POST['password']); // Đổi tên biến
-            
-            $sql = "SELECT id, password FROM customer WHERE name = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("s", $name);
-            $stmt->execute();
-            $stmt->store_result();
-    
-            if ($stmt->num_rows > 0) {
-                $stmt->bind_result($id, $hashed_password);
-                $stmt->fetch();
-                if (password_verify($input_password, $hashed_password)) { // Sử dụng biến mới
-                    // Xóa session cũ nếu có
-                    session_unset();
-                    session_destroy();
-                    session_start(); // Bắt đầu session mới
-                    
-                    $_SESSION['user_id'] = $id;
-                    $_SESSION['username'] = $name;
-                    
-                    header("Location: index.php");
-                    exit();
-                } else {
-                    echo "<script>alert('Sai mật khẩu!');</script>";
-                }
-            } else {
-                echo "<script>alert('Tài khoản không tồn tại!');</script>";
-            }
-            $stmt->close();
-        }
+    $error_message = "";
+
+    // Sử dụng prepared statements để tránh SQL Injection
+    $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ? AND password = ?");
+    $stmt->bind_param("ss", $name, $password);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows == 1) {
+        $stmt->bind_result($user_id);
+        $stmt->fetch();
+
+        session_unset();
+        session_destroy();
+        session_start();
+
+        $_SESSION['user_id'] = $user_id;
+        $_SESSION['username'] = $name;
+        header("Location: index.php");
+        exit();
+    } else {
+        $error_message = "Tên đăng nhập hoặc mật khẩu không đúng!";
     }
-    
-    ?>
+
+    $stmt->close();
+    $conn->close();
+}
+?>
 
 
-        <body>
-        <form method="post">
+<body>
+    <form method="post">
 
-            <div class="login-container">
-                    <h2 style="">Đăng nhập</h2>
-                    <input type="text" id="username" name="name" placeholder="Tên đăng nhập" required>
-                    <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
-                    <button type="submit" name="login">Đăng nhập</button>
-                    <p id="error-message" class="error-message"></p>
-                    <p class="back-to-login"style="color:#28a745; text-align:center" >Chưa có tài khoản? <a href=dk.php style="color:#28a745;  " > Đăng ký ngay!</a></p>
+        <div class="login-container">
+            <h2 style="">Đăng nhập</h2>
+            <?php if (!empty($error_message)): ?>
+                <p style="color: red; text-align:center;"><?php echo $error_message; ?></p>
+            <?php endif; ?>
+            <input type="text" id="username" name="name" placeholder="Tên đăng nhập" required>
+            <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
+            <button type="submit" name="login">Đăng nhập</button>
+            <p id="error-message" class="error-message"></p>
+            <p class="back-to-login" style="color:#28a745; text-align:center">Chưa có tài khoản? <a href=dk.php style="color:#28a745;  "> Đăng ký ngay!</a></p>
 
-            </div>
-        </form>
+        </div>
+    </form>
 
 
 
-            <div id="mainPage" class="main-page" style="display: none;">
-                <h1 style="color:#f2f6f3;">Chào mừng, <span id="userDisplayName"></span>!</h1>
-            </div>
+    <div id="mainPage" class="main-page" style="display: none;">
+        <h1 style="color:#f2f6f3;">Chào mừng, <span id="userDisplayName"></span>!</h1>
+    </div>
 
-        </body>
+</body>
+
 </html>
