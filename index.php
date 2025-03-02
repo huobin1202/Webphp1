@@ -1,4 +1,33 @@
-<!DOCTYPE html> 
+<?php
+session_start();
+
+// Ngăn chặn cache để tránh hiển thị thông tin cũ
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "admindoan";
+
+// Kết nối CSDL
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Kết nối thất bại: " . $conn->connect_error);
+}
+
+// Xử lý đăng xuất
+if (isset($_GET['logout'])) {
+    session_unset();
+    session_destroy();
+    header("Location: index.php");
+    exit;
+}
+
+// Kiểm tra nếu có tài khoản đăng nhập
+$username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
+?>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -49,58 +78,37 @@
 
                             <div class="auth-container" method="POST">
 
-                                <?php
-                                session_start();
+                                <?php if ($username): ?>
+                                    <?php
+                                    $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
+                                    $stmt->bind_param("s", $username);
+                                    $stmt->execute();
+                                    $result = $stmt->get_result();
 
-                                // Ngăn chặn cache để tránh hiển thị sai thông tin cũ
-                                header("Cache-Control: no-cache, must-revalidate");
-                                header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
-
-                                $servername = "localhost";
-                                $username = "root";
-                                $password = "";
-                                $dbname = "admindoan";
-
-                                $conn = new mysqli($servername, $username, $password, $dbname);
-                                if ($conn->connect_error) {
-                                    die("Kết nối thất bại" . $conn->connect_error);
-                                }
-                                if (!isset($_SESSION["username"])) {
-                                    header("Location: dn.php");
-                                    exit;
-                                }
-
-                                $username = $_SESSION["username"];
-                                $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
-                                $stmt->bind_param("s", $username);
-                                $stmt->execute();
-                                $result = $stmt->get_result();
-
-                                if ($result->num_rows > 0) {
-                                    $row = $result->fetch_assoc();
-                                    echo '
-                                <div class="user-info">
-                                      <h1 class="welcome"><span style="color:green;">' . htmlspecialchars($row["name"]) . '</span></h1>
-                                <a href="dn.php"><button class="logout-btn" style="font-size: 17px;">Đăng xuất</button></a>
-                                </div>';
-                                } else {
-                                    echo "Không tìm thấy tài khoản!";
-                                }
-
-                                $stmt->close();
-                                $conn->close();
-                                ?>
+                                    if ($result->num_rows > 0) {
+                                        $row = $result->fetch_assoc();
+                                        echo '
+                                        <div class="user-info">
+                                            <h1 class="welcome"><span style="color:green;">' . htmlspecialchars($row["name"]) . '</span></h1>
+                                            <a href="index.php?logout=true"><button class="logout-btn" style="font-size: 17px;">Đăng xuất</button></a>
+                                        </div>';
+                                    }
+                                    $stmt->close();
+                                    ?>
+                                <?php else: ?>
+                                    <a href="dn.php"><button class="login-btn" style="font-size: 17px;">Đăng nhập</button></a>
+                                <?php endif; ?>
 
 
                                 <div class="hoadon">
-                                    <span class="ravao">Giỏ hàng</span>
-                                    <a href="hoadon.php">
+
+                                    <span class="ravao" onclick="<?php echo $username ? 'openCart()' : 'requireLogin()' ?>">Giỏ hàng</span>                                    
+                                    <a href="<?php echo $username ? 'hoadon.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
                                         <div class="hd">Hóa đơn</div>
                                     </a>
-                                    <a href="admin.php">
+                                    <a href="<?php echo $username ? 'admin.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
                                         <div class="hd">Quản lý</div>
                                     </a>
-
                                 </div>
                             </div>
                     </ul>
@@ -310,7 +318,7 @@
                 <p style=" font-weight: bold;margin-top: 10px; margin-bottom: 20px;">Tổng tiền:<span>0</span><sup></sup>
                 </p>
             </div>
-            <a class="thanhtoan" href="thanhtoan.php">Thanh toán</a>
+            <a class="thanhtoan" href="<?php echo $username ? 'thanhtoan.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">Thanh toán</a>
         </form>
     </section>
 
@@ -496,7 +504,31 @@
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
     <script src="js/main.js"></script>
+    <script>
+    function requireLogin() {
+        alert("Bạn cần đăng nhập để sử dụng chức năng này!");
+        return false; // Ngăn chặn hành động
+    }
+
+    function openCart() {
+        document.querySelector('.cart').style.display = 'block';
+    }
+    window.onload = function () {
+    const username = localStorage.getItem('username'); // Kiểm tra đăng nhập
+    const cartSection = document.querySelector('.cart'); // Lấy phần giỏ hàng
+
+    if (!username) {
+        cartSection.style.display = "none"; // Ẩn giỏ hàng nếu chưa đăng nhập
+    } else {
+        cartSection.style.display = "block"; // Hiển thị nếu đã đăng nhập
+        displayCart(); // Hiển thị giỏ hàng
+    }
+};
+
+</script>
+
 
 </body>
+<?php $conn->close(); ?>
 
 </html>
