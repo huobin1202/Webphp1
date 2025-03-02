@@ -81,14 +81,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $error_message = "";
 
     // Sử dụng prepared statements để tránh SQL Injection
-    $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ? AND password = ?");
-    $stmt->bind_param("ss", $name, $password);
-    $stmt->execute();
-    $stmt->store_result();
+    $result = $conn->prepare("SELECT id FROM customer WHERE name = ? AND password = ?");
+    $result->bind_param("ss", $name, $password);
+    $result->execute();
+    $result->store_result();
 
-    if ($stmt->num_rows == 1) {
-        $stmt->bind_result($user_id);
-        $stmt->fetch();
+    if ($result->num_rows == 1) {
+        $result->bind_result($user_id);
+        $result->fetch();
 
         session_unset();
         session_destroy();
@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = "Tên đăng nhập hoặc mật khẩu không đúng!";
     }
 
-    $stmt->close();
+    $result->close();
     $conn->close();
 }
 ?>
