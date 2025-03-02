@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tenMon = htmlspecialchars($_POST['fullname'], ENT_QUOTES, 'UTF-8');
     $category = htmlspecialchars($_POST['phone'], ENT_QUOTES, 'UTF-8');
     $mauXe = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-    $giaBan = isset($_POST['user-status']) && $_POST['user-status'] == '1' ? 1 : 0; // Default to 0 if not set
     
     // Sanitize inputs to prevent SQL injection
     $tenMon = $conn->real_escape_string($tenMon);
@@ -29,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Insert data into the database
     $sql = "INSERT INTO customer (name, contact, joindate, password, status)
-            VALUES ('$tenMon', '$category',NOW(), '$mauXe', '$giaBan')";
+            VALUES ('$tenMon', '$category',NOW(), '$mauXe', 1)";
 
     if ($conn->query($sql) === TRUE) {
         echo "<script>
@@ -201,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $conn = new mysqli($servername,$username,$password,$dbname);
 
                             if ($conn->connect_error){
-                                die("Kế nối thất bại: ".$conn->connect_error);
+                                die("Kết nối thất bại: ".$conn->connect_error);
 
                             }
 
@@ -242,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h3 class="modal-container-title add-account-e ">THÊM KHÁCH HÀNG MỚI</h3>
             <a href="khachhang.php"><button class="modal-close"><i class="fa-regular fa-xmark"></i></button></a>
             <div class="form-content sign-up">
-                <form action="" class="signup-form" method="POST" enctype="multipart/form-data" onsubmit="return confirmSubmit()">
+                <form action="" class="signup-form" method="POST" enctype="multipart/form-data" >
                     <div class="form-group">
                         <label for="fullname" class="form-label">Tên đầy đủ</label>
                         <input id="fullname" name="fullname" type="text" placeholder="VD: Nguyễn Văn A" class="form-control" required>
@@ -255,22 +254,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="password" class="form-label">Mật khẩu</label>
                         <input id="password" name="password" type="text" placeholder="Nhập mật khẩu" class="form-control" required>
                     </div>
-                    <div class="form-group edit-account-e">
-                        <label for="user-status" class="form-label">Trạng thái</label>
-                        <input type="hidden" name="user-status" value="0">
-                        <input type="checkbox" id="user-status" name="user-status" value="1" class="switch-input">
-                        <label for="user-status" class="switch"></label>
-                    </div>
+          
                     <button class="form-submit add-account-e" id="signup-button">Đăng ký</button>
                 </form>
             </div>
         </div>
     </div>
-    <script>
-        function confirmSubmit() {
-            return confirm("Bạn có chắc chắn muốn thêm khách hàng này?");
-        }
-    </script>
+  
 </body>
 
 </html>

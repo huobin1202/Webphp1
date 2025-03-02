@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $error_message = "Tài khoản hoặc số điện thoại đã tồn tại, vui lòng chọn thông tin khác!";
             } else {
                 // Thêm tài khoản mới vào CSDL
-                $sql = "INSERT INTO customer (name, contact, joindate, status, password) VALUES (?, ?, NOW(), 'active', ?)";
+                $sql = "INSERT INTO customer (name, contact, joindate, status, password) VALUES (?, ?, NOW(), '1', ?)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("sss", $name, $contact, $password);
                 

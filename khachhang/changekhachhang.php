@@ -32,12 +32,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($conn->query($sqlUpdate) === TRUE) {
         echo "<script>
                 alert('Chỉnh sửa thông tin khách hàng thành công!');
-                window.location.href = '/khachhang.php';
+                window.location.href = 'khachhang.php';
               </script>";
     } else {
         echo "<script>
                 alert('Không thể chỉnh sửa khách hàng! Lỗi: " . $conn->error . "');
-                window.location.href = '/newkhachhang.php';
+                window.location.href = 'newkhachhang.php';
               </script>";
     }
 }
