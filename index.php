@@ -266,7 +266,7 @@
                                 </a>
                                 <h3>' . $row["tensp"] . '</h3>
                                 <div class="greenSpacer"></div>
-                                <div class="price">' . $row["giaban"] . 'đ</div>
+                                <div class="price">' . number_format($row["giaban"], 0, ',', '.') . 'đ</div>
                                 <button type="button" class="mua" onclick="addToCart(\'' . $row["tensp"] . '\', ' . $row["giaban"] . ', \'image/' . $row["hinhanh"] . '\')">Thêm vào giỏ hàng </button>
                                 </div>';
                             }
