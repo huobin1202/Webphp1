@@ -4,6 +4,8 @@
         chi tiết hóa đơn (hoadon.php),
         tìm kiếm sp, trang edit thông tin kh
         
+**Index lỗi:** đăng xuất nhưng tk vẫn còn
+        
 **Admin thiếu:** đơn hàng + chi tiết dh,
              thống kế sp + chi tiết,
              thống kê kh + chi tiết + chi tiết hd kh,
