@@ -1,3 +1,5 @@
+**https://www.youtube.com/watch?v=U2Fjfqm-7g8**
+
 **Index thiếu:**  lưu sản phẩm đã thêm vào giỏ hàng, 
         địa chỉ đã lưu không hiện lên (nhập d/c mới thì hiện), 
         trang thanh toán (thanhtoan.tc), 
