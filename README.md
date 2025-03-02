@@ -9,7 +9,7 @@
              thống kê kh + chi tiết + chi tiết hd kh,
              trang đăng nhập vào tk admin
 
-**Admin lỗi:** thongkekh / thongkesp không tìm bằng date dc + nút reset không có tác dụng vs date, lỗi hiện khách hàng mặc định 'bị khóa'
+****Admin lỗi:** thongkekh / thongkesp không tìm bằng date dc + nút reset không có tác dụng vs date, lỗi hiện khách hàng mặc định 'bị khóa'**
 
 
 
