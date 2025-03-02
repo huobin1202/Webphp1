@@ -124,13 +124,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         </div>
     </form>
-
-
-
-    <div id="mainPage" class="main-page" style="display: none;">
-        <h1 style="color:#f2f6f3;">Chào mừng, <span id="userDisplayName"></span>!</h1>
-    </div>
-
 </body>
 
 </html>
