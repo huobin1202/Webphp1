@@ -71,7 +71,6 @@
                                 }
 
                                 $username = $_SESSION["username"];
-
                                 $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
                                 $stmt->bind_param("s", $username);
                                 $stmt->execute();
@@ -80,10 +79,10 @@
                                 if ($result->num_rows > 0) {
                                     $row = $result->fetch_assoc();
                                     echo '
-    <div class="user-info">
-        <h1 class="welcome"><span style="color:green;">' . htmlspecialchars($row["name"]) . '</span></h1>
-        <a href="dn.php"><button class="logout-btn" style="font-size: 17px;">Đăng xuất</button></a>
-    </div>';
+                                <div class="user-info">
+                                      <h1 class="welcome"><span style="color:green;">' . htmlspecialchars($row["name"]) . '</span></h1>
+                                <a href="dn.php"><button class="logout-btn" style="font-size: 17px;">Đăng xuất</button></a>
+                                </div>';
                                 } else {
                                     echo "Không tìm thấy tài khoản!";
                                 }

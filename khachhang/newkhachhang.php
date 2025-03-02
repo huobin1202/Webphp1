@@ -28,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
 
     // Insert data into the database
-    $sql = "INSERT INTO customer (name, contact, password, status)
-            VALUES ('$tenMon', '$category', '$mauXe', '$giaBan')";
+    $sql = "INSERT INTO customer (name, contact, joindate, password, status)
+            VALUES ('$tenMon', '$category',NOW(), '$mauXe', '$giaBan')";
 
     if ($conn->query($sql) === TRUE) {
         echo "<script>
