@@ -37,7 +37,7 @@
                             </a>
                         </li>
                         <li class="sidebar-list-item tab-content">
-                            <a href="h/sanpham/sanpham.php" class="sidebar-link">
+                            <a href="/sanpham/sanpham.php" class="sidebar-link">
                                 <div class="sidebar-icon"><i class="fa-thin fa-motorcycle"></i></div>
                                 <div class="hidden-sidebar">Sản phẩm</div>
                             </a>
