@@ -75,42 +75,55 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                 <div class="header-middle-right">
                     <ul class="header-middle-right-list">
                         <li class="header-middle-right-item dropdown open">
+                            <li class="header-middle-right-item open">
 
-                            <div class="auth-container" method="POST">
+                                <div class="auth-container" method="POST">
+                                    <?php if ($username): ?>
+                                        <?php
+                                        $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
+                                        $stmt->bind_param("s", $username);
+                                        $stmt->execute();
+                                        $result = $stmt->get_result();
 
-                                <?php if ($username): ?>
-                                    <?php
-                                    $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
-                                    $stmt->bind_param("s", $username);
-                                    $stmt->execute();
-                                    $result = $stmt->get_result();
+                                        if ($result->num_rows > 0) {
+                                            $row = $result->fetch_assoc();
+                                        ?>
+                                            <div class="user-info">
+                                                <div class="dropdownb">
+                                                    <h1 class="welcome">
+                                                        <i class="fa-light fa-user"></i>
 
-                                    if ($result->num_rows > 0) {
-                                        $row = $result->fetch_assoc();
-                                        echo '
-                                        <div class="user-info">
-                                            <h1 class="welcome"><span style="color:green;">' . htmlspecialchars($row["name"]) . '</span></h1>
-                                            <a href="index.php?logout=true"><button class="logout-btn" style="font-size: 17px;">Đăng xuất</button></a>
-                                        </div>';
-                                    }
-                                    $stmt->close();
-                                    ?>
-                                <?php else: ?>
-                                    <a href="dn.php"><button class="login-btn" style="font-size: 17px;">Đăng nhập</button></a>
-                                <?php endif; ?>
+                                                        <span class="dropdownb-toggle" style="color:green;"><?php echo htmlspecialchars($row["name"]); ?></span>
+                                                    </h1>
+                                                    <div class="dropdownb-menu">
 
+                                                        <a href="<?php echo $username ? 'hoadon.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
+                                                            <div class="hd">Hóa đơn</div>
+                                                            <a href="dnurl.php">
+                                                                <div class="hd">Quản lý</div>
+                                                            </a>
+                                                            <a href="index.php?logout=true">
+                                                                <div class="hd">Đăng xuất</div>
+                                                            </a>
+                                                            
+                                                            
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php } ?>
+                                        <?php $stmt->close(); ?>
+                                    <?php else: ?>
+                                        <a href="dn.php"><button class="login-btn" style="font-size: 17px;">Đăng nhập</button></a>
+                                    <?php endif; ?>
 
-                                <div class="hoadon">
-
-                                    <span class="ravao" onclick="<?php echo $username ? 'openCart()' : 'requireLogin()' ?>">Giỏ hàng</span>                                    
-                                    <a href="<?php echo $username ? 'hoadon.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
-                                        <div class="hd">Hóa đơn</div>
-                                    </a>
-                                    <a href="dnurl.php">
-                                        <div class="hd">Quản lý</div>
-                                    </a>
+                                    <div class="hoadon">
+                                        <span class="ravao" onclick="<?php echo $username ? 'openCart()' : 'requireLogin()' ?>">Giỏ hàng</span>
+                                    </div>
                                 </div>
-                            </div>
+                            </li>
+                        </li>
+
                     </ul>
                 </div>
             </div>
@@ -253,7 +266,7 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                     <div class="grid-container" id="product-list">
 
                         <?php
-                       
+
 
                         $sql = "SELECT id, tensp, giaban, hinhanh FROM products";
                         $result = $conn->query($sql);
@@ -302,7 +315,7 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                     </tr>
                 </thead>
                 <tbody>
-              
+
 
 
                 </tbody>
@@ -316,34 +329,33 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
     </section>
 
     <div class="green-line-header"></div>
-   <?php include 'footer.php'?>
+    <?php include 'footer.php' ?>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
     <script src="js/main.js"></script>
     <script>
-    function requireLogin() {
-        alert("Bạn cần đăng nhập để sử dụng chức năng này!");
-        return false; // Ngăn chặn hành động
-    }
+        function requireLogin() {
+            alert("Bạn cần đăng nhập để sử dụng chức năng này!");
+            return false; // Ngăn chặn hành động
+        }
 
-    function openCart() {
-        document.querySelector('.cart').style.display = 'block';
-    }
-    window.onload = function () {
-    const username = localStorage.getItem('username'); // Kiểm tra đăng nhập
-    const cartSection = document.querySelector('.cart'); // Lấy phần giỏ hàng
+        function openCart() {
+            document.querySelector('.cart').style.display = 'block';
+        }
+        window.onload = function() {
+            const username = localStorage.getItem('username'); // Kiểm tra đăng nhập
+            const cartSection = document.querySelector('.cart'); // Lấy phần giỏ hàng
 
-    if (!username) {
-        cartSection.style.display = "none"; // Ẩn giỏ hàng nếu chưa đăng nhập
-    } else {
-        cartSection.style.display = "block"; // Hiển thị nếu đã đăng nhập
-        displayCart(); // Hiển thị giỏ hàng
-    }
-};
-
-</script>
+            if (!username) {
+                cartSection.style.display = "none"; // Ẩn giỏ hàng nếu chưa đăng nhập
+            } else {
+                cartSection.style.display = "block"; // Hiển thị nếu đã đăng nhập
+                displayCart(); // Hiển thị giỏ hàng
+            }
+        };
+    </script>
 
 
 
