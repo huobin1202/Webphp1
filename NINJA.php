@@ -1,3 +1,32 @@
+<?php
+session_start();
+
+// Ngăn chặn cache để tránh hiển thị thông tin cũ
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "admindoan";
+
+// Kết nối CSDL
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Kết nối thất bại: " . $conn->connect_error);
+}
+
+// Xử lý đăng xuất
+if (isset($_GET['logout'])) {
+    session_unset();
+    session_destroy();
+    header("Location: index.php");
+    exit;
+}
+
+// Kiểm tra nếu có tài khoản đăng nhập
+$username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,7 +59,7 @@
                 <div class="header-middle-center">
                     <form action="" class="form-search">
                         <span class="search-btn">
-                            <a href="timthay.php">
+                            <a href="">
                                 <i class="fa-light fa-magnifying-glass"></i>
                             </a>
                         </span>
@@ -47,23 +76,39 @@
                     <ul class="header-middle-right-list">
                         <li class="header-middle-right-item dropdown open">
 
-                            <div class="auth-container">
+                            <div class="auth-container" method="POST">
 
-                                <div class="user-info">
-                                    <h1 class="welcome"> <span id="userDisplayName"></span></h1>
-                                    <a href="dk.php"><button class="logout-btn" onclick="logout()"
-                                            style="font-size: 17px;">Đăng xuất</button></a>
-                                </div>
+                                <?php if ($username): ?>
+                                    <?php
+                                    $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
+                                    $stmt->bind_param("s", $username);
+                                    $stmt->execute();
+                                    $result = $stmt->get_result();
+
+                                    if ($result->num_rows > 0) {
+                                        $row = $result->fetch_assoc();
+                                        echo '
+                                        <div class="user-info">
+                                            <h1 class="welcome"><span style="color:green;">' . htmlspecialchars($row["name"]) . '</span></h1>
+                                            <a href="index.php?logout=true"><button class="logout-btn" style="font-size: 17px;">Đăng xuất</button></a>
+                                        </div>';
+                                    }
+                                    $stmt->close();
+                                    ?>
+                                <?php else: ?>
+                                    <a href="dn.php"><button class="login-btn" style="font-size: 17px;">Đăng nhập</button></a>
+                                <?php endif; ?>
+
 
                                 <div class="hoadon">
-                                    <span class="ravao">Giỏ hàng</span>
-                                    <a href="hoadon.php">
+
+                                    <span class="ravao" onclick="<?php echo $username ? 'openCart()' : 'requireLogin()' ?>">Giỏ hàng</span>                                    
+                                    <a href="<?php echo $username ? 'hoadon.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
                                         <div class="hd">Hóa đơn</div>
                                     </a>
-                                    <a href="admin.php">
-                                        <div class="hd">Quan ly</div>
+                                    <a href="<?php echo $username ? 'admin.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
+                                        <div class="hd">Quản lý</div>
                                     </a>
-
                                 </div>
                             </div>
                     </ul>
@@ -87,7 +132,7 @@
                 <input type="number" placeholder="tối thiểu" id="min-price" onchange="searchProducts()">
                 <span>đến</span>
                 <input type="number" placeholder="tối đa" id="max-price" onchange="searchProducts()">
-                <button id="advanced-search-price-btn"><a href="timthay2.php"><i class="fa-light fa-magnifying-glass-dollar"></i></a></button>
+                <button id="advanced-search-price-btn"><a href=""><i class="fa-light fa-magnifying-glass-dollar"></i></a></button>
             </div>
             <div class="advanced-search-control">
                 <button id="sort-ascending" onclick="searchProducts(1)"><i
@@ -208,15 +253,7 @@
                     <div class="grid-container" id="product-list">
 
                         <?php
-                        $servername = "localhost";
-                        $username = "root";
-                        $password = "";
-                        $dbname = "admindoan";
-
-                        $conn = new mysqli($servername, $username, $password, $dbname);
-                        if ($conn->connect_error) {
-                            die("Kết nối thất bại" . $conn->connect_error);
-                        }
+                     
 
                         $sql = "SELECT id, tensp, giaban, hinhanh FROM products WHERE dongsp='Dòng Ninja'";
                         $result = $conn->query($sql);
@@ -226,14 +263,14 @@
                                 <div class="card page-1" id="invoiceModal">
                                 <a href="thongtinsp.php?id=' . $row["id"] . '">                                
                                 <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
-                                <h3>' . $row["tensp"] . '</h4>
+                                </a>
+                                <h3>' . $row["tensp"] . '</h3>
                                 <div class="greenSpacer"></div>
-                                <div class="price">' . $row["giaban"] . 'đ</div>
+                                <div class="price">' . number_format($row["giaban"], 0, ',', '.') . 'đ</div>
                                 <button type="button" class="mua" onclick="addToCart(\'' . $row["tensp"] . '\', ' . $row["giaban"] . ', \'image/' . $row["hinhanh"] . '\')">Thêm vào giỏ hàng </button>
                                 </div>';
                             }
-                        }     else {                echo "<div class='no-products'>Không có sản phẩm nào!</div>";                }
-
+                        }
                         ?>
 
                     </div>
@@ -249,10 +286,10 @@
 
     </main>
     <section class="cart">
-        <button class="dong">Đóng</button>
+        <button class="dong"><i class="fa-regular fa-xmark"></i></button>
         <!-- <div>Đóng</div> -->
         <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
-        <form action="">
+        <form action="" method="POST">
             <table>
                 <thead>
                     <tr>
@@ -266,18 +303,19 @@
                 </thead>
                 <tbody>
 
-                    <!-- <td style="display: flex;align-items: center;"><img style ="width: 120px;"src="image/ninja-1000sx.png"alt ="">Ninja</td>
-                        <td><p><span>1500</span><sup>đ</sup></p></td>
-                         <td><input style="width: 40px; outline: none;" type="number"value ="1"min="1""max="2""></td>
-                         <td style="cursor: pointer;">Xóa </td>
-                     -->
+                <?php 
+                
+                
+                ?>
+
+
                 </tbody>
             </table>
             <div style="text-align: center;" class="price-total">
                 <p style=" font-weight: bold;margin-top: 10px; margin-bottom: 20px;">Tổng tiền:<span>0</span><sup></sup>
                 </p>
             </div>
-            <a class="thanhtoan" href="thanhtoan.php">Thanh toán</a>
+            <a class="thanhtoan" href="<?php echo $username ? 'thanhtoan.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">Thanh toán</a>
         </form>
     </section>
 
@@ -458,30 +496,36 @@
             </div>
         </div>
     </div>
-
-    <script>
-        // Lấy tên người dùng từ localStorage
-        const loggedInUser = localStorage.getItem('loggedInUser');
-
-        // Kiểm tra nếu có người dùng đã đăng nhập, hiển thị tên
-        if (loggedInUser) {
-            document.getElementById('userDisplayName').textContent = loggedInUser;
-        }
-
-        // Hàm đăng xuất
-        function logout() {
-            // Xóa thông tin người dùng khỏi localStorage
-            localStorage.removeItem('loggedInUser');
-
-            // Chuyển hướng về trang đăng nhập
-            window.location.href = 'index.php';
-        }
-    </script>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+    function requireLogin() {
+        alert("Bạn cần đăng nhập để sử dụng chức năng này!");
+        return false; // Ngăn chặn hành động
+    }
+
+    function openCart() {
+        document.querySelector('.cart').style.display = 'block';
+    }
+    window.onload = function () {
+    const username = localStorage.getItem('username'); // Kiểm tra đăng nhập
+    const cartSection = document.querySelector('.cart'); // Lấy phần giỏ hàng
+
+    if (!username) {
+        cartSection.style.display = "none"; // Ẩn giỏ hàng nếu chưa đăng nhập
+    } else {
+        cartSection.style.display = "block"; // Hiển thị nếu đã đăng nhập
+        displayCart(); // Hiển thị giỏ hàng
+    }
+};
+
+</script>
+
 
 </body>
+<?php $conn->close(); ?>
 
 </html>

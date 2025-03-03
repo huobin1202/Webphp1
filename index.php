@@ -253,15 +253,7 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                     <div class="grid-container" id="product-list">
 
                         <?php
-                        $servername = "localhost";
-                        $username = "root";
-                        $password = "";
-                        $dbname = "admindoan";
-
-                        $conn = new mysqli($servername, $username, $password, $dbname);
-                        if ($conn->connect_error) {
-                            die("Kết nối thất bại" . $conn->connect_error);
-                        }
+                       
 
                         $sql = "SELECT id, tensp, giaban, hinhanh FROM products";
                         $result = $conn->query($sql);
@@ -310,6 +302,7 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                     </tr>
                 </thead>
                 <tbody>
+              
 
 
                 </tbody>
