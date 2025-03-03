@@ -1,3 +1,55 @@
+<?php
+session_start();
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "admindoan";
+
+// Kết nối CSDL
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Kết nối thất bại: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
+
+    if (empty($username) || empty($password)) {
+        echo "<script>alert('Vui lòng nhập đầy đủ thông tin!'); window.location='dnurl.php';</script>";
+        exit();
+    }
+
+    $sql = "SELECT * FROM nhanvien WHERE name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows ==1) {
+        $user = $result->fetch_assoc();
+        
+        if ($password == $user['password']) {
+            $_SESSION['username'] = $user['name'];
+            $_SESSION['loainv'] = $user['loainv'];
+            $_SESSION['id'] = $user['id'];
+
+            if ($user['loainv'] == 1) {
+                header("Location: admin.php");
+                exit();
+            } else {
+                echo "<script>alert('Bạn không có quyền truy cập!'); window.location='dnurl.php';</script>";
+            }
+        } else {
+            echo "<script>alert('Sai tài khoản hoặc mật khẩu!'); window.location='dnurl.php';</script>";
+        }
+    } 
+    
+    $stmt->close();
+    $conn->close();
+}
+?>
+
 <!DOCTYPE php>
 <php lang="en">
 <head>
@@ -112,7 +164,7 @@ input:focus, button:focus {
     </style>
     <div class="login-container">
         <h2>Đăng nhập vào hệ thống</h2>
-        <form id="loginForm" onsubmit="login(event)">
+        <form id="loginForm" method="POST">
             <label for="username">Tên đăng nhập:</label>
             <input type="text" id="username" name="username" required>
 
@@ -123,21 +175,6 @@ input:focus, button:focus {
         </form>
     </div>
 
-    <script>
-        function login(event) {
-            event.preventDefault();
-
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;// Kiểm tra thông tin đăng nhập (ở đây chỉ kiểm tra với một tài khoản giả)
-            if (username === "admin" && password === "admin123") {
-                // Lưu thông tin đăng nhập vào localStorage
-                localStorage.setItem("isLoggedIn", "true");
-                localStorage.setItem("username", username);
-                window.location.href = "admin.php";  // Chuyển hướng đến trang admin
-            } else {
-                alert("Tên đăng nhập hoặc mật khẩu sai.");
-            }
-        }
-    </script>
+  
 </body>
 </php>
