@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 28, 2025 at 05:43 PM
+-- Generation Time: Mar 03, 2025 at 01:08 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -34,31 +34,32 @@ CREATE TABLE `customer` (
   `joindate` date NOT NULL,
   `status` int(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `ghichu` text DEFAULT NULL
+  `ghichu` text DEFAULT NULL,
+  `email` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `customer`
 --
 
-INSERT INTO `customer` (`id`, `name`, `contact`, `joindate`, `status`, `password`, `ghichu`) VALUES
-(27, '65745674567456', 2147483647, '2025-02-26', 0, '123', NULL),
-(28, '123', 123, '2025-02-26', 0, '$2y$10$L2HhFVm3hY2HxVpjUWWq4O1wGlanl6i8CDLq81F5HplnDFDrBpfaq', NULL),
-(29, '1234', 1234, '2025-02-26', 0, '$2y$10$tj/HRe1FJfJuzKhb8cApM.slOhtY1xIzepHJbRdovDP.VzTdzI0sO', NULL),
-(31, '12345', 12345, '2025-02-28', 0, '$2y$10$W1LDNKdC7E925X6Os4Zypur337kN4b/baPgmwkeafMPIJNsrewcuO', NULL),
-(32, '5454', 5454, '2025-02-28', 0, '$2y$10$rRgk82isoTbQCIbgLZIvxuzQaxddwN1B2lwvXzUISbCLGr0c3v7ay', NULL),
-(33, 'haha', 34563456, '2025-02-28', 0, '$2y$10$J3zIUdhQ67hE2hkivQ8D0encIXS96ynOXkOiEHSgo1OCbpZxf/ou.', NULL),
-(34, '4214124', 123124, '2025-02-28', 0, '123', NULL),
-(35, '8762847', 562456, '2025-02-28', 0, '876', NULL),
-(36, 'binhho', 52645256, '2025-02-28', 0, '123', NULL);
+INSERT INTO `customer` (`id`, `name`, `contact`, `joindate`, `status`, `password`, `ghichu`, `email`) VALUES
+(27, '65745674567456', 2147483647, '2025-02-26', 0, '123', NULL, ''),
+(28, '123', 123, '2025-02-26', 0, '$2y$10$L2HhFVm3hY2HxVpjUWWq4O1wGlanl6i8CDLq81F5HplnDFDrBpfaq', NULL, ''),
+(29, '1234', 1234, '2025-02-26', 0, '$2y$10$tj/HRe1FJfJuzKhb8cApM.slOhtY1xIzepHJbRdovDP.VzTdzI0sO', NULL, ''),
+(31, '12345', 12345, '2025-02-28', 0, '$2y$10$W1LDNKdC7E925X6Os4Zypur337kN4b/baPgmwkeafMPIJNsrewcuO', NULL, ''),
+(32, '5454', 5454, '2025-02-28', 0, '$2y$10$rRgk82isoTbQCIbgLZIvxuzQaxddwN1B2lwvXzUISbCLGr0c3v7ay', NULL, ''),
+(33, 'haha', 34563456, '2025-02-28', 0, '$2y$10$J3zIUdhQ67hE2hkivQ8D0encIXS96ynOXkOiEHSgo1OCbpZxf/ou.', NULL, ''),
+(34, '4214124', 123124, '2025-02-28', 0, '123', NULL, ''),
+(35, '8762847', 562456, '2025-02-28', 0, '876', NULL, ''),
+(36, 'binhho', 52645256, '2025-02-28', 0, '123', NULL, '');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `gio_hang`
+-- Table structure for table `giohang`
 --
 
-CREATE TABLE `gio_hang` (
+CREATE TABLE `giohang` (
   `id` int(11) NOT NULL,
   `customer_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
@@ -76,6 +77,26 @@ CREATE TABLE `loaiproducts` (
   `namelsp` varchar(255) NOT NULL,
   `dongsp` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `nhanvien`
+--
+
+CREATE TABLE `nhanvien` (
+  `id` int(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `loainv` int(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `nhanvien`
+--
+
+INSERT INTO `nhanvien` (`id`, `name`, `password`, `loainv`) VALUES
+(1, 'admin', 'admin', 1);
 
 -- --------------------------------------------------------
 
@@ -119,9 +140,9 @@ ALTER TABLE `customer`
   ADD UNIQUE KEY `contact` (`contact`);
 
 --
--- Indexes for table `gio_hang`
+-- Indexes for table `giohang`
 --
-ALTER TABLE `gio_hang`
+ALTER TABLE `giohang`
   ADD PRIMARY KEY (`id`),
   ADD KEY `customer_id` (`customer_id`),
   ADD KEY `product_id` (`product_id`);
@@ -149,9 +170,9 @@ ALTER TABLE `customer`
   MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
--- AUTO_INCREMENT for table `gio_hang`
+-- AUTO_INCREMENT for table `giohang`
 --
-ALTER TABLE `gio_hang`
+ALTER TABLE `giohang`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -171,11 +192,11 @@ ALTER TABLE `products`
 --
 
 --
--- Constraints for table `gio_hang`
+-- Constraints for table `giohang`
 --
-ALTER TABLE `gio_hang`
-  ADD CONSTRAINT `gio_hang_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `gio_hang_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
+ALTER TABLE `giohang`
+  ADD CONSTRAINT `giohang_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `giohang_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
