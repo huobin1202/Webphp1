@@ -7,7 +7,7 @@
         tìm kiếm sp, trang edit thông tin kh
        
         
-**Index lỗi:** **đăng xuất nhưng tk vẫn còn**,  lỗi (dk.php) khi nhập tên tk quá limit
+**Index lỗi:** lỗi (dk.php) khi nhập tên tk quá limit
         
 **Admin thiếu:** đơn hàng + chi tiết dh,
              thống kế sp + chi tiết,
