@@ -106,7 +106,7 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                                     <a href="<?php echo $username ? 'hoadon.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
                                         <div class="hd">Hóa đơn</div>
                                     </a>
-                                    <a href="<?php echo $username ? 'dnurl.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
+                                    <a href="dnurl.php">
                                         <div class="hd">Quản lý</div>
                                     </a>
                                 </div>
