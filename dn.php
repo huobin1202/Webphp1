@@ -80,6 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $error_message = "";
 
+    // Sử dụng prepared statements để tránh SQL Injection
     $result = $conn->prepare("SELECT id FROM customer WHERE name = ? AND password = ?");
     $result->bind_param("ss", $name, $password);
     $result->execute();
