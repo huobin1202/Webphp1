@@ -210,6 +210,7 @@
     /* Khoảng cách giữa hai phần tử được giãn đều */
     align-items: center;
     /* Căn giữa theo trục dọc (chiều cao) */
+    top:-5px;
 }
 
 .ravao,

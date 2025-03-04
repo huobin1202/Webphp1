@@ -30,7 +30,7 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+<head> hello
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -75,53 +75,56 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                 <div class="header-middle-right">
                     <ul class="header-middle-right-list">
                         <li class="header-middle-right-item dropdown open">
-                            <li class="header-middle-right-item open">
+                        <li class="header-middle-right-item open">
 
-                                <div class="auth-container" method="POST">
-                                    <?php if ($username): ?>
-                                        <?php
-                                        $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
-                                        $stmt->bind_param("s", $username);
-                                        $stmt->execute();
-                                        $result = $stmt->get_result();
+                            <div class="auth-container" method="POST">
+                                <?php if ($username): ?>
+                                    <?php
+                                    $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
+                                    $stmt->bind_param("s", $username);
+                                    $stmt->execute();
+                                    $result = $stmt->get_result();
 
-                                        if ($result->num_rows > 0) {
-                                            $row = $result->fetch_assoc();
-                                        ?>
-                                            <div class="user-info">
-                                                <div class="dropdownb">
-                                                    <h1 class="welcome">
-                                                        <i class="fa-light fa-user"></i>
+                                    if ($result->num_rows > 0) {
+                                        $row = $result->fetch_assoc();
+                                    ?>
+                                        <div class="user-info">
+                                            <div class="dropdownb">
+                                                <h1 class="welcome">
+                                                    <i class="fa-light fa-user"></i>
 
-                                                        <span class="dropdownb-toggle" style="color:green;"><?php echo htmlspecialchars($row["name"]); ?></span>
-                                                    </h1>
-                                                    <div class="dropdownb-menu">
+                                                    <span class="dropdownb-toggle" style="color:green;"><?php echo htmlspecialchars($row["name"]); ?></span>
+                                                </h1>
+                                                <div class="dropdownb-menu">
 
-                                                        <a href="<?php echo $username ? 'hoadon.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
-                                                            <div class="hd">Hóa đơn</div>
-                                                            <a href="dnurl.php">
-                                                                <div class="hd">Quản lý</div>
-                                                            </a>
-                                                            <a href="index.php?logout=true">
-                                                                <div class="hd">Đăng xuất</div>
-                                                            </a>
-                                                            
-                                                            
+                                                    <a href="<?php echo $username ? 'hoadon.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
+                                                        <div class="hd">Hóa đơn</div>
+                                                        <a href="dnurl.php">
+                                                            <div class="hd">Quản lý</div>
                                                         </a>
-                                                    </div>
+                                                        <a href="index.php?logout=true">
+                                                            <div class="hd">Đăng xuất</div>
+                                                        </a>
+
+
+                                                    </a>
                                                 </div>
                                             </div>
-                                        <?php } ?>
-                                        <?php $stmt->close(); ?>
-                                    <?php else: ?>
-                                        <a href="dn.php"><button class="login-btn" style="font-size: 17px;">Đăng nhập</button></a>
-                                    <?php endif; ?>
+                                        </div>
+                                    <?php } ?>
+                                    <?php $stmt->close(); ?>
+                                <?php else: ?>
+                                    <a href="dn.php"><button class="login-btn" style="font-size: 17px;">Đăng nhập</button></a>
+                                <?php endif; ?>
 
-                                    <div class="hoadon">
-                                        <span class="ravao" onclick="<?php echo $username ? 'openCart()' : 'requireLogin()' ?>">Giỏ hàng</span>
-                                    </div>
+                                <div class="hoadon">
+
+                                    <span class="ravao" onclick="<?php echo $username ? 'openCart()' : 'requireLogin()' ?>"> 
+                                        <i class="fa-light fa-basket-shopping"></i>
+                                        Giỏ hàng</span>
                                 </div>
-                            </li>
+                            </div>
+                        </li>
                         </li>
 
                     </ul>
