@@ -46,7 +46,7 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 <body>
     <header>
 
-        <div class="header-middle">
+        <div class="header-middle"> kjk
             <div class="container">
                 <div class="header-middle-left">
                     <div class="header-logo">
