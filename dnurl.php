@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 $servername = "localhost";
 $username = "root";
@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<!DOCTYPE php>
+<!DOCTYPE php> helo
 <php lang="en">
 <head>
     <meta charset="UTF-8">
