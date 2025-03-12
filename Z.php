@@ -1,20 +1,6 @@
 <?php
 session_start();
-
-// Ngăn chặn cache để tránh hiển thị thông tin cũ
-header("Cache-Control: no-cache, must-revalidate");
-header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
-
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "admindoan";
-
-// Kết nối CSDL
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
+include('database.php');
 
 // Xử lý đăng xuất
 if (isset($_GET['logout'])) {
@@ -23,14 +9,26 @@ if (isset($_GET['logout'])) {
     header("Location: index.php");
     exit;
 }
-
-// Kiểm tra nếu có tài khoản đăng nhập
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
+$customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
+
+// Nếu có username, lấy ID từ bảng customer
+if ($username && !$customer_id) {
+    $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->bind_result($customer_id);
+    if ($stmt->fetch()) {
+        $_SESSION["customer_id"] = $customer_id;
+    }
+    $stmt->close();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,7 +43,6 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 
 <body>
     <header>
-
         <div class="header-middle">
             <div class="container">
                 <div class="header-middle-left">
@@ -53,7 +50,6 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                         <a href="" id="logo">
                             <img src="image/logo.png" alt="BMT">
                         </a>
-
                     </div>
                 </div>
                 <div class="header-middle-center">
@@ -71,12 +67,10 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                         </button>
                     </form>
                 </div>
-
                 <div class="header-middle-right">
                     <ul class="header-middle-right-list">
                         <li class="header-middle-right-item dropdown open">
                         <li class="header-middle-right-item open">
-
                             <div class="auth-container" method="POST">
                                 <?php if ($username): ?>
                                     <?php
@@ -97,12 +91,12 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                                                 </h1>
                                                 <div class="dropdownb-menu">
 
-                                                    <a href="<?php echo $username ? 'hoadon.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">
+                                                    <a href="hoadon.php">
                                                         <div class="hd">Hóa đơn</div>
                                                         <a href="dnurl.php">
                                                             <div class="hd">Quản lý</div>
                                                         </a>
-                                                        <a href="index.php?logout=true">
+                                                        <a href="index.php?logout=<?php echo $id; ?>" onclick="return confirm('bạn có muốn đăng xuất?')">
                                                             <div class="hd">Đăng xuất</div>
                                                         </a>
 
@@ -119,7 +113,7 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 
                                 <div class="hoadon">
 
-                                    <span class="ravao" onclick="<?php echo $username ? 'openCart()' : 'requireLogin()' ?>"> 
+                                    <span class="ravao" onclick="">
                                         <i class="fa-light fa-basket-shopping"></i>
                                         Giỏ hàng</span>
                                 </div>
@@ -269,22 +263,31 @@ $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
                     <div class="grid-container" id="product-list">
 
                         <?php
-
-
-$sql = "SELECT id, tensp, giaban, hinhanh FROM products WHERE dongsp='Dòng Z'";
-$result = $conn->query($sql);
+                        $sql = "SELECT id, tensp, giaban, hinhanh FROM products WHERE dongsp='Dòng Z'";
+                        $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo '
-                                <div class="card page-1" id="invoiceModal">
-                                <a href="thongtinsp.php?id=' . $row["id"] . '">                                
-                                <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
-                                </a>
-                                <h3>' . $row["tensp"] . '</h3>
-                                <div class="greenSpacer"></div>
-                                <div class="price">' . number_format($row["giaban"], 0, ',', '.') . 'đ</div>
-                                <button type="button" class="mua" onclick="addToCart(\'' . $row["tensp"] . '\', ' . $row["giaban"] . ', \'image/' . $row["hinhanh"] . '\')">Thêm vào giỏ hàng </button>
-                                </div>';
+                                <form method="POST" action="">
+                                    <div class="card page-1" id="invoiceModal">
+                                        <a href="thongtinsp.php?id=' . $row["id"] . '">
+                                            <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
+                                        </a>
+                                        <h3>' . $row["tensp"] . '</h3>
+                                        <div class="greenSpacer"></div>
+                                        <div class="price">' . number_format($row["giaban"], 0, ',', '.') . 'đ</div>
+
+                                        <input type="hidden" name="product_id" value="' . $row["id"] . '">
+                                        <input type="hidden" name="product_name" value="' . htmlspecialchars($row["tensp"]) . '">
+                                        <input type="hidden" name="product_price" value="' . $row["giaban"] . '">
+                                        <input type="hidden" name="product_img" value="' . $row["hinhanh"] . '">
+                                        <div class=display style="display:flex;">
+                                        <button type="submit" class="mua" name="add_to_cart">Thêm vào giỏ hàng</button>
+                                        <input type="number" min="1" value="1" name="quantity" class="num-input"></input>
+                                        </div>
+                                    
+                                    </div>
+                                </form>';
                             }
                         }
                         ?>
@@ -301,33 +304,108 @@ $result = $conn->query($sql);
         </div>
 
     </main>
+
     <section class="cart">
         <button class="dong"><i class="fa-regular fa-xmark"></i></button>
         <!-- <div>Đóng</div> -->
         <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
         <form action="" method="POST">
+            <?php
+            if (isset($_POST['add_to_cart'])) {
+                if (!$customer_id) {
+                    die("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
+                }
+            
+                $product_id = $_POST['product_id'];
+                $product_price = $_POST['product_price'];
+                $product_img = $_POST['product_img'];
+                $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
+            
+                // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
+                $stmt = $conn->prepare("SELECT soluong FROM giohang WHERE product_id = ? AND customer_id = ?");
+                $stmt->bind_param("ii", $product_id, $customer_id);
+                $stmt->execute();
+                $stmt->store_result();
+            
+                if ($stmt->num_rows > 0) {
+                    $stmt->close();
+                } else {
+                    $stmt = $conn->prepare("INSERT INTO giohang (customer_id, product_id, soluong, price, img) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->bind_param("iiiss", $customer_id, $product_id, $quantity, $product_price, $product_img);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+            }
+            
+
+            ?>
+
             <table>
                 <thead>
                     <tr>
                         <th>
                             Sản phẩm
                         </th>
+                        <th>Tên</th>
                         <th>Giá</th>
                         <th>Số lượng</th>
                         <th>Chọn</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php
+                    // Kiểm tra xem người dùng đã đăng nhập chưa
+                    if (!isset($_SESSION['customer_id'])) {
+                        echo "<tr><td colspan='4'>Bạn cần đăng nhập để xem giỏ hàng!</td></tr>";
+                    } else {
+                        $customer_id = $_SESSION['customer_id'];
 
+                        // Truy vấn lấy sản phẩm từ bảng giỏ hàng
+                        $sql = "SELECT g.id, g.product_id, g.soluong, g.price, g.img, p.tensp 
+                                FROM giohang g
+                                JOIN products p ON g.product_id = p.id
+                                WHERE g.customer_id = ?";
 
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bind_param("i", $customer_id);
+                        $stmt->execute();
+                        $result = $stmt->get_result();
 
+                        $total_price = 0;
+
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                $subtotal = $row["soluong"] * $row["price"];
+                                $total_price += $subtotal;
+                                echo '
+<tr>
+    <td style="display: flex; align-items: center;">
+        <img style="width: 90px;" src="sanpham/' . $row["img"] . '" alt="' . htmlspecialchars($row["tensp"]) . '">
+    </td>
+    <td><span>' . htmlspecialchars($row["tensp"]) . '</span></td>
+    <td>
+        <p><span>' . number_format($row["price"], 0, ',', '.') . '</span><sup>đ</sup></p>
+    </td>
+    <td>
+        <input style="width: 40px; outline: none;" type="number" value="' . $row["soluong"] . '" min="1" class="cart-quantity" data-cart-id="' . $row["id"] . '">
+    </td>
+    <td style="cursor: pointer;" class="delete-item" data-cart-id="' . $row["id"] . '">Xóa</td>
+</tr>';
+                            }
+                        } else {
+                            echo "<tr><td colspan='4'>Giỏ hàng của bạn đang trống!</td></tr>";
+                        }
+                    }
+                    ?>
                 </tbody>
+
             </table>
             <div style="text-align: center;" class="price-total">
-                <p style=" font-weight: bold;margin-top: 10px; margin-bottom: 20px;">Tổng tiền:<span>0</span><sup></sup>
+                <p style="font-weight: bold; margin-top: 10px; margin-bottom: 20px;">
+                    Tổng tiền: <span><?php echo number_format($total_price, 0, ',', '.'); ?></span>đ
                 </p>
             </div>
-            <a class="thanhtoan" href="<?php echo $username ? 'thanhtoan.php' : 'javascript:void(0);' ?>" onclick="<?php echo $username ? '' : 'requireLogin()' ?>">Thanh toán</a>
+            <a class="thanhtoan" href="thanhtoan.php">Thanh toán</a>
         </form>
     </section>
 
@@ -337,32 +415,15 @@ $result = $conn->query($sql);
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
-    <script src="js/main.js"></script>
-    <script>
-        function requireLogin() {
-            alert("Bạn cần đăng nhập để sử dụng chức năng này!");
-            return false; // Ngăn chặn hành động
-        }
 
-        function openCart() {
-            document.querySelector('.cart').style.display = 'block';
-        }
-        window.onload = function() {
-            const username = localStorage.getItem('username'); // Kiểm tra đăng nhập
-            const cartSection = document.querySelector('.cart'); // Lấy phần giỏ hàng
-
-            if (!username) {
-                cartSection.style.display = "none"; // Ẩn giỏ hàng nếu chưa đăng nhập
-            } else {
-                cartSection.style.display = "block"; // Hiển thị nếu đã đăng nhập
-                displayCart(); // Hiển thị giỏ hàng
-            }
-        };
-    </script>
 
 
 
 </body>
+<?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo "<script>if(window.history.replaceState){window.history.replaceState(null, null, window.location.href);}</script>";
+}
+?>
 <?php $conn->close(); ?>
 
 </html>
