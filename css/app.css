@@ -550,6 +550,8 @@ li {
 /* Slideshow container */
 .slideshow-container {
     display: relative;
+    margin-left: 10%;
+    margin-right: 10%;
 
 
 }
@@ -643,6 +645,7 @@ li {
 .next {
     right: 0;
     border-radius: 3px 0 0 3px;
+    margin-right:10%;
 }
 
 /* On hover, add a black background color with a little bit see-through */
@@ -698,8 +701,9 @@ li {
 
 .card .price {
     font-size: 18px;
-    color: #76767c;
-    font-weight: 400;
+    color: #139b3a;
+    font-weight: 700;
+    margin-bottom:20px;
 }
 
 .hidden {
@@ -1027,4 +1031,9 @@ li {
 .advanced-search-control button:hover {
     background-color: #139b3a;
     color: #fff;
+}
+
+.num-input{
+    width:30%;
+    text-align: center;
 }
