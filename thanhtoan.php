@@ -1,287 +1,182 @@
+<?php 
+session_start();
+include('database.php');
+
+// Kiểm tra đăng nhập
+if (!isset($_SESSION['customer_id'])) {
+    header('Location: dn.php');
+    exit();
+}
+$customer_id = $_SESSION['customer_id'];
+
+// Lấy giỏ hàng
+    $cart = [];
+$total = 0;
+$cart_query = $conn->prepare("
+    SELECT giohang.*, products.tensp 
+    FROM giohang 
+    JOIN products ON giohang.product_id = products.id 
+    WHERE giohang.customer_id = ?");
+$cart_query->bind_param("i", $customer_id);
+$cart_query->execute();
+$cart_result = $cart_query->get_result();
+while ($row = $cart_result->fetch_assoc()) {
+    $cart[] = $row;
+    $total += $row['soluong'] * $row['price'];
+}
+
+// Xử lý đặt hàng
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $tennguoinhan = $_POST['tennguoinhan'];
+    $sdt = $_POST['sdtnhan'];
+    $diachi = $_POST['diachinhan'];
+    $ghichu = $_POST['ghichu'] ?? '';
+    $payment = $_POST['payment_method'] ?? 'Tiền mặt';
+    $delivery = $_POST['delivery_type'] ?? 'Giao tận nơi';
+
+    // Lưu đơn hàng
+    $order_stmt = $conn->prepare("INSERT INTO orders (customer_id, total, note, payment_method, delivery_type) VALUES (?, ?, ?, ?, ?)");
+    $order_stmt->bind_param("idsss", $customer_id, $total, $ghichu, $payment, $delivery);
+    $order_stmt->execute();
+    $order_id = $conn->insert_id;
+
+    // Lưu địa chỉ đơn hàng
+    $insert_order_address = $conn->prepare("INSERT INTO order_addresses (order_id, address) VALUES (?, ?)");
+    $insert_order_address->bind_param("is", $order_id, $diachi);
+    $insert_order_address->execute();
+
+    // Lưu chi tiết đơn hàng
+    foreach ($cart as $item) {
+        $detail_stmt = $conn->prepare("INSERT INTO order_details (order_id, product_id, soluong, price) VALUES (?, ?, ?, ?)");
+        $detail_stmt->bind_param("iiid", $order_id, $item['product_id'], $item['soluong'], $item['price']);
+        $detail_stmt->execute();
+    }
+
+    // Xóa giỏ hàng
+    $delete_cart = $conn->prepare("DELETE FROM giohang WHERE customer_id = ?");
+    $delete_cart->bind_param("i", $customer_id);
+    $delete_cart->execute();
+    $_SESSION['success_message'] = "Đặt hàng thành công! Cảm ơn bạn đã mua hàng.";
+    header('Location: index.php');
+    exit();
+}
+?>
 <!DOCTYPE php>
-<php lang="vi">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Địa chỉ giao hàng</title>
-    <style>
-        /* Đặt khung chính giữa màn hình */
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            margin-left: 500px;
-            margin-right: 500px;
-        }
-        .form-section {
-            margin-top: 20px;
-        }
-        .form-section label {
-            display: block;
-            margin-bottom: 10px;
-        }
-        .form-section input, .form-section select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .form-section input[type="radio"] {
-            width: auto;
-        }
-        .btn-submit, .btn-delete {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none; 
-            border-radius: 5px;
-            cursor: pointer;
-        }
-         .btn-delete:hover {
-            background-color: #d50404;
-        }
-        .btn-submit:hover{
-            background-color:  #05a920;
-        }
-        .btn-delete {
-            margin-top: 10px;
-            background-color: #0e0d0d;
-        }
-    </style>
+    <title>Thanh Toán</title>
+    <link rel="stylesheet" href="css/reset.css ">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="./assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css">
 </head>
+
 <body>
-    <h1 style="text-align: center;">Địa chỉ giao hàng</h1>
-
-    <div>
-        <label>
-            <input type="radio" name="addressOption" value="saved" checked onclick="toggleAddressForm('saved')">
-            Chọn địa chỉ đã lưu
-        </label>
-
-        <label>
-            <input type="radio" name="addressOption" value="new" onclick="toggleAddressForm('new')">
-            Nhập địa chỉ giao hàng mới
-        </label>
+<div class="checkout-page">
+    <div class="checkout-header">
+        <div class="checkout-return">
+            <a href="index.php"><button ><i class="fa-regular fa-chevron-left"></i></button></a>
+        </div>
+        <h2 class="checkout-title">Thanh toán</h2>
     </div>
+    <main class="checkout-section container">
+        <div class="checkout-col-left">
+            <form action="" method="POST" class="info-nhan-hang">
+            <div class="checkout-row">
+                <div class="checkout-col-title">Thông tin người nhận</div>
+                <div class="checkout-col-content">
+                    <div class="content-group">
+                        <div class="form-group">
+                            <input id="tennguoinhan" name="tennguoinhan" type="text" value=""
+                                placeholder="Tên người nhận" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input id="sdtnhan" name="sdtnhan" type="text" value="" 
+                                placeholder="Số điện thoại" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input id="diachinhan" name="diachinhan" type="text" value=""
+                                placeholder="Địa chỉ nhận hàng" class="form-control chk-ship">
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Phần chọn địa chỉ đã lưu -->
-    <div id="savedAddressSection" class="form-section">
-        <label for="savedAddress">Chọn địa chỉ từ tài khoản của bạn:</label>
-        <select id="savedAddress">
-            <!-- Các địa chỉ đã lưu sẽ hiển thị ở đây -->
-        </select>
-        <button class="btn-delete" onclick="deleteSelectedAddress()" style="margin-top: 50px; margin-bottom: 10px;">Xóa địa chỉ</button>
-    </div>
+            <div class="checkout-row">
+                <div class="checkout-col-title">Thông tin đơn hàng</div>
+                <div class="checkout-col-content">
+                    <div class="content-group">
+                        <p class="checkout-content-label">Hình thức giao nhận</p>
+                        <div class="checkout-type-order">
+                            <button type="button" class="type-order-btn active" id="tudenlay">Mua trực tiếp</button>
+                            <button type="button" class="type-order-btn " id="giaotannoi">Giao tận nơi</button>
+                        </div>
+                    </div>
 
-    <!-- Phần nhập địa chỉ mới -->
-    <div id="newAddressSection" class="form-section" style="display: none;">
-        <label for="fullName">Họ và tên:</label>
-        <input type="text" id="fullName" placeholder="Nhập họ và tên">
+                    <div class="content-group chk-ship" id="giaotannoi-group">
+                        <p class="checkout-content-label">Phương thức thanh toán</p>
+                        <div class="delivery-time">
+                            <input type="radio" name="payment_method" value="Tiền mặt" id="giaongay" class="radio" checked>
+                            <label for="giaongay">Thanh toán bằng tiền mặt</label>
+                        </div>
+                        <div class="delivery-time">
+                            <input type="radio" name="payment_method" value="Chuyển khoản" id="deliverytime" class="radio">
+                            <label for="deliverytime">Thanh toán bằng chuyển khoản</label>
+                        </div>
+                    </div>
 
-        <label for="phone">Số điện thoại:</label>
-        <input type="text" id="phone" placeholder="Nhập số điện thoại">
+                    <div class="content-group" id="tudenlay-group">
+                        <p class="checkout-content-label">Lấy hàng tại chi nhánh</p>
+                        <div class="delivery-time">
+                            <input type="radio" name="delivery_type" value="273 An Dương Vương" id="chinhanh-1" class="radio" checked>
+                            <label for="chinhanh-1">273 An Dương Vương, Phường 3, Quận 5</label>
+                        </div>
+                        <div class="delivery-time">
+                            <input type="radio" name="delivery_type" value="04 Tôn Đức Thắng" id="chinhanh-2" class="radio">
+                            <label for="chinhanh-2">04 Tôn Đức Thắng, Phường Bến Nghé, Quận 1</label>
+                        </div>
+                        <div class="delivery-time">
+                            <input type="radio" name="delivery_type" value="105 Bà Huyện Thanh Quan" id="chinhanh-3" class="radio">
+                            <label for="chinhanh-3">105 Bà Huyện Thanh Quan, Phường Võ Thị Sáu, Quận 3</label>
+                        </div>
+                    </div>
 
-        <label for="address">Địa chỉ:</label>
-        <input type="text" id="address" placeholder="Nhập địa chỉ">
+                    <div class="content-group">
+                        <p class="checkout-content-label">Ghi chú đơn hàng</p>
+                        <textarea type="text" name="ghichu" class="note-order" placeholder="Nhập ghi chú"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <label for="province">Tỉnh/Thành:</label>
-        <input type="text" id="province" placeholder="Nhập tỉnh/thành">
-    </div>
+        <div class="checkout-col-right">
+            <p class="checkout-content-label">Đơn hàng</p>
+          
+            <div class="bill-payment">
+                  <div class="bill-total" id="list-order-checkout">
+                <?php foreach ($cart as $item): ?>
+                    <div>
+                        <?php echo htmlspecialchars($item['tensp']); ?> - SL: <?php echo $item['soluong']; ?> - <?php echo number_format($item['price']); ?>₫
+                    </div>
+                <?php endforeach; ?>
+            </div>
+                <div class="total-bill-order"></div>
+            </div>
+            <div class="total-checkout">
+                <div class="text">Tổng tiền</div>
+                <div class="price-bill">
+                    <div class="price-final" id="checkout-cart-price-final"><?php echo number_format($total); ?>₫</div>
+                </div>
+            </div>
+            <button type="submit" class="complete-checkout-btn">Đặt hàng</button>
+        </div>
+        </form>
+    </main>
+</div>
 
-    <button class="btn-submit" onclick="submitAddress()">Xác nhận địa chỉ</button>
-
-    <h1 style="text-align: center;"> Phương Thức Thanh Toán</h1>
-
-    <div class="form-section">
-        <label for="paymentOption">Phương thức thanh toán:</label>
-        <select id="paymentOption" onchange="togglePaymentMethod()">
-            <option value="cash" style="color: #2305a9; ">Thanh toán bằng tiền mặt</option>
-            <option value="bankTransfer" style="color: #0606aa;">Chuyển khoản ngân hàng</option>
-            <option value="creditCard" style="color: #1005a9;">Thanh toán bằng thẻ tín dụng</option>
-        </select>
-    </div>
-
-    <!-- Phương thức thanh toán bằng tiền mặt -->
-    <div id="cashMethod" class="form-section payment-method">
-        <h3 style="color: #05a920;">Thanh Toán Bằng Tiền Mặt</h3>
-        <p>Bạn sẽ thanh toán trực tiếp khi nhận hàng. Vui lòng chuẩn bị số tiền chính xác khi giao hàng.</p>
-    </div>
-
-    <!-- Phương thức thanh toán chuyển khoản -->
-    <div id="bankTransferMethod" class="form-section payment-method">
-        <h3 >Chuyển Khoản Ngân Hàng</h3>
-        <p>Thông tin tài khoản chuyển khoản:</p>
-        <label for="accountName">Tên tài khoản:</label>
-        <input type="text" id="accountName" value="Le Pham Huu Binh" disabled>
-
-        <label for="accountNumber">Số tài khoản:</label>
-        <input type="text" id="accountNumber" value="1234567890" disabled>
-
-        <label for="bankName">Ngân hàng:</label>
-        <input type="text" id="bankName" value="Ngân hàng Sacombank" disabled>
-
-        <p>Vui lòng ghi rõ mã đơn hàng trong nội dung chuyển khoản để chúng tôi xử lý đơn hàng nhanh chóng.</p>
-    </div>
-
-    <!-- Phương thức thanh toán bằng thẻ tín dụng -->
-    <div id="creditCardMethod" class="form-section payment-method">
-        <h3 style="color: #05a920;">Thanh Toán Bằng Thẻ Tín Dụng</h3>
-        <label for="cardNumber">Số thẻ:</label>
-        <input type="text" id="cardNumber" placeholder="Nhập số thẻ tín dụng">
-
-        <label for="cardHolder">Tên chủ thẻ:</label>
-        <input type="text" id="cardHolder" placeholder="Nhập tên chủ thẻ">
-
-        <label for="expiryDate">Ngày hết hạn:</label>
-        <input type="month" id="expiryDate">
-
-        <label for="cvv">CVV:</label>
-        <input type="text" id="cvv" placeholder="Nhập mã CVV (3 chữ số phía sau thẻ)">
-    </div>
-
-    <a href="thanhtoantc.php"> <button class="btn-submit" onclick="confirmPayment()">Xác nhận thanh toán</button></a>
-
-    <script>
-        // Hàm chuyển đổi giữa địa chỉ đã lưu và địa chỉ mới
-        function toggleAddressForm(option) {
-            const savedAddressSection = document.getElementById('savedAddressSection');
-            const newAddressSection = document.getElementById('newAddressSection');
-            
-            if (option === 'saved') {
-                savedAddressSection.style.display = 'block';
-                newAddressSection.style.display = 'none';
-            } else {
-                savedAddressSection.style.display = 'none';
-                newAddressSection.style.display = 'block';
-            }
-        }
-
-        // Hàm tải danh sách địa chỉ đã lưu từ localStorage và hiển thị trong select
-        function loadSavedAddresses() {
-            const savedAddresses = JSON.parse(localStorage.getItem('addresses')) || [];
-            const savedAddressDropdown = document.getElementById('savedAddress');
-            savedAddressDropdown.innerHTML = ''; // Xóa các tùy chọn cũ
-
-            savedAddresses.forEach((address, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = address.fullName + ' - ' +address.phone+','+ address.address + ', ' + address.province;
-                savedAddressDropdown.appendChild(option);
-            });
-        }
-
-        // Hàm lưu địa chỉ mới vào localStorage
-        function saveNewAddress(fullName, phone, address, province) {
-            const savedAddresses = JSON.parse(localStorage.getItem('addresses')) || [];
-
-            const newAddress = {
-                fullName,
-                phone,
-                address,
-                province
-            };
-
-            savedAddresses.push(newAddress);
-            localStorage.setItem('addresses', JSON.stringify(savedAddresses));
-
-            loadSavedAddresses(); // Tải lại danh sách địa chỉ sau khi thêm mới
-        }
-
-        // Hàm xử lý khi người dùng nhấn "Xác nhận địa chỉ"
-        function submitAddress() {
-            const selectedOption = document.querySelector('input[name="addressOption"]:checked').value;
-
-            if (selectedOption === 'saved') {
-                const savedAddressIndex = document.getElementById('savedAddress').value;
-                const savedAddresses = JSON.parse(localStorage.getItem('addresses')) || [];
-                const selectedAddress = savedAddresses[savedAddressIndex];
-                
-                alert('Bạn đã chọn địa chỉ:\n' +
-                    'Họ và tên: ' + selectedAddress.fullName + '\n' +
-                    'Số điện thoại: ' + selectedAddress.phone + '\n' +
-                    'Địa chỉ: ' + selectedAddress.address + '\n' +
-                    'Tỉnh/Thành: ' + selectedAddress.province);
-            } else {
-                const fullName = document.getElementById('fullName').value;
-                const phone = document.getElementById('phone').value;
-                const address = document.getElementById('address').value;
-                const province = document.getElementById('province').value;
-
-                if (fullName && phone && address && province) {
-                    saveNewAddress(fullName, phone, address, province);
-
-                    alert('Địa chỉ mới đã được lưu:\n' +
-                        'Họ và tên: ' + fullName + '\n' +
-                        'Số điện thoại: ' + phone + '\n' +
-                        'Địa chỉ: ' + address + '\n' )
-                        
-                } else {
-                    alert('Vui lòng nhập đầy đủ thông tin.');
-                }
-            }
-        }
-
-        // Hàm xóa địa chỉ đã lưu
-        function deleteSelectedAddress() {
-            const savedAddressIndex = document.getElementById('savedAddress').value;
-            let savedAddresses = JSON.parse(localStorage.getItem('addresses')) || [];
-
-            // Xóa địa chỉ được chọn
-            savedAddresses.splice(savedAddressIndex, 1);
-
-            // Cập nhật lại localStorage
-            localStorage.setItem('addresses', JSON.stringify(savedAddresses));
-
-            // Tải lại danh sách sau khi xóa
-            loadSavedAddresses();
-        }
-// Hiển thị phương thức thanh toán tương ứng
-function togglePaymentMethod() {
-            const paymentOption = document.getElementById('paymentOption').value;
-
-            // Ẩn tất cả các phương thức thanh toán trước khi hiển thị phương thức được chọn
-            document.getElementById('cashMethod').style.display = 'none';
-            document.getElementById('bankTransferMethod').style.display = 'none';
-            document.getElementById('creditCardMethod').style.display = 'none';
-
-            if (paymentOption === 'cash') {
-                document.getElementById('cashMethod').style.display = 'block';
-            } else if (paymentOption === 'bankTransfer') {
-                document.getElementById('bankTransferMethod').style.display = 'block';
-            } else if (paymentOption === 'creditCard') {
-                document.getElementById('creditCardMethod').style.display = 'block';
-            }
-        }
-
-        // Xử lý khi xác nhận thanh toán
-        function confirmPayment() {
-            const paymentOption = document.getElementById('paymentOption').value;
-
-            if (paymentOption === 'cash') {
-                alert("Bạn đã chọn thanh toán bằng tiền mặt khi nhận hàng.");
-            } else if (paymentOption === 'bankTransfer') {
-                alert("Vui lòng chuyển khoản theo thông tin chúng tôi đã cung cấp.");
-            } else if (paymentOption === 'creditCard') {
-                const cardNumber = document.getElementById('cardNumber').value;
-                const cardHolder = document.getElementById('cardHolder').value;
-                const expiryDate = document.getElementById('expiryDate').value;
-                const cvv = document.getElementById('cvv').value;
-
-                if (cardNumber && cardHolder && expiryDate && cvv) {
-                    alert("Thanh toán thẻ tín dụng thành công!");
-                } else {
-                    alert("Vui lòng điền đầy đủ thông tin thẻ tín dụng.");
-                }
-            }
-        }
-
-        
-        // Gọi hàm loadSavedAddresses khi trang được tải
-        window.onload = loadSavedAddresses;
-        //Hiển thị mặc định phương thức thanh toán đầu tiên (tiền mặt)
-        window.onload = function() {
-            togglePaymentMethod();
-        };
-    </script>
+<script src="js/checkout.js"></script>
 </body>
-</php>
+</html>

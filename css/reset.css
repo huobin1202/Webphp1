@@ -158,8 +158,7 @@
 .ravao {
     top: 20px;
     right: 20px;
-    background-color: #139b3a;
-    color: white;
+    color: #139b3a;
     border: none;
     padding: 10px 15px;
     cursor: pointer;
@@ -167,6 +166,7 @@
     transition: background-color 0.3s ease;
     text-align: center;
     margin-right:70px;
+    font-weight: bold;
 }
 
 
@@ -220,7 +220,7 @@
 
 .hd {
     cursor: pointer;
-    width: 120px;
+    width: 180px;
     /* Đặt con trỏ thành bàn tay khi rê vào hóa đơn */
 }
 
@@ -361,4 +361,149 @@
 
 .dropdownb-menu a:hover {
     background-color: #f1f1f1;
+}
+
+
+/* Order History */
+.order-history-section {
+    padding-top: 20px;
+    width: 100%;
+}
+
+.order-history-group {
+    border: 1px solid #e5e5e5;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.order-history {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.order-history-left {
+    display: flex;
+}
+
+.order-history-left img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 14px;
+    border-radius: 5px;
+}
+
+.order-history-info p {
+    margin-top: 7px;
+}
+
+.order-history-info h4 {
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+.order-history-note {
+    color: #0000008a;
+    font-size: 14px;
+}
+
+.order-history-price {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.order-history-old-price {
+    font-size: 14px;
+    text-decoration: line-through;
+    color: #808080;
+}
+
+.order-history-current-price {
+    color: var(--red);
+    font-weight: 500;
+}
+
+.order-history-control {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#order-history-detail,
+.order-history-status-sp {
+    background-color: #eee;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 14px;
+    color: var(--text-color);
+    text-transform: uppercase;
+    position: relative;
+}
+
+.order-history-status-sp.complete{
+    background-color: #27ae60;
+    color: var(--white);
+    padding-left: 35px;
+}
+
+.order-history-status-sp.complete::before{
+    content: "\f00c";
+    font-family: "Font Awesome 6 Pro";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.order-history-status-sp.no-complete{
+    background-color: #f04e2e;
+    color: var(--white);
+    padding-left: 35px;
+}
+
+.order-history-status-sp.no-complete::before{
+    content: "\e1d4";
+    font-family: "Font Awesome 6 Pro";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#order-history-detail {
+    outline: none;
+    border: none;
+    cursor: pointer;
+    background-color: #e5e5e5;
+    color: var(--text-color);
+}
+
+#order-history-detail i {
+    margin-right: 5px;
+}
+
+.order-history-total-desc {
+    font-size: 15px;
+    margin-right: 15px;
+}
+
+.order-history-toltal-price {
+    color: var(--red);
+    font-size: 22px;
+    font-weight: 500;
+}
+
+.empty-order-section{
+    text-align: center;
+}
+
+.empty-order-img{
+    width: 250px;
+    margin-bottom: 20px;
 }
