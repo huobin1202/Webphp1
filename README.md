@@ -10,15 +10,7 @@
              thống kê kh + chi tiết + chi tiết hd kh,
              hiện tài khoản đăng nhập admin
        
-
-
-        
 **Index lỗi:** lỗi (dk.php) khi nhập tên tk quá limit, thêm trang edit thông tin kh
-
-****Admin lỗi:** thongkekh / thongkesp không tìm bằng date dc + nút reset không có tác dụng vs date,
-lỗi new + change khi nhập tên tk quá limit (khachhang)
-
-
 
             
             
