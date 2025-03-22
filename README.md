@@ -1,7 +1,7 @@
 **https://www.youtube.com/watch?v=U2Fjfqm-7g8**
 
 **Index thiếu:**  
-        chi tiết hóa đơn (hoadon.php),
+    
         tìm kiếm sp, 
 
 **Admin thiếu:** đơn hàng + chi tiết dh,
