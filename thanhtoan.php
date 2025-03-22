@@ -56,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $delete_cart = $conn->prepare("DELETE FROM giohang WHERE customer_id = ?");
     $delete_cart->bind_param("i", $customer_id);
     $delete_cart->execute();
-    $_SESSION['success_message'] = "Đặt hàng thành công! Cảm ơn bạn đã mua hàng.";
     header('Location: index.php');
     exit();
 }
