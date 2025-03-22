@@ -116,8 +116,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <?php if (!empty($error_message)): ?>
                 <p style="color: red; text-align:center;"><?php echo $error_message; ?></p>
             <?php endif; ?>
-            <input type="text" id="username" name="name" placeholder="Tên đăng nhập" required>
-            <input type="password" id="password" name="password" placeholder="Mật khẩu" required>
+            <input type="text" id="username" name="name" placeholder="Tên đăng nhập" required maxlength="20">
+            <input type="password" id="password" name="password" placeholder="Mật khẩu" maxlength="20" required>
             <button type="submit" name="login">Đăng nhập</button>
             <p id="error-message" class="error-message"></p>
             <p class="back-to-login" style="color:#28a745; text-align:center">Chưa có tài khoản? <a href=dk.php style="color:#28a745;  "> Đăng ký ngay!</a></p>

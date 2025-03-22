@@ -77,7 +77,10 @@ if ($username && !$customer_id) {
                                     $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
                                     $stmt->bind_param("s", $username);
                                     $stmt->execute();
-                                    $result = $stmt->get_result();
+                                    $result = $stmt->get_result();if (isset($_SESSION['success_message'])) {
+                                        echo "<div class='alert alert-success'>{$_SESSION['success_message']}</div>";
+                                        unset($_SESSION['success_message']);
+                                    }
 
                                     if ($result->num_rows > 0) {
                                         $row = $result->fetch_assoc();
@@ -92,7 +95,7 @@ if ($username && !$customer_id) {
                                                 <div class="dropdownb-menu">
 
                                                     <a href="hoadon.php">
-                                                        <div class="hd">Hóa đơn</div>
+                                                        <div class="hd">Đơn hàng đã mua </div>
                                                         <a href="dnurl.php">
                                                             
                                                             <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i>Quản lý</div>
@@ -177,6 +180,7 @@ if ($username && !$customer_id) {
             </ul>
         </div>
     </nav>
+    
 
 
     <main class="main-wrapper">
@@ -379,19 +383,19 @@ if ($username && !$customer_id) {
                                 $subtotal = $row["soluong"] * $row["price"];
                                 $total_price += $subtotal;
                                 echo '
-<tr>
-    <td style="display: flex; align-items: center;">
-        <img style="width: 90px;" src="sanpham/' . $row["img"] . '" alt="' . htmlspecialchars($row["tensp"]) . '">
-    </td>
-    <td><span>' . htmlspecialchars($row["tensp"]) . '</span></td>
-    <td>
-        <p><span>' . number_format($row["price"], 0, ',', '.') . '</span><sup>đ</sup></p>
-    </td>
-    <td>
-        <input style="width: 40px; outline: none;" type="number" value="' . $row["soluong"] . '" min="1" class="cart-quantity" data-cart-id="' . $row["id"] . '">
-    </td>
-    <td style="cursor: pointer;" class="delete-item" data-cart-id="' . $row["id"] . '">Xóa</td>
-</tr>';
+                                <tr>
+                                    <td style="display: flex; align-items: center;">
+                                        <img style="width: 90px;" src="sanpham/' . $row["img"] . '" alt="' . htmlspecialchars($row["tensp"]) . '">
+                                    </td>
+                                    <td><span>' . htmlspecialchars($row["tensp"]) . '</span></td>
+                                    <td>
+                                        <p><span>' . number_format($row["price"], 0, ',', '.') . '</span><sup>đ</sup></p>
+                                    </td>
+                                    <td>
+                                        <input style="width: 40px; outline: none;" type="number" value="' . $row["soluong"] . '" min="1" class="cart-quantity" data-cart-id="' . $row["id"] . '">
+                                    </td>
+                                    <td style="cursor: pointer;" class="delete-item" data-cart-id="' . $row["id"] . '">Xóa</td>
+                                </tr>';
                             }
                         } else {
                             echo "<tr><td colspan='4'>Giỏ hàng của bạn đang trống!</td></tr>";

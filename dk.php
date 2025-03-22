@@ -123,10 +123,10 @@ $conn->close();
             <p class="error-message"><?php echo $error_message; ?></p>
         <?php endif; ?>
         <form method="post">
-            <input type="text" id="newUsername" placeholder="Tên đăng nhập" name="name" required>
-            <input type="text" id="newContact" placeholder="Số điện thoại" name="contact" required>
-            <input type="password" id="newPassword" placeholder="Mật khẩu" name="password" required>
-            <input type="password" id="confirmPassword" placeholder="Xác nhận mật khẩu" name="password_confirm" required>
+            <input type="text" id="newUsername" placeholder="Tên đăng nhập" name="name" maxlength="20" required>
+            <input type="text" id="newContact" placeholder="Số điện thoại" name="contact" maxlength="11" required>
+            <input type="password" id="newPassword" placeholder="Mật khẩu" name="password" maxlength="20" required>
+            <input type="password" id="confirmPassword" placeholder="Xác nhận mật khẩu" name="password_confirm" maxlength="20" required>
             <button name="register">Đăng ký</button>
         </form>
         <p class="back-to-login"style="color:#28a745; text-align:center" >Quay lại trang <a href=dn.php style="color:#28a745;  " > đăng nhập!</a></p>
