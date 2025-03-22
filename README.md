@@ -1,7 +1,6 @@
 **https://www.youtube.com/watch?v=U2Fjfqm-7g8**
 
-**Index thiếu:**  **lưu sản phẩm đã thêm vào giỏ hàng (mỗi tk khác nhau)** , 
-        trang thanh toán (thanhtoan.tc), 
+**Index thiếu:**  
         chi tiết hóa đơn (hoadon.php),
         tìm kiếm sp, 
 
