@@ -165,6 +165,61 @@ document.addEventListener("DOMContentLoaded", function () {
         resetTable();
     });
 });
+document.querySelectorAll('.view-order-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        const modal = document.querySelector('.modal.detail-order');
+        modal.classList.add('open');
+
+        modal.querySelector('.modal-container-title').innerText = `CHI TIẾT ĐƠN HÀNG #${button.dataset.orderId}`;
+
+        const info = modal.querySelectorAll('.detail-order-item-right');
+        info[0].innerText = button.dataset.createdDate;
+        info[1].innerText = button.dataset.deliveryType;
+        info[2].innerText = button.dataset.recipientName;
+        info[3].innerText = button.dataset.recipientPhone;
+
+        modal.querySelectorAll('.detail-order-item-b')[0].innerText = button.dataset.address;
+        modal.querySelectorAll('.detail-order-item-b')[1].innerText = button.dataset.note;
+        modal.querySelector('.price').innerText = button.dataset.total;
+
+        const productGroup = modal.querySelector('.order-item-group');
+        const products = JSON.parse(button.dataset.products);
+        productGroup.innerHTML = '';
+        products.forEach(item => {
+            productGroup.innerHTML += `
+    <div class="order-product">
+        <div class="order-product-left">
+            <img src="/Webphp1/sanpham/${item.hinhanh}" alt="">
+            <div class="order-product-info">
+                <h4>${item.tensp}</h4>
+                <p class="order-product-quantity">SL: ${item.soluong}</p>
+            </div>
+        </div>
+        <div class="order-product-right">
+            <div class="order-product-price">
+                <span class="order-product-current-price">${Number(item.price).toLocaleString('vi-VN')}đ</span>
+            </div>
+        </div>
+    </div>`;
+        });
+
+        // Button trạng thái
+        const form = modal.querySelector('.modal-detail-bottom-right form');
+        if (button.dataset.status == 0) {
+            form.method = "post";
+            form.innerHTML = `
+    <input type="hidden" name="order_id" value="${button.dataset.orderId}">
+    <button type="submit" name="process_order" class="modal-detail-btn btn-chuaxuly">Chưa xử lý</button>
+`;
+        } else {
+            form.innerHTML = `<button disabled class="modal-detail-btn btn-daxuly">Đã xử lý</button>`;
+        }
+    });
+});
+
+document.querySelector('.modal-close').addEventListener('click', () => {
+    document.querySelector('.modal.detail-order').classList.remove('open');
+});
 
 // Khách hàng
 document.addEventListener("DOMContentLoaded", function () {

@@ -123,10 +123,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="checkout-row">
                 <div class="checkout-col-title">Thông tin đơn hàng</div>
                 <div class="checkout-col-content">
-                    <div class="content-group">
+                    <div class="content-group  ">
                         <p class="checkout-content-label">Hình thức giao nhận</p>
                         <div class="checkout-type-order">
-                        <input type="button" class="type-order-btn " id="tudenlay" value="Tự đến lấy"></input>
+                        <input type="button" class="type-order-btn active " id="tudenlay" value="Tự đến lấy"  ></input>
                         <input type="button" class="type-order-btn " id="giaotannoi" value="Giao tận nơi"></input>
                         <input type="hidden" name="delivery_mode" id="delivery_mode" value="Mua trực tiếp">
                         <input type="hidden" name="delivery_mode" id="delivery_mode" value="Giao tận nơi">

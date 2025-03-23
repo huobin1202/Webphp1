@@ -1,17 +1,76 @@
+<?php
+// File: donhang/donhang.php
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "admindoan";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Kết nối thất bại: " . $conn->connect_error);
+}
 
 
+// XỬ LÝ CẬP NHẬT TRẠNG THÁI NẾU POST
+if (isset($_POST['process_order'])) {
+    $order_id = intval($_POST['order_id']);
+    $update = $conn->prepare("UPDATE orders SET status = 1 WHERE id = ?");
+    $update->bind_param("i", $order_id);
+    $update->execute();
+    // Redirect để tránh resubmit form
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+
+// Lấy tất cả đơn hàng & chi tiết để hiển thị
+$sql = "SELECT 
+            orders.id AS order_id, 
+            orders.customer_id, 
+            orders.total, 
+            orders.created_at, 
+            orders.status, 
+            orders.recipient_name,
+            orders.recipient_phone,
+            orders.delivery_type,
+            orders.address,
+            orders.note,
+            customer.name AS customer_name
+        FROM orders
+        INNER JOIN customer ON orders.customer_id = customer.id
+        ORDER BY orders.created_at DESC";
+$result = $conn->query($sql);
+
+// Lưu tất cả đơn hàng + chi tiết vào mảng
+$orders = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $orderId = $row['order_id'];
+        // Lấy chi tiết sản phẩm
+        $sql_details = "SELECT order_details.*, products.tensp, products.hinhanh 
+                        FROM order_details
+                        INNER JOIN products ON order_details.product_id = products.id
+                        WHERE order_details.order_id = $orderId";
+        $details_result = $conn->query($sql_details);
+        $details = [];
+        while ($detail = $details_result->fetch_assoc()) {
+            $details[] = $detail;
+        }
+        $row['details'] = $details;
+        $orders[] = $row;
+    }
+}
+$conn->close();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='../img/logo.png' rel='icon' type='image/x-icon' />
+    <title>Quản lý đơn hàng</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <link href="../assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="../assets/css/admin-responsive.css">
-    <title>Quản lý cửa hàng</title>
+    <link href="../assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -94,7 +153,6 @@
 
         </aside>
         <main class="content">
-            <!-- Order  -->
             <div class="section">
                 <div class="admin-control">
                     <div class="admin-control-left">
@@ -115,11 +173,11 @@
                         <form action="" class="fillter-date">
                             <div>
                                 <label for="time-start">Từ</label>
-                                <input type="date" class="form-control-date" id="time-start" >
+                                <input type="date" class="form-control-date" id="time-start">
                             </div>
                             <div>
                                 <label for="time-end">Đến</label>
-                                <input type="date" class="form-control-date" id="time-end" >
+                                <input type="date" class="form-control-date" id="time-end">
                             </div>
                         </form>
                         <button class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></button>
@@ -131,7 +189,6 @@
                             <tr>
                                 <td>Mã DH</td>
                                 <td>Mã KH</td>
-
                                 <td>Tên khách hàng</td>
                                 <td>Ngày đặt</td>
                                 <td>Tổng tiền</td>
@@ -139,79 +196,112 @@
                                 <td>Thao tác</td>
                             </tr>
                         </thead>
-                        <?php
-                        $servername = "localhost";
-                        $username = "root";
-                        $password = "";
-                        $dbname = "admindoan";
-
-                        // Create connection
-                        $conn = new mysqli($servername, $username, $password, $dbname);
-
-                        // Check connection
-                        if ($conn->connect_error) {
-                            die("Kết nối thất bại: " . $conn->connect_error);
-                        }
-
-                        $sql = "SELECT 
-                            orders.id AS order_id, 
-                            orders.customer_id, 
-                            orders.total, 
-                            orders.created_at, 
-                            orders.status, 
-                            customer.name AS customer_name
-                        FROM orders
-                        INNER JOIN customer ON orders.customer_id = customer.id
-                        ORDER BY orders.created_at DESC";
-
-                        $result = $conn->query($sql);
-                        ?>
-
                         <tbody id="showOrder">
-                            <?php
-                            if ($result->num_rows > 0) {
-                                while ($row = $result->fetch_assoc()) {
-                                    $orderId = $row['order_id'];
-                                    $customerId = str_pad($row['customer_id'], 2, '0', STR_PAD_LEFT);
-                                    $customerName = htmlspecialchars($row['customer_name']);
-                                    $createdDate = date('d/m/Y', strtotime($row['created_at']));
-                                    $total = number_format($row['total'], 0, ',', '.') . 'đ';
-                                    $status = $row['status'] == 1
-                                        ? '<span class="status-complete">Đã xử lý</span>'
-                                        : '<span class="status-no-complete">Chưa xử lý</span>';
-                                    $detailLink = "chitietdonhang" . $row['order_id'] . ".php";
+                            <?php foreach ($orders as $order):
+                                $orderId = $order['order_id'];
+                                $customerId = str_pad($order['customer_id'], 2, '0', STR_PAD_LEFT);
+                                $customerName = htmlspecialchars($order['customer_name']);
+                                $createdDate = date('d/m/Y', strtotime($order['created_at']));
+                                $total = number_format($order['total'], 0, ',', '.') . 'đ';
+                                $statusText = $order['status'] == 1
+                                    ? '<span class="status-complete">Đã xử lý</span>'
+                                    : '<span class="status-no-complete">Chưa xử lý</span>';
+                                $details_json = htmlspecialchars(json_encode($order['details']), ENT_QUOTES, 'UTF-8');
                             ?>
-                                    <tr>
-                                        <td><?= $orderId ?></td>
-                                        <td><?= $customerId ?></td>
-                                        <td><?= $customerName ?></td>
-                                        <td><?= $createdDate ?></td>
-                                        <td><?= $total ?></td>
-                                        <td><?= $status ?></td>
-                                        <td class="control">
-                                            <a href="<?= $detailLink ?>"><button class="btn-detail"><i class="fa-regular fa-eye"></i> Chi tiết</button></a>
-                                        </td>
-                                    </tr>
-                            <?php
-                                }
-                            } else {
-                                echo "<tr><td colspan='7'>Không có đơn hàng nào.</td></tr>";
-                            }
-                            ?>
+                                <tr>
+                                    <td><?= $orderId ?></td>
+                                    <td><?= $customerId ?></td>
+                                    <td><?= $customerName ?></td>
+                                    <td><?= $createdDate ?></td>
+                                    <td><?= $total ?></td>
+                                    <td><?= $statusText ?></td>
+                                    <td class="control">
+                                        <button class="btn-detail view-order-btn"
+                                            data-order-id="<?= $orderId ?>"
+                                            data-customer-name="<?= $customerName ?>"
+                                            data-created-date="<?= $createdDate ?>"
+                                            data-total="<?= $total ?>"
+                                            data-status="<?= $order['status'] ?>"
+                                            data-recipient-name="<?= htmlspecialchars($order['recipient_name']) ?>"
+                                            data-recipient-phone="<?= htmlspecialchars($order['recipient_phone']) ?>"
+                                            data-delivery-type="<?= htmlspecialchars($order['delivery_type']) ?>"
+                                            data-address="<?= htmlspecialchars($order['address']) ?>"
+                                            data-note="<?= htmlspecialchars($order['note']) ?: 'Không có' ?>"
+                                            data-products='<?= $details_json ?>'>
+                                            <i class="fa-regular fa-eye"></i> Chi tiết
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            <?php if (count($orders) == 0): ?>
+                                <tr>
+                                    <td colspan="7">Không có đơn hàng nào.</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
-
-                        <?php
-                        $conn->close();
-                        ?>
-
                     </table>
                 </div>
             </div>
-
         </main>
+
+        <!-- MODAL -->
+        <div class="modal detail-order">
+            <div class="modal-container">
+                <h3 class="modal-container-title">CHI TIẾT ĐƠN HÀNG</h3>
+                <button class="modal-close"><i class="fa-regular fa-xmark"></i></button>
+                <div class="modal-detail-order">
+                    <div class="modal-detail-left">
+                        <div class="order-item-group">
+                            <!-- Products injected here -->
+                        </div>
+                    </div>
+                    <div class="modal-detail-right">
+                        <ul class="detail-order-group">
+                            <li class="detail-order-item">
+                                <span class="detail-order-item-left"><i class="fa-light fa-calendar-days"></i> Ngày đặt</span>
+                                <span class="detail-order-item-right"></span>
+                            </li>
+                            <li class="detail-order-item">
+                                <span class="detail-order-item-left"><i class="fa-light fa-truck"></i> Hình thức giao</span>
+                                <span class="detail-order-item-right"></span>
+                            </li>
+                            <li class="detail-order-item">
+                                <span class="detail-order-item-left"><i class="fa-thin fa-person"></i> Người nhận</span>
+                                <span class="detail-order-item-right"></span>
+                            </li>
+                            <li class="detail-order-item">
+                                <span class="detail-order-item-left"><i class="fa-light fa-phone"></i> Số điện thoại</span>
+                                <span class="detail-order-item-right"></span>
+                            </li>
+                            <li class="detail-order-item tb">
+                                <span class="detail-order-item-t"><i class="fa-light fa-location-dot"></i> Địa chỉ</span>
+                                <p class="detail-order-item-b"></p>
+                            </li>
+                            <li class="detail-order-item tb">
+                                <span class="detail-order-item-t"><i class="fa-light fa-note-sticky"></i> Ghi chú</span>
+                                <p class="detail-order-item-b"></p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-detail-bottom">
+                    <div class="modal-detail-bottom-left">
+                        <div class="price-total">
+                            <span class="thanhtien">Thành tiền</span>
+                            <span class="price"></span>
+                        </div>
+                    </div>
+                    <div class="modal-detail-bottom-right">
+                        <form>
+                            <button disabled class="modal-detail-btn btn-daxuly"></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="../assets/js/admin.js"></script>
     </div>
 
-    <script src="../assets/js/admin.js"></script>
 </body>
 
 </html>
