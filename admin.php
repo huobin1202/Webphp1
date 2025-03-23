@@ -21,12 +21,12 @@ $userCount = $userCountResult->fetch_assoc()['user_count'];
 $productCountQuery = "SELECT COUNT(*) as product_count FROM products";
 $productCountResult = $conn->query($productCountQuery);
 $productCount = $productCountResult->fetch_assoc()['product_count'];
-/*
+
 // Query to count orders
 $orderCountQuery = "SELECT COUNT(*) as order_count FROM orders";
 $orderCountResult = $conn->query($orderCountQuery);
 $orderCount = $orderCountResult->fetch_assoc()['order_count'];
-
+/*
 // Query to calculate total revenue
 $revenueQuery = "SELECT SUM(total_amount) as total_revenue FROM orders";
 $revenueResult = $conn->query($revenueQuery);
@@ -159,8 +159,8 @@ $conn->close();
             <div class="card-single">
                 <div class="box">
                     <div class="on-box">
-                        <h2 id="amount-order">0</h2>
-                        <h3>Đơn hàng</h3>
+                    <h2 id="amount-order"><?php echo $orderCount; ?></h2>
+                    <h3>Đơn hàng</h3>
                     </div>
                     <div class="order-statistical-item-icon">
                         <i class="fa-light fa-file-lines" style="position: absolute;top: 12px;right: -1px;"></i>

@@ -39,7 +39,7 @@ if ($result->num_rows > 0) {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title><?php echo $row["tensp"]; ?></title>
-        <link rel="stylesheet" href="css/reset.css">
+        <link rel="stylesheet" href="css/app.css">
         <style>
             body {
                 font-family: Arial, sans-serif;
