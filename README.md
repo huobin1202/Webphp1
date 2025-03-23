@@ -5,7 +5,6 @@
         tìm kiếm sp, 
 
 **Admin thiếu:** 
-đơn hàng + chi tiết dh,
              thống kế sp + chi tiết,
              thống kê kh + chi tiết + chi tiết hd kh,
              hiện tài khoản đăng nhập admin
