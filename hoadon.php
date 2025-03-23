@@ -32,7 +32,6 @@ if ($username && !$customer_id) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/reset.css ">
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -189,39 +188,119 @@ if ($username && !$customer_id) {
             </div>
             <div class="main-account-body">
                 <div class="order-history-section">
-                    <div class="order-history-group">
-                        <div class="order-history">
-                            <div class="order-history-left">
-                                <img src="${infosp.img}" alt="">
-                                <div class="order-history-info">
-                                    <h4>${infosp.title}!</h4>
-                                    <p class="order-history-note"><i class="fa-light fa-pen"></i> ${sp.note}</p>
-                                    <p class="order-history-quantity">x${sp.soluong}</p>
+                    <?php
+                    if (!$customer_id) {
+                        echo "<p>Bạn cần đăng nhập để xem lịch sử đơn hàng!</p>";
+                    } else {
+                        $sql_orders = "SELECT * FROM orders WHERE customer_id = ?";
+                        $stmt_orders = $conn->prepare($sql_orders);
+                        $stmt_orders->bind_param("i", $customer_id);
+                        $stmt_orders->execute();
+                        $result_orders = $stmt_orders->get_result();
+
+                        if ($result_orders->num_rows > 0) {
+                            while ($order = $result_orders->fetch_assoc()) {
+                                $order_id = $order['id'];
+                    ?>
+                                <div class="order-history-group">
+                                    <?php
+                                    // Chi tiết đơn hàng
+                                    $sql_details = "SELECT od.*, p.tensp, p.hinhanh
+                                                FROM order_details od
+                                                JOIN products p ON od.product_id = p.id
+                                                WHERE od.order_id = ?";
+                                    $stmt_details = $conn->prepare($sql_details);
+                                    $stmt_details->bind_param("i", $order_id);
+                                    $stmt_details->execute();
+                                    $result_details = $stmt_details->get_result();
+
+                                    while ($detail = $result_details->fetch_assoc()) { ?>
+                                        <div class="order-history">
+                                            <div class="order-history-left">
+                                                <img src="sanpham/<?= $detail['hinhanh'] ?>" alt="<?= htmlspecialchars(string: $detail['tensp']) ?>">
+                                                <div class="order-history-info">
+                                                    <h4><?= htmlspecialchars($detail['tensp']) ?></h4>
+                                                    <p class="order-history-quantity">x<?= $detail['soluong'] ?></p>
+                                                </div>
+                                            </div>
+                                            <div class="order-history-right">
+                                                <div class="order-history-price">
+                                                    <span class="order-history-current-price"><?= number_format($detail['price'], 0, ',', '.') ?>₫</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php } ?>
+
+                                    <div class="order-history-control">
+                                        <div class="order-history-status">
+                                            <?php
+                                            $status_class = ($order['status'] === '1') ? 'complete' : 'no-complete';
+                                            $status_text = ($order['status'] === '1') ? 'Đã hoàn thành' : 'Đang xử lý';
+                                            ?>
+                                            <span class="order-history-status-sp <?= $status_class ?>"><?= $status_text ?></span>
+
+                                            <!-- Nút "Xem chi tiết" mới với data-* -->
+                                            <button class="order-history-detail-btn" id="order-history-detail"
+                                                data-created-at="<?= $order['created_at'] ?>"
+                                                data-delivery-type="<?= $order['delivery_type'] ?>"
+                                                data-address="<?= htmlspecialchars($order['address']) ?>"
+                                                data-recipient-name="<?= htmlspecialchars($order['recipient_name']) ?>"
+                                                data-recipient-phone="<?= htmlspecialchars($order['recipient_phone']) ?>"><i class="fa-regular fa-eye"></i> Xem chi tiết
+                                            </button>
+                                        </div>
+
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="order-history-right">
-                                <div class="order-history-price">
-                                    <span class="order-history-current-price">${vnd(sp.price)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-
-
-
-
+                    <?php
+                                $stmt_details->close();
+                            }
+                        } else {
+                            echo "<p>Bạn chưa có đơn hàng nào.</p>";
+                        }
+                        $stmt_orders->close();
+                    }
+                    ?>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal detail-order">
+        <div class="modal-container mdl-cnt">
+            <h3 class="modal-container-title">Thông tin đơn hàng</h3>
+            <button class="form-close" onclick="closeModal()"><i class="fa-regular fa-xmark"></i></button>
+            <div class="detail-order-content">
+                <ul class="detail-order-group">
+                    <li class="detail-order-item">
+                        <span class="detail-order-item-left"><i class="fa-light fa-calendar-days"></i> Ngày đặt hàng</span>
+                        <span class="detail-order-item-right" id="modal-created-at"></span>
+                    </li>
+                    <li class="detail-order-item">
+                        <span class="detail-order-item-left"><i class="fa-light fa-truck"></i> Hình thức giao</span>
+                        <span class="detail-order-item-right" id="modal-delivery-type"></span>
+                    </li>
+                    <li class="detail-order-item">
+                        <span class="detail-order-item-left"><i class="fa-light fa-location-dot"></i> Địa điểm nhận</span>
+                        <span class="detail-order-item-right" id="modal-address"></span>
+                    </li>
+                    <li class="detail-order-item">
+                        <span class="detail-order-item-left"><i class="fa-thin fa-person"></i> Người nhận</span>
+                        <span class="detail-order-item-right" id="modal-recipient-name"></span>
+                    </li>
+                    <li class="detail-order-item">
+                        <span class="detail-order-item-left"><i class="fa-light fa-phone"></i> Số điện thoại nhận</span>
+                        <span class="detail-order-item-right" id="modal-recipient-phone"></span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 
 
 
+
+
     <section class="cart">
         <button class="dong"><i class="fa-regular fa-xmark"></i></button>
-        <!-- <div>Đóng</div> -->
         <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
         <form action="" method="POST">
             <?php
@@ -325,7 +404,7 @@ if ($username && !$customer_id) {
 
     <div class="green-line-header"></div>
     <?php include 'footer.php' ?>
-    <!-- <script src="js/hoadon.js"></script> -->
+    <script src="js/hoadon.js"></script>
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>

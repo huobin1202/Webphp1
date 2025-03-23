@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const giaoTanNoiGroup = document.getElementById('giaotannoi-group');
     const tuDenLayGroup = document.getElementById('tudenlay-group');
 
+    const deliveryModeInput = document.getElementById('delivery_mode'); // Hidden input
+
     // Giao Tận Nơi button click
     btnGiaoTanNoi.addEventListener('click', function () {
         btnGiaoTanNoi.classList.add('active');
@@ -13,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
         diaChiNhan.style.display = 'block';
         giaoTanNoiGroup.style.display = 'block';
         tuDenLayGroup.style.display = 'none';
+
+        deliveryModeInput.value = 'Giao tận nơi'; // Set value
     });
 
     // Tự Đến Lấy button click
@@ -22,13 +26,14 @@ document.addEventListener('DOMContentLoaded', function () {
         diaChiNhan.style.display = 'none';
         giaoTanNoiGroup.style.display = 'none';
         tuDenLayGroup.style.display = 'block';
+
+        deliveryModeInput.value = 'Mua trực tiếp'; // Set value
     });
 
     // Handle thanh toán radio buttons
     const radioChuyenKhoan = document.getElementById('deliverytime');
     const radioTienMat = document.getElementById('giaongay');
 
-    // Tạo div chứa thông tin tài khoản
     const accountInfo = document.createElement('div');
     accountInfo.classList.add('account-info');
     accountInfo.innerHTML = `
@@ -56,9 +61,11 @@ document.addEventListener('DOMContentLoaded', function () {
         diaChiNhan.style.display = 'block';
         giaoTanNoiGroup.style.display = 'block';
         tuDenLayGroup.style.display = 'none';
+        deliveryModeInput.value = 'Giao tận nơi';
     } else {
         diaChiNhan.style.display = 'none';
         giaoTanNoiGroup.style.display = 'none';
         tuDenLayGroup.style.display = 'block';
+        deliveryModeInput.value = 'Mua trực tiếp';
     }
 });

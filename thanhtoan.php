@@ -2,15 +2,15 @@
 session_start();
 include('database.php');
 
-// Kiểm tra đăng nhập
 if (!isset($_SESSION['customer_id'])) {
     header('Location: dn.php');
     exit();
 }
+
 $customer_id = $_SESSION['customer_id'];
 
 // Lấy giỏ hàng
-    $cart = [];
+$cart = [];
 $total = 0;
 $cart_query = $conn->prepare("
     SELECT giohang.*, products.tensp 
@@ -34,16 +34,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $payment = $_POST['payment_method'] ?? 'Tiền mặt';
     $delivery = $_POST['delivery_type'] ?? 'Giao tận nơi';
 
+    // Xác định địa chỉ lưu vào orders
+    if ($delivery === 'Giao tận nơi') {
+        $order_address = $diachi;
+    } else {
+        $order_address = $delivery; // chi nhánh
+    }
+
+    $delivery_mode = $_POST['delivery_mode']; // "Mua trực tiếp" hoặc "Giao tận nơi"
+
+    if ($delivery_mode === 'Giao tận nơi') {
+        $order_address = $_POST['diachinhan'];
+    } else {
+        $order_address = $_POST['delivery_type']; // Chi nhánh (radio)
+    }
+    
     // Lưu đơn hàng
-    $order_stmt = $conn->prepare("INSERT INTO orders (customer_id, total, note, payment_method, delivery_type) VALUES (?, ?, ?, ?, ?)");
-    $order_stmt->bind_param("idsss", $customer_id, $total, $ghichu, $payment, $delivery);
+    $order_stmt = $conn->prepare("
+        INSERT INTO orders (customer_id, total, note, payment_method, delivery_type, status, recipient_name, recipient_phone, address) 
+        VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?)
+    ");
+    $order_stmt->bind_param("idssssss", $customer_id, $total, $ghichu, $payment, $delivery_mode, $tennguoinhan, $sdt, $order_address);
+    
     $order_stmt->execute();
     $order_id = $conn->insert_id;
-
-    // Lưu địa chỉ đơn hàng
-    $insert_order_address = $conn->prepare("INSERT INTO order_addresses (order_id, address) VALUES (?, ?)");
-    $insert_order_address->bind_param("is", $order_id, $diachi);
-    $insert_order_address->execute();
 
     // Lưu chi tiết đơn hàng
     foreach ($cart as $item) {
@@ -56,17 +70,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $delete_cart = $conn->prepare("DELETE FROM giohang WHERE customer_id = ?");
     $delete_cart->bind_param("i", $customer_id);
     $delete_cart->execute();
+
     header('Location: index.php');
     exit();
 }
 ?>
+
+
 <!DOCTYPE php>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thanh Toán</title>
-    <link rel="stylesheet" href="css/reset.css ">
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -110,8 +126,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="content-group">
                         <p class="checkout-content-label">Hình thức giao nhận</p>
                         <div class="checkout-type-order">
-                            <button type="button" class="type-order-btn active" id="tudenlay">Mua trực tiếp</button>
-                            <button type="button" class="type-order-btn " id="giaotannoi">Giao tận nơi</button>
+                        <input type="button" class="type-order-btn " id="tudenlay" value="Tự đến lấy"></input>
+                        <input type="button" class="type-order-btn " id="giaotannoi" value="Giao tận nơi"></input>
+                        <input type="hidden" name="delivery_mode" id="delivery_mode" value="Mua trực tiếp">
+                        <input type="hidden" name="delivery_mode" id="delivery_mode" value="Giao tận nơi">
                         </div>
                     </div>
 

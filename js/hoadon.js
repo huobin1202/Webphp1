@@ -1,68 +1,23 @@
-function displayCart() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const cartItemsContainer = document.getElementById('cartItems');
-            const totalAmount = document.getElementById('totalAmount');
-            let total = 0;
+document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.querySelector('.modal.detail-order');
+    const detailButtons = document.querySelectorAll('.order-history-detail-btn');
 
-            cartItemsContainer.innerHTML = '';
+    detailButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            // Gán dữ liệu vào modal
+            document.getElementById('modal-created-at').innerText = this.dataset.createdAt;
+            document.getElementById('modal-delivery-type').innerText = this.dataset.deliveryType;
+            document.getElementById('modal-address').innerText = this.dataset.address;
+            document.getElementById('modal-recipient-name').innerText = this.dataset.recipientName;
+            document.getElementById('modal-recipient-phone').innerText = this.dataset.recipientPhone;
 
-            cart.forEach((item, index) => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
+            // Hiển thị modal
+            modal.classList.add('open');
+        });
+    });
 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><img src="${item.image}" style="width: 50px;"> ${item.name}</td>
-                    <td>${item.price.toLocaleString()} đ</td>
-                    <td>${item.quantity}</td>
-                    <td>${itemTotal.toLocaleString()} đ</td>
-                    <td><button class="btn-delete" onclick="deleteItem(${index})">Xóa</button></td>
-                `;
-                cartItemsContainer.appendChild(row);
-            });
-
-            totalAmount.innerText = total.toLocaleString() + ' đ';
-        }
-
-        // Hàm xóa sản phẩm khỏi giỏ hàng
-        function deleteItem(index) {
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-            cart.splice(index, 1);
-            localStorage.setItem('cart', JSON.stringify(cart));
-
-            displayCart();
-        }
-
-        // Hàm hiển thị/ẩn tóm tắt hóa đơn
-        function toggleInvoice() {
-            const invoiceDetails = document.getElementById('invoiceDetails');
-            if (invoiceDetails.style.display === "none") {
-                invoiceDetails.style.display = "block";
-                displayCart();
-            } else {
-                invoiceDetails.style.display = "none";
-            }
-        }
-
-        window.onload = displayCart;
-        cartItemsContainer.innerHTML = '';
-
-            cart.forEach(item => {
-                const itemTotal = item.price * item.quantity;
-                total += itemTotal;
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>
-                        <img src="${item.image}" class="product-image" alt="${item.name}"> ${item.name}
-                    </td>
-                    <td>${item.price} đ</td>
-                    <td>${item.quantity}</td>
-                    <td>${itemTotal} đ</td>
-                `;
-                cartItemsContainer.appendChild(row);
-            });
-
-            totalAmount.innerText = total.toLocaleString() + ' đ';
-        
+    // Hàm đóng modal
+    window.closeModal = function () {
+        modal.classList.remove('open');
+    }
+});
