@@ -30,13 +30,11 @@ header {
 
 .header-middle {
     box-shadow: inset 0px -0.5px 0px #e6e6e6;
-    margin-left: -700px;
 
 }
 
 .header-logo img {
     width: 70px;
-    margin-left: 400px;
 
 }
 
@@ -56,7 +54,7 @@ header {
     display: flex;
     justify-content: center;
     position: relative;
-    right: -55px;
+    width:100%;
 }
 
 .form-search-input {
@@ -143,7 +141,6 @@ header {
 
 .auth-container {
     display: flex;
-    flex-direction: column;
 }
 
 .text-dndk {
@@ -1937,11 +1934,9 @@ li {
 .hoadon {
     text-align: center;
     /* Đặt canh giữa các phần tử con nếu muốn */
-    position: absolute;
     right: -388px;
 }
 
-.ravao,
 .hd {
     display: inline-block;
  
@@ -1961,9 +1956,8 @@ li {
     top:-5px;
 }
 
-.ravao,
 .hd {
-    font-size: 17px;
+    font-size: 12px;
     /* Điều chỉnh kích thước chữ */
 }
 
@@ -2018,6 +2012,7 @@ li {
     /* Căn giữa theo chiều dọc */
     gap: 20px;
     /* Khoảng cách giữa tiêu đề và nút */
+    margin-right:40px;
 }
 
 .welcome {
@@ -2031,8 +2026,7 @@ li {
 
 .logout-btn,
 .login-btn {
-    background-color: #139b3a;
-    color: white;
+    color: #139b3a;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -2040,8 +2034,8 @@ li {
 }
 
 
-.logout-btn:hover,
-.login-btn:hover {
+.logout-btn:hover
+ {
     background-color: darkgreen;
 }
 
@@ -2259,3 +2253,141 @@ li {
 
 
 
+.login-btn {
+    font-size: 17px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: transparent;
+    
+}
+
+.account-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.main-text {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.sub-text {
+    font-size: 12px;
+}
+
+a.account-link {
+    text-decoration: none;
+}
+
+
+/* Thông tin sản phẩm */
+/* Trang thong tin tai khoan */
+#account-user {
+    display: flex;
+    justify-content: center;
+    background-color: #fff;
+}
+
+.sidebar-account {
+    width: 20%;
+    margin-right: 40px;
+}
+
+.menu-account {
+    border: 1px solid #dae2e6;
+}
+
+.menu-account-item {
+    padding: 10px 15px;
+    color: black;
+    display: block;
+    height: 100%;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.menu-account-item:hover,
+.menu-account-item.active {
+    background-color: #eee;
+}
+
+.menu-account-item:not(last-child) {
+    border-bottom: 1px solid #eee;
+}
+
+.menu-account-item i {
+    margin-right: 5px;
+}
+
+.main-account {
+    width: 80%;
+    border: 1px solid #dae2e6;
+    padding: 20px;
+}
+
+.main-account.active {
+    display: block;
+}
+
+
+.main-account-header {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.main-account-body {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.main-account-body-row {
+    width: 100%;
+    display: flex;
+}
+
+.main-account-body-row>div {
+    width: 50%;
+}
+
+
+.main-account-body-col {
+    padding-top: 10px;
+    width: 50%;
+}
+
+.main-account-body-col .form-group {
+    margin-right: 30px;
+}
+
+#save-password,
+#save-info-user {
+    border: none;
+    outline: none;
+    color: white;
+    background-color: #139b3a;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#save-password i,
+#save-info-user i {
+    margin-right: 5px;
+}
+
+input[type=number] {
+    --moz-appearance: textfield;
+}
+
+.form-label {
+    margin-bottom: 5px;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+}
