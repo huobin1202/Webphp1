@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const changeLogOut = document.getElementById("logoutacc");
     if (changeLogOut) {
         changeLogOut.addEventListener("click", () => {
-            if (confirm("Bạn có muốn thoát tài khoản admin và trở về trang chủ?") == true) {
+            if (confirm("Bạn có muốn thoát tài khoản quản trị và trở về trang chủ?") == true) {
                 alert("Đã thoát!");
                 window.location.href = "/";
             }

@@ -154,21 +154,17 @@ if ($productId > 0) {
                     </li>
 
                     <div class="spacer" style="height:50px;width:1px"></div>
+                
                     <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
-                        <a href="../index.php" class="sidebar-link">
-                            <div class="sidebar-icon"><i class="fa-thin fa-circle-chevron-left"></i></div>
-                            <div class="hidden-sidebar">Trang chủ</div>
-                        </a>
-                    </li>
-
-                    <li class="sidebar-list-item user-logout">
                         <a href="#" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-circle-user"></i></div>
-                            <div class="hidden-sidebar" id="name-acc">Admin</div>
+                            <div class="hidden-sidebar" id="name-acc">
+                                <?php echo $_SESSION['username']; ?>
+                            </div>
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="#" class="sidebar-link">
+                        <a href="../index.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>
@@ -274,20 +270,20 @@ if ($productId > 0) {
                 <form action="" method="POST" enctype="multipart/form-data" class="add-product-form">
                     <input type="hidden" name="product-id" value="<?php echo $product['id']; ?>">
                     <div class="modal-content-left">
-                        <img src="<?php echo $product['hinhanh']; ?>" alt="<?php echo $product['tensp']; ?>" class="upload-image-preview">
+                        <img src="<?php echo $product['hinhanh']; ?>" alt="<?php echo $product['tensp']; ?>" class="upload-image-preview" id="preview-image-1">
                         <div class="form-group file">
                             <label for="up-hinh-anh" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
-                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh" name="up-hinh-anh" type="file" class="form-control">
+                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh" name="up-hinh-anh" type="file" class="form-control" onchange="previewImage(this, 'preview-image-1')">
                         </div>
-                        <img src="<?php echo $product['hinhanh2']; ?>" alt="<?php echo $product['tensp']; ?>" class="upload-image-preview">
+                        <img src="<?php echo $product['hinhanh2']; ?>" alt="<?php echo $product['tensp']; ?>" class="upload-image-preview" id="preview-image-2">
                         <div class="form-group file">
                             <label for="up-hinh-anh2" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
-                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh2" name="up-hinh-anh2" type="file" class="form-control">
+                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh2" name="up-hinh-anh2" type="file" class="form-control" onchange="previewImage(this, 'preview-image-2')">
                         </div>
-                        <img src="<?php echo $product['hinhanh3']; ?>" alt="<?php echo $product['tensp']; ?>" class="upload-image-preview">
+                        <img src="<?php echo $product['hinhanh3']; ?>" alt="<?php echo $product['tensp']; ?>" class="upload-image-preview" id="preview-image-3">
                         <div class="form-group file">
                             <label for="up-hinh-anh3" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
-                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh3" name="up-hinh-anh3" type="file" class="form-control">
+                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh3" name="up-hinh-anh3" type="file" class="form-control" onchange="previewImage(this, 'preview-image-3')">
                         </div>
                     </div>
                     <div class="modal-content-right">
@@ -324,6 +320,16 @@ if ($productId > 0) {
             </div>
         </div>
     </div>
+    <script>function previewImage(input, previewId) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById(previewId).src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }</script>
     <script src="../assets/js/admin.js"></script>
 
 </body>

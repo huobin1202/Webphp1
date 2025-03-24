@@ -235,7 +235,7 @@
     </section>
 
     <div class="green-line-header"></div>
-    <?php include'footer.php'; ?>
+    <?php include 'footer.php'; ?>
 
 
     <script>

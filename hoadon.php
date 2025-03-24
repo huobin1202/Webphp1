@@ -68,63 +68,89 @@ if ($username && !$customer_id) {
                 </div>
                 <div class="header-middle-right">
                     <ul class="header-middle-right-list">
-                        <li class="header-middle-right-item dropdown open">
                         <li class="header-middle-right-item open">
-                            <div class="auth-container" method="POST">
-                                <?php if ($username): ?>
-                                    <?php
-                                    $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
-                                    $stmt->bind_param("s", $username);
-                                    $stmt->execute();
-                                    $result = $stmt->get_result();
-                                    if (isset($_SESSION['success_message'])) {
-                                        echo "<div class='alert alert-success'>{$_SESSION['success_message']}</div>";
-                                        unset($_SESSION['success_message']);
-                                    }
+                            <i class="fa-light fa-user" style="color:#139b3a"></i>
 
-                                    if ($result->num_rows > 0) {
-                                        $row = $result->fetch_assoc();
-                                    ?>
-                                        <div class="user-info">
-                                            <div class="dropdownb">
-                                                <h1 class="welcome">
-                                                    <i class="fa-light fa-user"></i>
+                            <div class="auth-container">
+                                <div class="user-info">
+                                    <div class="dropdownb">
+                                        <h1 class="welcome">
+                                            <div class="drip" style="display:flex;flex-direction:column">
 
-                                                    <span class="dropdownb-toggle" style="color:green;"><?php echo htmlspecialchars($row["name"]); ?></span>
-                                                </h1>
-                                                <div class="dropdownb-menu">
+                                                <!-- Dòng trên -->
+                                                <span style="font-size:12px">
+                                                    <?php
+                                                    if (isset($_SESSION['customer_id'])) {
+                                                        echo "Tài khoản";
+                                                    } else {
+                                                        echo "Đăng nhập/ Đăng ký";
+                                                    }
+                                                    ?>
+                                                </span>
 
-                                                    <a href="hoadon.php">
-                                                        <div class="hd">Đơn hàng đã mua </div>
-                                                        <a href="dnurl.php">
+                                                <!-- Dòng dưới -->
 
-                                                            <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i>Quản lý</div>
-                                                        </a>
-                                                        <a href="index.php?logout=<?php echo $id; ?>" onclick="return confirm('bạn có muốn đăng xuất?')">
-                                                            <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i>Đăng xuất</div>
-                                                        </a>
+                                                <span class="dropdownb-toggle" style="color:green;font-size:17px">
 
 
-                                                    </a>
-                                                </div>
+                                                    <?php
+                                                    if (isset($_SESSION['customer_id'])) {
+                                                        // Lấy tên khách hàng
+                                                        $stmt = $conn->prepare("SELECT name FROM customer WHERE id = ?");
+                                                        $stmt->bind_param("i", $_SESSION['customer_id']);
+                                                        $stmt->execute();
+                                                        $stmt->bind_result($name);
+                                                        if ($stmt->fetch()) {
+                                                            echo htmlspecialchars($name);
+                                                        } else {
+                                                            echo "Tài khoản";
+                                                        }
+                                                        $stmt->close();
+                                                    } else {
+                                                        echo "Tài khoản";
+                                                    }
+                                                    ?>
+                                                    <i class="fa-sharp fa-solid fa-caret-down" style="font-size:12px;"></i>
+                                                </span>
                                             </div>
+                                        </h1>
+
+                                        <!-- Dropdown -->
+                                        <div class="dropdownb-menu">
+                                            <?php if (isset($_SESSION['customer_id'])): ?>
+                                                <a href="dnurl.php">
+                                                    <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i> Quản lý</div>
+                                                </a>
+                                                <a href="thongtintk.php">
+                                                    <div class="hd"><i class="fa-light fa-circle-user" style="font-size:20px"></i> Tài khoản của tôi</div>
+                                                </a>
+                                                <a href="hoadon.php">
+                                                    <div class="hd"><i class="fa-regular fa-bags-shopping" style="font-size:20px"> </i> Đơn hàng đã mua</div>
+                                                </a>
+                                               
+                                                <a href="index.php?logout=1" onclick="return confirm('Bạn có muốn đăng xuất?')">
+                                                    <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i> Đăng xuất</div>
+                                                </a>
+                                            <?php else: ?>
+                                                <a href="dn.php">
+                                                    <div class="hd"><i class="fa-light fa-right-to-bracket" style="font-size:20px;color:green"></i> Đăng nhập</div>
+                                                </a>
+                                                <a href="dk.php">
+                                                    <div class="hd"><i class="fa-light fa-user-plus" style="font-size:20px;color:green"></i> Đăng ký</div>
+                                                </a>
+                                            <?php endif; ?>
                                         </div>
-                                    <?php } ?>
-                                    <?php $stmt->close(); ?>
-                                <?php else: ?>
-                                    <a href="dn.php"><button class="login-btn" style="font-size: 17px;">Đăng nhập</button></a>
-                                <?php endif; ?>
+                                    </div>
+                                </div>
 
                                 <div class="hoadon">
-
-                                    <span class="ravao" onclick="">
-                                        <i class="fa-light fa-basket-shopping"></i>
-                                        Giỏ hàng</span>
+                                    <span class="ravao">
+                                        <i class="fa-light fa-basket-shopping"></i> Giỏ hàng
+                                    </span>
                                 </div>
+
                             </div>
                         </li>
-                        </li>
-
                     </ul>
                 </div>
             </div>
@@ -203,6 +229,7 @@ if ($username && !$customer_id) {
                                 $order_id = $order['id'];
                     ?>
                                 <div class="order-history-group">
+                                    
                                     <?php
                                     // Chi tiết đơn hàng
                                     $sql_details = "SELECT od.*, p.tensp, p.hinhanh
@@ -235,7 +262,7 @@ if ($username && !$customer_id) {
                                         <div class="order-history-status">
                                             <?php
                                             $status_class = ($order['status'] === '1') ? 'complete' : 'no-complete';
-                                            $status_text = ($order['status'] === '1') ? 'Đã hoàn thành' : 'Đang xử lý';
+                                            $status_text = ($order['status'] === '1') ? 'Đã xử lý' : 'Đang xử lý';
                                             ?>
                                             <span class="order-history-status-sp <?= $status_class ?>"><?= $status_text ?></span>
 

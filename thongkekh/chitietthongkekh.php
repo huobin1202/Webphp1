@@ -1,3 +1,9 @@
+<?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: dnurl.php");
+    exit();
+}?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -67,20 +73,15 @@
                     </li>
                     <div class="spacer" style="height:50px;width:1px"></div>
                     <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
-                        <a href="../index.html" class="sidebar-link">
-                            <div class="sidebar-icon"><i class="fa-thin fa-circle-chevron-left"></i></div>
-                            <div class="hidden-sidebar">Trang chủ</div>
-                        </a>
-                    </li>
-
-                    <li class="sidebar-list-item user-logout">
                         <a href="#" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-circle-user"></i></div>
-                            <div class="hidden-sidebar" id="name-acc">Admin</div>
+                            <div class="hidden-sidebar" id="name-acc">
+                                <?php echo $_SESSION['username']; ?>
+                            </div>
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="#" class="sidebar-link" >
+                        <a href="../index.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>
@@ -136,58 +137,12 @@
                                 </td>
                                 <td>10</td>
                                 <td>980.000.000đ</td>
-                                <td><button class="btn-detail product-order-detail"><a href="chitietthongkekh1.html"><i
+                                <td><button class="btn-detail product-order-detail"><a href="chitietthongkekh1.php"><i
                                                 class="fa-regular fa-eye"></i> Chi tiết</a></button></td>
                             </tr>
                         </tbody>
-                        <tbody id="showTk">
-                            <tr>
-                                <td>KH006</td>
-                                <td>
-                                    <p>Nguyễn Văn A</p>
-                                </td>
-                                <td>7</td>
-                                <td>960.000.000đ</td>
-                                <td><button class="btn-detail product-order-detail"><a href="chitietthongkekh2.html"><i
-                                    class="fa-regular fa-eye"></i> Chi tiết</a></button></td>
-                            </tr>
-                        </tbody>
-                        <tbody id="showTk">
-                            <tr>
-                                <td>KH008</td>
-                                <td>
-                                    <p>Nguyễn Thị Bánh Bèo</p>
-                                </td>
-                                <td>5</td>
-                                <td>840.000.000đ</td>
-                                <td><button class="btn-detail product-order-detail"><a href="chitietthongkekh3.html"><i
-                                    class="fa-regular fa-eye"></i> Chi tiết</a></button></td>
-                            </tr>
-                        </tbody>
-                        <tbody id="showTk">
-                            <tr>
-                                <td>KH004</td>
-                                <td>
-                                    <p>Nguyễn Minh</p>
-                                </td>
-                                <td>3</td>
-                                <td>560.000.000đ</td>
-                                <td><button class="btn-detail product-order-detail"><a href="chitietthongkekh4.html"><i
-                                    class="fa-regular fa-eye"></i> Chi tiết</a></button></td>
-                            </tr>
-                        </tbody>
-                        <tbody id="showTk">
-                            <tr>
-                                <td>KH002</td>
-                                <td>
-                                    <p>Huỳnh Thành</p>
-                                </td>
-                                <td>2</td>
-                                <td>490.000.000đ</td>
-                                <td><button class="btn-detail product-order-detail"><a href="chitietthongkekh5.html"><i
-                                    class="fa-regular fa-eye"></i> Chi tiết</a></button></td>
-                            </tr>
-                        </tbody>
+                  
+          
                        
                     </table>
                 </div>
@@ -196,7 +151,7 @@
     </div>
     <div class="modal detail-order-product open">
         <div class="modal-container">
-            <a href="thongkekh.html"><button class="modal-close"><i class="fa-regular fa-xmark"></i></button></a>
+            <a href="thongkekh.php"><button class="modal-close"><i class="fa-regular fa-xmark"></i></button></a>
             <div class="table">
                 <table width="100%">
                     <thead>

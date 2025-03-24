@@ -1,4 +1,10 @@
 <?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: dnurl.php");
+    exit();
+}
+
 // Database configuration
 $servername = "localhost";
 $username = "root";
@@ -21,14 +27,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $giaBan = floatval($_POST['gia-ban']);
     $thongTinSP = $conn->real_escape_string(htmlspecialchars($_POST['thong-tin-sp'], ENT_QUOTES, 'UTF-8'));
     $thongSoKT = $conn->real_escape_string(htmlspecialchars($_POST['thong-so-ky-thuat'], ENT_QUOTES, 'UTF-8'));
-    
+
 
     // Handle image uploads
     $uploadDir = "uploads/";
     $mainImage = isset($_FILES['up-hinh-anh']['name']) && $_FILES['up-hinh-anh']['name'] !== '' ? $uploadDir . basename($_FILES['up-hinh-anh']['name']) : '';
     $image2 = isset($_FILES['up-hinh-anh2']['name']) && $_FILES['up-hinh-anh2']['name'] !== '' ? $uploadDir . basename($_FILES['up-hinh-anh2']['name']) : '';
     $image3 = isset($_FILES['up-hinh-anh3']['name']) && $_FILES['up-hinh-anh3']['name'] !== '' ? $uploadDir . basename($_FILES['up-hinh-anh3']['name']) : '';
-    
+
     // Move uploaded files
     if ($mainImage) move_uploaded_file($_FILES['up-hinh-anh']['tmp_name'], $mainImage);
     if ($image2) move_uploaded_file($_FILES['up-hinh-anh2']['tmp_name'], $image2);
@@ -130,21 +136,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </li>
 
                     <div class="spacer" style="height:50px;width:1px"></div>
-                    <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
-                        <a href="../index.php" class="sidebar-link">
-                            <div class="sidebar-icon"><i class="fa-thin fa-circle-chevron-left"></i></div>
-                            <div class="hidden-sidebar">Trang chủ</div>
-                        </a>
-                    </li>
 
-                    <li class="sidebar-list-item user-logout">
+                  
+                    <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
                         <a href="#" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-circle-user"></i></div>
-                            <div class="hidden-sidebar" id="name-acc">Admin</div>
+                            <div class="hidden-sidebar" id="name-acc">
+                                <?php echo $_SESSION['username']; ?>
+                            </div>
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="#" class="sidebar-link">
+                        <a href="../index.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>
@@ -247,26 +250,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="modal-content">
                 <form action="" method="POST" enctype="multipart/form-data" class="add-product-form" onsubmit="return confirmSubmit()">
                     <div class="modal-content-left">
-                        <img src="../image/blank-image.png" alt="" class="upload-image-preview">
+                        <img src="../image/blank-image.png" alt="" class="upload-image-preview" id="preview-image-1">
                         <div class="form-group file">
                             <label for="up-hinh-anh" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
-                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh" name="up-hinh-anh" type="file" class="form-control">
+                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh" name="up-hinh-anh" type="file" class="form-control" onchange="previewImage(this, 'preview-image-1')">
                         </div>
-                        <img src="../image/blank-image.png" alt="" class="upload-image-preview">
+
+                        <img src="../image/blank-image.png" alt="" class="upload-image-preview" id="preview-image-2">
                         <div class="form-group file">
                             <label for="up-hinh-anh2" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
-                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh2" name="up-hinh-anh2" type="file" class="form-control">
+                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh2" name="up-hinh-anh2" type="file" class="form-control" onchange="previewImage(this, 'preview-image-2')">
                         </div>
-                        <img src="../image/blank-image.png" alt="" class="upload-image-preview">
+
+                        <img src="../image/blank-image.png" alt="" class="upload-image-preview" id="preview-image-3">
                         <div class="form-group file">
                             <label for="up-hinh-anh3" class="form-label-file"><i class="fa-regular fa-cloud-arrow-up"></i>Chọn hình ảnh</label>
-                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh3" name="up-hinh-anh3" type="file" class="form-control">
+                            <input accept="image/jpeg, image/png, image/jpg" id="up-hinh-anh3" name="up-hinh-anh3" type="file" class="form-control" onchange="previewImage(this, 'preview-image-3')">
                         </div>
+
                     </div>
                     <div class="modal-content-right">
                         <div class="form-group">
                             <label for="ten-mon" class="form-label">Tên xe</label>
-                            <input id="ten-mon" name="ten-mon" type="text" placeholder="Nhập tên xe"  class="form-control" required>
+                            <input id="ten-mon" name="ten-mon" type="text" placeholder="Nhập tên xe" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="category" class="form-label">Chọn dòng</label>
@@ -276,13 +282,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <option value="Dòng KLX">Dòng KLX</option>
                             </select>
                         </div>
-                      
+
                         <div class="form-group">
                             <label for="gia-ban" class="form-label">Giá bán</label>
                             <input id="gia-ban" name="gia-ban" type="text" placeholder="Nhập giá bán" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="thong-tin-sp" class="f  orm-label">Thông tin sản phẩm</label>
+                            <label for="thong-tin-sp" class="form-label">Thông tin sản phẩm</label>
                             <textarea name="thong-tin-sp" class="product-desc" id="thong-tin-sp" placeholder="Nhập thông tin sản phẩm" style="width:100%;height:100%;"></textarea>
                         </div>
                         <div class="form-group">
@@ -298,10 +304,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
-    </div>
     <script>
-        function confirmSubmit() {
-            return confirm("Bạn có chắc chắn muốn thêm sản phẩm này?");
+        function previewImage(input, previewId) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(previewId).src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
         }
     </script>
     <script src="../assets/js/admin.js"></script>

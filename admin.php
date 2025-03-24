@@ -104,14 +104,9 @@ $conn->close();
                         </a>
                     </li>
                     <div class="spacer" style="height:50px;width:1px"></div>
-                    <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
-                        <a href="index.php" class="sidebar-link">
-                            <div class="sidebar-icon"><i class="fa-thin fa-circle-chevron-left"></i></div>
-                            <div class="hidden-sidebar">Trang chủ</div>
-                        </a>
-                    </li>
+                   
 
-                    <li class="sidebar-list-item user-logout">
+                    <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
                         <a href="#" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-circle-user"></i></div>
                             <div class="hidden-sidebar" id="name-acc">
@@ -120,7 +115,7 @@ $conn->close();
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="logout.php" class="sidebar-link">
+                        <a href="index.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>
