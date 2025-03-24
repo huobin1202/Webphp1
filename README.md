@@ -1,6 +1,6 @@
 **https://www.youtube.com/watch?v=U2Fjfqm-7g8**
 
-**Index thiếu:**  tìm kiếm sp, 
+**Index thiếu:**  tìm kiếm sp + timkiem.php, 
     
 
 **Admin thiếu:** 
