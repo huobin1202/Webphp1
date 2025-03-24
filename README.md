@@ -1,8 +1,7 @@
 **https://www.youtube.com/watch?v=U2Fjfqm-7g8**
 
-**Index thiếu:**  
+**Index thiếu:**  tìm kiếm sp, 
     
-        tìm kiếm sp, 
 
 **Admin thiếu:** 
              thống kế sp + chi tiết,
