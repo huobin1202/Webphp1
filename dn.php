@@ -65,7 +65,7 @@ session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim($_POST['name']);
-    $password = trim($_POST['password']); // Đổi tên biến để tránh trùng lặp
+    $password = trim($_POST['password']);
 
     $servername = "localhost";
     $username = "root";
@@ -80,29 +80,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $error_message = "";
 
-    // Sử dụng prepared statements để tránh SQL Injection
-    $result = $conn->prepare("SELECT id FROM customer WHERE name = ? AND password = ?");
-    $result->bind_param("ss", $name, $password);
-    $result->execute();
-    $result->store_result();
+    // Prepared statement to get user id, status
+    $stmt = $conn->prepare("SELECT id, status FROM customer WHERE name = ? AND password = ?");
+    $stmt->bind_param("ss", $name, $password);
+    $stmt->execute();
+    $stmt->store_result();
 
-    if ($result->num_rows == 1) {
-        $result->bind_result($user_id);
-        $result->fetch();
+    if ($stmt->num_rows == 1) {
+        $stmt->bind_result($user_id, $status);
+        $stmt->fetch();
 
-        session_unset();
-        session_destroy();
-        session_start();
+        if ($status == 0) {
+            $error_message = "Tài khoản của bạn đã bị khóa!";
+        } else {
+            session_unset();
+            session_destroy();
+            session_start();
 
-        $_SESSION['user_id'] = $user_id;
-        $_SESSION['username'] = $name;
-        header("Location: index.php");
-        exit();
+            $_SESSION['user_id'] = $user_id;
+            $_SESSION['username'] = $name;
+            header("Location: index.php");
+            exit();
+        }
     } else {
         $error_message = "Tên đăng nhập hoặc mật khẩu không đúng!";
     }
 
-    $result->close();
+    $stmt->close();
     $conn->close();
 }
 ?>

@@ -30,13 +30,11 @@ header {
 
 .header-middle {
     box-shadow: inset 0px -0.5px 0px #e6e6e6;
-    margin-left: -700px;
 
 }
 
 .header-logo img {
     width: 70px;
-    margin-left: 400px;
 
 }
 
@@ -56,7 +54,7 @@ header {
     display: flex;
     justify-content: center;
     position: relative;
-    right: -55px;
+    width:100%;
 }
 
 .form-search-input {
@@ -143,7 +141,6 @@ header {
 
 .auth-container {
     display: flex;
-    flex-direction: column;
 }
 
 .text-dndk {
@@ -1937,7 +1934,6 @@ li {
 .hoadon {
     text-align: center;
     /* Đặt canh giữa các phần tử con nếu muốn */
-    position: absolute;
     right: -388px;
 }
 
@@ -2018,6 +2014,7 @@ li {
     /* Căn giữa theo chiều dọc */
     gap: 20px;
     /* Khoảng cách giữa tiêu đề và nút */
+    margin-right:40px;
 }
 
 .welcome {
@@ -2031,8 +2028,7 @@ li {
 
 .logout-btn,
 .login-btn {
-    background-color: #139b3a;
-    color: white;
+    color: #139b3a;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -2040,8 +2036,8 @@ li {
 }
 
 
-.logout-btn:hover,
-.login-btn:hover {
+.logout-btn:hover
+ {
     background-color: darkgreen;
 }
 
@@ -2259,3 +2255,37 @@ li {
 
 
 
+.login-btn {
+    font-size: 17px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: transparent;
+    
+}
+
+.account-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.main-text {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.sub-text {
+    font-size: 12px;
+}
+
+a.account-link {
+    text-decoration: none;
+}
+
+
+/* Thông tin sản phẩm */

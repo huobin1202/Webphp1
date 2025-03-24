@@ -92,7 +92,7 @@ if ($productId > 0) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='img/logo.png' rel='icon' type='image/x-icon' />
+    <link href='image/logo.png' rel='icon' type='image/x-icon' />
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link href="../assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="../assets/css/admin-responsive.css">
@@ -110,44 +110,44 @@ if ($productId > 0) {
     <div class="container">
         <aside class="sidebar open">
             <div class="top-sidebar">
-                <a href="" class="channel-logo"><img src="../img/logo.png" alt="Channel Logo"></a>
+                <a href="" class="channel-logo"><img src="../image/logo.png" alt="Channel Logo"></a>
                 <div class="hidden-sidebar your-channel"><img src="" style="height: 30px;" alt="">
                 </div>
             </div>
             <div class="middle-sidebar">
                 <ul class="sidebar-list">
                     <li class="sidebar-list-item tab-content">
-                        <a href="/admin.php" class="sidebar-link">
+                        <a href="../admin.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-house"></i></div>
                             <div class="hidden-sidebar">Trang tổng quan</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content active">
-                        <a href="/sanpham/sanpham.php" class="sidebar-link">
+                        <a href="../sanpham/sanpham.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-thin fa-motorcycle"></i></div>
                             <div class="hidden-sidebar">Sản phẩm</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="/khachhang/khachhang.php" class="sidebar-link">
+                        <a href="../khachhang/khachhang.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-users"></i></div>
                             <div class="hidden-sidebar">Khách hàng</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="/donhang/donhang.php" class="sidebar-link">
+                        <a href="../donhang/donhang.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-basket-shopping"></i></div>
                             <div class="hidden-sidebar">Đơn hàng</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="/thongkesp/thongke.php" class="sidebar-link">
+                        <a href="../thongkesp/thongke.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
                             <div class="hidden-sidebar">Thống kê sản phẩm</div>
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                        <a href="/thongkekh/thongkekh.php" class="sidebar-link">
+                        <a href="../thongkekh/thongkekh.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
                             <div class="hidden-sidebar">Thống kê khách hàng</div>
                         </a>
@@ -155,7 +155,7 @@ if ($productId > 0) {
 
                     <div class="spacer" style="height:50px;width:1px"></div>
                     <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
-                        <a href="index.php" class="sidebar-link">
+                        <a href="../index.php" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-thin fa-circle-chevron-left"></i></div>
                             <div class="hidden-sidebar">Trang chủ</div>
                         </a>
