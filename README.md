@@ -2,7 +2,6 @@
 - Tìm kiếm cơ bản + nâng cao
 - Giỏ hàng: địa chỉ tk/ địa chỉ mới
 - Hiển thị hóa đơn
-- Thêm tài khoản user
 
 **Admin:**
 - Xóa xp: Kiểm tra nếu sp đã được bán ra thì ẩn sp hiển thị trên web, nếu sản phẩm chưa được bán ra thì hỏi lại và xóa
