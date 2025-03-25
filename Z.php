@@ -1,6 +1,11 @@
 <?php
 session_start();
 include('database.php');
+include('toast.php');
+if (isset($_SESSION['success'])) {
+    echo '<script>alert("' . $_SESSION['success'] . '");</script>';
+    unset($_SESSION['success']); // Xóa thông báo sau khi hiển thị
+}
 
 // Xử lý đăng xuất
 if (isset($_GET['logout'])) {
@@ -11,17 +16,20 @@ if (isset($_GET['logout'])) {
 }
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
+$role = null;
 
-// Nếu có username, lấy ID từ bảng customer
 if ($username && !$customer_id) {
-    $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ?");
+    $stmt = $conn->prepare("SELECT id, role FROM customer WHERE name = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $stmt->bind_result($customer_id);
+    $stmt->bind_result($customer_id, $role);
     if ($stmt->fetch()) {
         $_SESSION["customer_id"] = $customer_id;
+        $_SESSION["role"] = $role;
     }
     $stmt->close();
+} else {
+    $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
 }
 
 ?>
@@ -118,9 +126,7 @@ if ($username && !$customer_id) {
                         <!-- Dropdown -->
                         <div class="dropdownb-menu">
                                             <?php if (isset($_SESSION['customer_id'])): ?>
-                                                <a href="dnurl.php">
-                                                    <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i> Quản lý</div>
-                                                </a>
+                                            
                                                 <a href="thongtintk.php">
                                                     <div class="hd"><i class="fa-light fa-circle-user" style="font-size:20px"></i> Tài khoản của tôi</div>
                                                 </a>
@@ -131,6 +137,11 @@ if ($username && !$customer_id) {
                                                 <a href="index.php?logout=1" onclick="return confirm('Bạn có muốn đăng xuất?')">
                                                     <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i> Đăng xuất</div>
                                                 </a>
+                                                <?php if ($role === 'admin'): ?>
+                                                    <a href="dnurl.php">
+                                                        <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i> Quản lý</div>
+                                                    </a>
+                                                <?php endif; ?>
                                             <?php else: ?>
                                                 <a href="dn.php">
                                                     <div class="hd"><i class="fa-light fa-right-to-bracket" style="font-size:20px;color:green"></i> Đăng nhập</div>

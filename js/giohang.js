@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.querySelector("tbody").innerHTML = data.cart_html; 
                 document.querySelector(".price-total span").innerText = data.total_price; 
                 
-                setTimeout(attachEventListeners, 500); // Đợi một chút rồi gán lại sự kiện
+                setTimeout(attachEventListeners, 0); // Đợi một chút rồi gán lại sự kiện
             })
             .catch(error => console.error("Lỗi khi tải giỏ hàng:", error));
     }

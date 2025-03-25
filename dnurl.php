@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $sql = "SELECT * FROM nhanvien WHERE name = ?";
+    $sql = "SELECT * FROM customer WHERE name = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -31,10 +31,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         if ($password == $user['password']) {
             $_SESSION['username'] = $user['name'];
-            $_SESSION['loainv'] = $user['loainv'];
+            $_SESSION['role'] = $user['role'];
             $_SESSION['id'] = $user['id'];
 
-            if ($user['loainv'] == 1) {
+            if ($user['role'] == 'admin') {
                 header("Location: admin.php");
                 exit();
             } else {
@@ -166,10 +166,10 @@ input:focus, button:focus {
         <h2>Đăng nhập vào hệ thống</h2>
         <form id="loginForm" method="POST">
             <label for="username">Tên đăng nhập:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" name="username" maxlength="20" required>
 
             <label for="password">Mật khẩu:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" name="password" maxlength="20" required>
 
             <button type="submit">Đăng nhập</button>
         </form>

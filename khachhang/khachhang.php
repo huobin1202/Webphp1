@@ -4,6 +4,7 @@ if (!isset($_SESSION['username'])) {
     header("Location: dnurl.php");
     exit();
 }
+include('../toast.php');
 ?>
 <!DOCTYPE php>
 <html lang="en">
@@ -18,7 +19,6 @@ if (!isset($_SESSION['username'])) {
     <link rel="stylesheet" href="../assets/css/admin-responsive.css">
     <title>Quản lý cửa hàng</title>
 </head>
-
 <body>
     <header class="header">
         <button class="menu-icon-btn">
@@ -178,10 +178,6 @@ if (!isset($_SESSION['username'])) {
                                     echo "<div class='no-products'>Không có sản phẩm nào!</div>";                }
                             
                             ?>
-                           
-                        
-
-                            
                         </tbody>
                     </table>
                 </div>

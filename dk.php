@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $password_confirm = trim($_POST['password_confirm']);
 
         if ($password !== $password_confirm) {
-            $error_message = "Mật khẩu xác nhận không khớp!";
+            $_SESSION['error'] = "Mật khẩu xác nhận không khớp!";
         } else {
             // Kiểm tra xem tài khoản hoặc số điện thoại đã tồn tại chưa
             $check_sql = "SELECT id FROM customer WHERE name = ? OR contact = ?";
@@ -31,10 +31,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $result = $check_stmt->get_result();
             
             if ($result->num_rows > 0) {
-                $error_message = "Tài khoản hoặc số điện thoại đã tồn tại, vui lòng chọn thông tin khác!";
+                $_SESSION['error'] = "Tài khoản hoặc số điện thoại đã tồn tại!";
+
             } else {
                 // Thêm tài khoản mới vào CSDL
-                $sql = "INSERT INTO customer (name, contact, joindate, status, password) VALUES (?, ?, NOW(), '1', ?)";
+                $sql = "INSERT INTO customer (name, contact, joindate, status, password, role) VALUES (?, ?, NOW(), '1', ?,user)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("sss", $name, $contact, $password);
                 
@@ -45,6 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Lưu thông tin vào session
                     $_SESSION['user_id'] = $user_id;
                     $_SESSION['username'] = $name;
+                    $_SESSION['success'] = "Tạo tài khoản thành công!";
+
 
                     // Chuyển hướng về trang index.php
                     header("Location: index.php");
@@ -117,11 +120,9 @@ $conn->close();
     </style>
 </head>
 <body>
+    <?php include('toast.php'); ?>
     <div class="register-container">
         <h2 style="text-align: center;">Đăng ký</h2>
-        <?php if ($error_message): ?>
-            <p class="error-message"><?php echo $error_message; ?></p>
-        <?php endif; ?>
         <form method="post">
             <input type="text" id="newUsername" placeholder="Tên đăng nhập" name="name" maxlength="20" required>
             <input type="text" id="newContact" placeholder="Số điện thoại" name="contact" maxlength="11" required>

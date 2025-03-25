@@ -78,8 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Kết nối thất bại: " . $conn->connect_error);
     }
 
-    $error_message = "";
-
     // Prepared statement to get user id, status
     $stmt = $conn->prepare("SELECT id, status FROM customer WHERE name = ? AND password = ?");
     $stmt->bind_param("ss", $name, $password);
@@ -91,19 +89,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->fetch();
 
         if ($status == 0) {
-            $error_message = "Tài khoản của bạn đã bị khóa!";
-        } else {
-            session_unset();
-            session_destroy();
-            session_start();
-
-            $_SESSION['user_id'] = $user_id;
-            $_SESSION['username'] = $name;
-            header("Location: index.php");
+            $_SESSION['error'] = "Tài khoản của bạn đã bị khóa!";
+            header("Location: dn.php");
             exit();
         }
+
+        session_unset();
+        session_destroy();
+        session_start();
+
+        $_SESSION['user_id'] = $user_id;
+        $_SESSION['username'] = $name;
+        $_SESSION['success'] = "Đăng nhập thành công!";
+        header("Location: index.php");
+        exit();
     } else {
-        $error_message = "Tên đăng nhập hoặc mật khẩu không đúng!";
+        $_SESSION['error'] = "Tên đăng nhập hoặc mật khẩu không đúng!";
+        header("Location: dn.php");
+        exit();
     }
 
     $stmt->close();
@@ -111,21 +114,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
 <body>
+    <?php include 'toast.php'; ?>
     <form method="post">
-
         <div class="login-container">
-            <h2 style="">Đăng nhập</h2>
-            <?php if (!empty($error_message)): ?>
-                <p style="color: red; text-align:center;"><?php echo $error_message; ?></p>
-            <?php endif; ?>
+            <h2>Đăng nhập</h2>
             <input type="text" id="username" name="name" placeholder="Tên đăng nhập" required maxlength="20">
             <input type="password" id="password" name="password" placeholder="Mật khẩu" maxlength="20" required>
             <button type="submit" name="login">Đăng nhập</button>
-            <p id="error-message" class="error-message"></p>
-            <p class="back-to-login" style="color:#28a745; text-align:center">Chưa có tài khoản? <a href=dk.php style="color:#28a745;  "> Đăng ký ngay!</a></p>
-
+            <p class="back-to-login" style="color:#28a745; text-align:center">Chưa có tài khoản? <a href="dk.php" style="color:#28a745">Đăng ký ngay!</a></p>
         </div>
     </form>
 </body>

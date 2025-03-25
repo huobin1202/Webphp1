@@ -12,11 +12,11 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
+include('../toast.php');
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo "<script>if (!confirm('Bạn có chắc chắn muốn sửa sản phẩm này?')) { window.location.href = 'sanpham.php'; }</script>";
-    
+
     $productId = intval($_POST['product-id']);
     $tenXe = $conn->real_escape_string($_POST['ten-mon']);
     $dongXe = $conn->real_escape_string($_POST['category']);
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle additional images upload
     $imageFields = ['up-hinh-anh2' => 'hinhanh2', 'up-hinh-anh3' => 'hinhanh3'];
     $additionalImages = [];
-    
+
     foreach ($imageFields as $field => $dbColumn) {
         if (!empty($_FILES[$field]['name'])) {
             $imagePath = "uploads/" . basename($_FILES[$field]['name']);
@@ -60,11 +60,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     hinhanh2 = '{$additionalImages['hinhanh2']}',
                     hinhanh3 = '{$additionalImages['hinhanh3']}'
                   WHERE id = $productId";
-    
+
     if ($conn->query($sqlUpdate) === TRUE) {
-        echo "<script>alert('Cập nhật sản phẩm thành công!'); window.location.href = 'sanpham.php';</script>";
+        $_SESSION['success'] = "Cập nhật sản phẩm thành công!";
+        header("Location: sanpham.php");
+        exit();
     } else {
-        echo "Lỗi cập nhật sản phẩm: " . $conn->error;
+        $_SESSION['error'] = "Không thể thêm sản phẩm! Lỗi: " . $conn->error;
+        header("Location: sanpham.php");
+        exit();
     }
 }
 
@@ -79,7 +83,6 @@ if ($productId > 0) {
     } else {
         echo "<script>alert('Không thể tìm thấy sản phẩm!'); window.location.href = 'sanpham.php';</script>";
     }
-    $conn->close();
 }
 
 ?>
@@ -100,7 +103,7 @@ if ($productId > 0) {
 </head>
 
 <body>
-<header class="header">
+    <header class="header">
         <button class="menu-icon-btn">
             <div class="menu-icon">
                 <i class="fa-regular fa-bars"></i>
@@ -154,7 +157,7 @@ if ($productId > 0) {
                     </li>
 
                     <div class="spacer" style="height:50px;width:1px"></div>
-                
+
                     <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
                         <a href="#" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-circle-user"></i></div>
@@ -201,19 +204,7 @@ if ($productId > 0) {
                 </div>
                 <div id="show-product"></div>
                 <?php
-                // Database configuration
-                $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "admindoan";
 
-                // Create connection
-                $conn = new mysqli($servername, $username, $password, $dbname);
-
-                // Check connection
-                if ($conn->connect_error) {
-                    die("Kết nối thất bại: " . $conn->connect_error);
-                }
 
                 // Fetch product data
                 $sql = "SELECT id, tensp, dongsp, giaban, thongtinsp, hinhanh FROM products";
@@ -254,13 +245,12 @@ if ($productId > 0) {
                 }
 
                 // Close connection
-                $conn->close();
                 ?>
             </div>
         </main>
     </div>
 
-    
+
 
     <div class="modal add-product open ">
         <div class="modal-container">
@@ -320,16 +310,18 @@ if ($productId > 0) {
             </div>
         </div>
     </div>
-    <script>function previewImage(input, previewId) {
-        const file = input.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById(previewId).src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+    <script>
+        function previewImage(input, previewId) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(previewId).src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
         }
-    }</script>
+    </script>
     <script src="../assets/js/admin.js"></script>
 
 </body>

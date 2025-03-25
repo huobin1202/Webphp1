@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
         changeLogOut.addEventListener("click", () => {
             if (confirm("Bạn có muốn thoát tài khoản quản trị và trở về trang chủ?") == true) {
                 alert("Đã thoát!");
-                window.location.href = "/";
+                window.location.href = "index.php";
             }
         });
     }

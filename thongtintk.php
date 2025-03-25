@@ -1,30 +1,87 @@
 <?php
 session_start();
 include('database.php');
+include('toast.php');
 
-// Xử lý đăng xuất
-if (isset($_GET['logout'])) {
-    session_unset();
-    session_destroy();
-    header("Location: index.php");
-    exit;
+// Kiểm tra đăng nhập
+if (!isset($_SESSION['customer_id'])) {
+    $_SESSION['error'] = "Bạn cần đăng nhập để thực hiện thao tác này!";
+    header("Location: dn.php");
+    exit();
 }
-$username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
-$customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
 
-// Nếu có username, lấy ID từ bảng customer
-if ($username && !$customer_id) {
-    $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->bind_result($customer_id);
-    if ($stmt->fetch()) {
-        $_SESSION["customer_id"] = $customer_id;
+$customer_id = $_SESSION['customer_id'];
+
+// Lấy thông tin khách hàng
+$stmt = $conn->prepare("SELECT name, contact, email, address, password FROM customer WHERE id = ?");
+$stmt->bind_param("i", $customer_id);
+$stmt->execute();
+$stmt->bind_result($tenUser, $sdtUser, $emailUser, $diachiUser, $current_password);
+$stmt->fetch();
+$stmt->close();
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $tenUser = trim($_POST['infoname']);
+    $sdtUser = trim($_POST['infophone']);
+    $emailUser = trim($_POST['infoemail']);
+    $diachiUser = trim($_POST['infoaddress']);
+    $mkHientai = trim($_POST['current-pass']);
+    $mkMoi = trim($_POST['new-pass']);
+    $xnMkMoi = trim($_POST['confirm-new-pass']);
+
+    // Kiểm tra email hợp lệ
+    if (!filter_var($emailUser, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error'] = "Email không hợp lệ!";
+    } elseif (!ctype_digit($sdtUser)) {
+        $_SESSION['error'] = "Số điện thoại phải là số!";
+    } else {
+        // Kiểm tra trùng số điện thoại hoặc tên với tài khoản khác
+        $stmt = $conn->prepare("SELECT id FROM customer WHERE (contact = ? OR name = ?) AND id != ?");
+        $stmt->bind_param("ssi", $sdtUser, $tenUser, $customer_id);
+        $stmt->execute();
+        $stmt->store_result();
+        
+        if ($stmt->num_rows > 0) {
+            $_SESSION['error'] = "Tên hoặc số điện thoại đã tồn tại!";
+        } else {
+            if (!empty($mkMoi)) {
+                if (empty($mkHientai)) {
+                    $_SESSION['error'] = "Bạn cần nhập mật khẩu hiện tại để đổi mật khẩu!";
+                } elseif ($mkHientai !== $current_password) {
+                    $_SESSION['error'] = "Mật khẩu hiện tại không đúng!";
+                } elseif ($mkMoi === $current_password) {
+                    $_SESSION['error'] = "Mật khẩu mới không được trùng với mật khẩu hiện tại!";
+                } elseif ($mkMoi !== $xnMkMoi) {
+                    $_SESSION['error'] = "Xác nhận mật khẩu mới không khớp!";
+                } else {
+                    $passwordToUpdate = $mkMoi;
+                }
+            } else {
+                $passwordToUpdate = $current_password;
+            }
+
+            if (!isset($_SESSION['error'])) {
+                $stmt = $conn->prepare("UPDATE customer SET name=?, contact=?, email=?, address=?, password=? WHERE id=?");
+                $stmt->bind_param("sssssi", $tenUser, $sdtUser, $emailUser, $diachiUser, $passwordToUpdate, $customer_id);
+
+                if ($stmt->execute()) {
+                    if ($stmt->affected_rows > 0) {
+                        $_SESSION['success'] = "Cập nhật thông tin thành công!";
+                    } else {
+                        $_SESSION['info'] = "Không có thông tin nào thay đổi!";
+                    }
+                } else {
+                    $_SESSION['error'] = "Lỗi: " . $conn->error;
+                }
+            }
+        }
     }
-    $stmt->close();
+    header("Location: thongtintk.php");
+    exit();
 }
-
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -118,18 +175,19 @@ if ($username && !$customer_id) {
                                         <!-- Dropdown -->
                                         <div class="dropdownb-menu">
                                             <?php if (isset($_SESSION['customer_id'])): ?>
-                                                <a href="dnurl.php">
-                                                    <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i> Quản lý</div>
-                                                </a>
+                                               
                                                 <a href="thongtintk.php">
                                                     <div class="hd"><i class="fa-light fa-circle-user" style="font-size:20px"></i> Tài khoản của tôi</div>
                                                 </a>
                                                 <a href="hoadon.php">
                                                     <div class="hd"><i class="fa-regular fa-bags-shopping" style="font-size:20px"> </i> Đơn hàng đã mua</div>
                                                 </a>
-                                               
+
                                                 <a href="index.php?logout=1" onclick="return confirm('Bạn có muốn đăng xuất?')">
                                                     <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i> Đăng xuất</div>
+                                                </a>
+                                                <a href="dnurl.php">
+                                                    <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i> Quản lý</div>
                                                 </a>
                                             <?php else: ?>
                                                 <a href="dn.php">
@@ -207,105 +265,69 @@ if ($username && !$customer_id) {
         </div>
     </nav>
     <div class="container" id="account-user">
-            <div class="main-account">
-                <div class="main-account-header">
-                    <h3>Thông tin tài khoản của bạn</h3>
-                    <p>Quản lý thông tin để bảo mật tài khoản</p>
-                </div>
-                <div class="main-account-body">
-                    <div class="main-account-body-col">
-                        <form action="" class="info-user">
-                            <div class="form-group">
-                                <label for="infoname" class="form-label">Họ và tên</label>
-                                <input class="form-control" type="text" name="infoname" id="infoname" placeholder="">
-                            </div>
-                            <div class="form-group">
-                                <label for="infophone" class="form-label">Số điện thoại</label>
-                                <input class="form-control" type="text" name="infophone" id="infophone" 
-                                    placeholder="">
-                            </div>
-                            <div class="form-group">
-                                <label for="infoemail" class="form-label">Email</label>
-                                <input class="form-control" type="email" name="infoemail" id="infoemail"
-                                    placeholder="Thêm địa chỉ email của bạn">
-                                <span class="inforemail-error form-message"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="infoaddress" class="form-label">Địa chỉ</label>
-                                <input class="form-control" type="text" name="infoaddress" id="infoaddress"
-                                    placeholder="Thêm địa chỉ giao hàng của bạn">
-                            </div>
-                        </form>
+        <div class="main-account">
+            <div class="main-account-header">
+                <h3>Thông tin tài khoản của bạn</h3>
+                <p>Quản lý thông tin để bảo mật tài khoản</p>
+            </div>
+            <form class="main-account-body" method="POST">
+
+                <div class="main-account-body-col">
+                    <div class="form-group">
+                        <label for="infoname" class="form-label">Tên tài khoản</label>
+                        <input class="form-control" type="text" name="infoname" value="<?php echo htmlspecialchars($tenUser); ?>" required><br>
                     </div>
-                    <div class="main-account-body-col">
-                        <form action="" class="change-password">
-                            <div class="form-group">
-                                <label for="" class="form-label w60">Mật khẩu hiện tại</label>
-                                <input class="form-control" type="password" name="" id="password-cur-info"
-                                    placeholder="Nhập mật khẩu hiện tại">
-                                <span class="password-cur-info-error form-message"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="" class="form-label w60">Mật khẩu mới </label>
-                                <input class="form-control" type="password" name="" id="password-after-info"
-                                    placeholder="Nhập mật khẩu mới">
-                                <span class="password-after-info-error form-message"></span>
-                            </div>
-                            <div class="form-group">
-                                <label for="" class="form-label w60">Xác nhận mật khẩu mới</label>
-                                <input class="form-control" type="password" name="" id="password-comfirm-info"
-                                    placeholder="Nhập lại mật khẩu mới">
-                                <span class="password-after-comfirm-error form-message"></span>
-                            </div>
-                        </form>
+                    <div class="form-group">
+                        <label for="infophone" class="form-label">Số điện thoại</label>
+                        <input class="form-control" type="text" name="infophone" value="<?php echo htmlspecialchars(string: $sdtUser); ?>" required><br>
                     </div>
-                    <div class="main-account-body-row">
-                        <div>
-                            <button id="save-info-user" onclick="changeInformation()"><i
-                                    class="fa-regular fa-floppy-disk"></i> Lưu thay đổi</button>
-                        </div>
-                        <div>
-                            <button id="save-password" onclick="changePassword()"><i class="fa-regular fa-key"></i> Đổi
-                                mật khẩu</button>
-                        </div>
+                    <div class="form-group">
+                        <label for="infoemail" class="form-label">Email</label>
+                            <input class="form-control" type="email" name="infoemail" id="infoemail" value="<?php echo htmlspecialchars(string: $emailUser); ?>" required><br>
+                        <span class="inforemail-error form-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="infoaddress" class="form-label">Địa chỉ</label>
+                            <input class="form-control" type="text" name="infoaddress" id="infoaddress" value="<?php echo htmlspecialchars(string: $diachiUser); ?>" required><br>
+
+                            
                     </div>
                 </div>
-            </div>
-        </div>
-    <div class="modal detail-order">
-        <div class="modal-container mdl-cnt">
-            <h3 class="modal-container-title">Thông tin đơn hàng</h3>
-            <button class="form-close" onclick="closeModal()"><i class="fa-regular fa-xmark"></i></button>
-            <div class="detail-order-content">
-                <ul class="detail-order-group">
-                    <li class="detail-order-item">
-                        <span class="detail-order-item-left"><i class="fa-light fa-calendar-days"></i> Ngày đặt hàng</span>
-                        <span class="detail-order-item-right" id="modal-created-at"></span>
-                    </li>
-                    <li class="detail-order-item">
-                        <span class="detail-order-item-left"><i class="fa-light fa-truck"></i> Hình thức giao</span>
-                        <span class="detail-order-item-right" id="modal-delivery-type"></span>
-                    </li>
-                    <li class="detail-order-item">
-                        <span class="detail-order-item-left"><i class="fa-light fa-location-dot"></i> Địa điểm nhận</span>
-                        <span class="detail-order-item-right" id="modal-address"></span>
-                    </li>
-                    <li class="detail-order-item">
-                        <span class="detail-order-item-left"><i class="fa-thin fa-person"></i> Người nhận</span>
-                        <span class="detail-order-item-right" id="modal-recipient-name"></span>
-                    </li>
-                    <li class="detail-order-item">
-                        <span class="detail-order-item-left"><i class="fa-light fa-phone"></i> Số điện thoại nhận</span>
-                        <span class="detail-order-item-right" id="modal-recipient-phone"></span>
-                    </li>
-                </ul>
-            </div>
+                <div class="main-account-body-col">
+                    <div class="form-group">
+                        <label for="" class="form-label w60">Mật khẩu hiện tại</label>
+                        <input class="form-control" type="password" name="current-pass" id="password-cur-info"
+                            placeholder="Nhập mật khẩu hiện tại">
+                        <span class="password-cur-info-error form-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="form-label w60">Mật khẩu mới </label>
+                        <input class="form-control" type="password" name="new-pass" id="password-after-info"
+                            placeholder="Nhập mật khẩu mới">
+                        <span class="password-after-info-error form-message"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="form-label w60">Xác nhận mật khẩu mới</label>
+                        <input class="form-control" type="password" name="confirm-new-pass" id="password-comfirm-info"
+                            placeholder="Nhập lại mật khẩu mới">
+                        <span class="password-after-comfirm-error form-message"></span>
+                    </div>
+                </div>
+                <div class="main-account-body-row">
+                    <div>
+                        <button id="save-info-user" type="submit"><i
+                                class="fa-regular fa-floppy-disk"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                    <div>
+                        <button id="save-password" type="submit"><i class="fa-regular fa-key"></i> Đổi
+                            mật khẩu
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-
-
-
-
 
     <section class="cart">
         <button class="dong"><i class="fa-regular fa-xmark"></i></button>
@@ -329,12 +351,10 @@ if ($username && !$customer_id) {
                 $stmt->store_result();
 
                 if ($stmt->num_rows > 0) {
-                    $stmt->close();
                 } else {
                     $stmt = $conn->prepare("INSERT INTO giohang (customer_id, product_id, soluong, price, img) VALUES (?, ?, ?, ?, ?)");
                     $stmt->bind_param("iiiss", $customer_id, $product_id, $quantity, $product_price, $product_img);
                     $stmt->execute();
-                    $stmt->close();
                 }
             }
 
@@ -411,6 +431,7 @@ if ($username && !$customer_id) {
     </section>
 
     <div class="green-line-header"></div>
+
     <?php include 'footer.php' ?>
     <script src="js/hoadon.js"></script>
     <script src="js/giohang.js"></script>
@@ -420,11 +441,11 @@ if ($username && !$customer_id) {
 
 
 
+
 </body>
 <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "<script>if(window.history.replaceState){window.history.replaceState(null, null, window.location.href);}</script>";
 }
 ?>
-<?php $conn->close(); ?>
 
 </html>

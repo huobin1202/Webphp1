@@ -115,7 +115,7 @@ $conn->close();
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="index.php" class="sidebar-link">
+                        <a  class="sidebar-link" style="cursor:pointer">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>

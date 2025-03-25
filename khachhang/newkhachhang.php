@@ -19,6 +19,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
+include('../toast.php');
 
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -26,31 +27,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tenMon = htmlspecialchars($_POST['fullname'], ENT_QUOTES, 'UTF-8');
     $category = htmlspecialchars($_POST['phone'], ENT_QUOTES, 'UTF-8');
     $mauXe = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
-    
+
     // Sanitize inputs to prevent SQL injection
     $tenMon = $conn->real_escape_string($tenMon);
     $category = $conn->real_escape_string($category);
     $mauXe = $conn->real_escape_string($mauXe);
-    
+
 
     // Insert data into the database
     $sql = "INSERT INTO customer (name, contact, joindate, password, status)
             VALUES ('$tenMon', '$category',NOW(), '$mauXe', 1)";
 
     if ($conn->query($sql) === TRUE) {
-        echo "<script>
-                alert('Thêm thông tin khách hàng thành công!');
-                window.location.href = 'khachhang.php';
-              </script>";
+        $_SESSION['success'] = "Thêm khách hàng thành công!";
+        header("Location: khachhang.php");
+        exit();
     } else {
-        echo "<script>
-                alert('Không thể thêm khách hàng! Lỗi: " . $conn->error . "');
-                window.location.href = 'newkhachhang.php';
-              </script>";
+        $_SESSION['error'] = "Không thể thêm khách hàng! Lỗi: " . $conn->error;
+        header("Location: khachhang.php");
+        exit();
     }
-
-    // Close connection
-    $conn->close();
 }
 ?>
 
@@ -69,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-<header class="header">
+    <header class="header">
         <button class="menu-icon-btn">
             <div class="menu-icon">
                 <i class="fa-regular fa-bars"></i>
@@ -122,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="hidden-sidebar">Thống kê khách hàng</div>
                         </a>
                     </li>
-                    
+
                     <div class="spacer" style="height:50px;width:1px"></div>
                     <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
                         <a href="#" class="sidebar-link">
@@ -140,16 +136,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </li>
                 </ul>
             </div>
-         
+
         </aside>
         <main class="content">
-            
-            
+
+
             <!-- Account  -->
             <div class="section">
                 <div class="admin-control">
                     <div class="admin-control-left">
-                        <select name="tinh-trang-user" id="tinh-trang-user" >
+                        <select name="tinh-trang-user" id="tinh-trang-user">
                             <option value="2">Tất cả</option>
                             <option value="1">Hoạt động</option>
                             <option value="0">Bị khóa</option>
@@ -159,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <form action="" class="form-search">
                             <span class="search-btn"><i class="fa-light fa-magnifying-glass"></i></span>
                             <input id="form-search-user" type="text" class="form-search-input"
-                                placeholder="Tìm kiếm mã khách hàng, tên khách hàng..." >
+                                placeholder="Tìm kiếm mã khách hàng, tên khách hàng...">
                         </form>
                     </div>
                     <div class="admin-control-right">
@@ -173,10 +169,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input type="date" class="form-control-date" id="time-end-user" value="">
                             </div>
                         </form>
-                        <button class="btn-reset-order" ><i
+                        <button class="btn-reset-order"><i
                                 class="fa-light fa-arrow-rotate-right"></i></button>
-                        <a href="newkhachhang.php"><button id="btn-add-user" class="btn-control-large" ><i
-                                class="fa-light fa-plus"></i> <span>Thêm khách hàng</span></button></a>
+                        <a href="newkhachhang.php"><button id="btn-add-user" class="btn-control-large"><i
+                                    class="fa-light fa-plus"></i> <span>Thêm khách hàng</span></button></a>
                     </div>
                 </div>
                 <div class="table">
@@ -193,49 +189,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </tr>
                         </thead>
                         <tbody id="show-user">
-                            <?php 
-                            $servername="localhost";
-                            $username="root";
-                            $password="";
-                            $dbname="admindoan";
-                            
-                            $conn = new mysqli($servername,$username,$password,$dbname);
+                            <?php
+                            $servername = "localhost";
+                            $username = "root";
+                            $password = "";
+                            $dbname = "admindoan";
 
-                            if ($conn->connect_error){
-                                die("Kết nối thất bại: ".$conn->connect_error);
+                            $conn = new mysqli($servername, $username, $password, $dbname);
 
+                            if ($conn->connect_error) {
+                                die("Kết nối thất bại: " . $conn->connect_error);
                             }
 
 
-                            $sql="SELECT id, name, contact, joindate, status FROM customer";
+                            $sql = "SELECT id, name, contact, joindate, status FROM customer";
                             $result = $conn->query($sql);
                             if ($result->num_rows > 0) {
-                                while($row= $result->fetch_assoc()) {
-                                    
+                                while ($row = $result->fetch_assoc()) {
+
                                     echo "<tr>";
-                                    echo "<td>".$row["id"]."</td>";
-                                    echo "<td>".$row["name"]."</td>";
-                                    echo "<td>".$row["contact"]."</td>";
-                                    echo "<td>".$row["joindate"]."</td>";
-                                    echo "<td><span class='status-".($row["status"]==1?"complete":"no-complete")."'>".($row["status"]==1?"Hoạt động":"Bị khóa")."</span></td>";
+                                    echo "<td>" . $row["id"] . "</td>";
+                                    echo "<td>" . $row["name"] . "</td>";
+                                    echo "<td>" . $row["contact"] . "</td>";
+                                    echo "<td>" . $row["joindate"] . "</td>";
+                                    echo "<td><span class='status-" . ($row["status"] == 1 ? "complete" : "no-complete") . "'>" . ($row["status"] == 1 ? "Hoạt động" : "Bị khóa") . "</span></td>";
                                     echo "<td class='control control-table'>";
-                                    echo "<a href='changekhachhang.php?id=".$row["id"]."'><button class='btn-edit' id='edit-account'  >";
+                                    echo "<a href='changekhachhang.php?id=" . $row["id"] . "'><button class='btn-edit' id='edit-account'  >";
                                     echo "<i class='fa-light fa-pen-to-square'></i></button></a>";
                                     echo "</td>";
                                     echo "</tr>";
-                                }}
-                            
-                            ?>
-                           
-                        
+                                }
+                            }
 
-                            
+                            ?>
+
+
+
+
                         </tbody>
                     </table>
                 </div>
                 <!-- </div> -->
             </div>
-            
+
         </main>
     </div>
     <div class="modal signup open">
@@ -243,26 +239,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h3 class="modal-container-title add-account-e ">THÊM KHÁCH HÀNG MỚI</h3>
             <a href="khachhang.php"><button class="modal-close"><i class="fa-regular fa-xmark"></i></button></a>
             <div class="form-content sign-up">
-                <form action="" class="signup-form" method="POST" enctype="multipart/form-data" >
+                <form action="" class="signup-form" method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="fullname" class="form-label">Tên đầy đủ</label>
-                        <input id="fullname" name="fullname" type="text" placeholder="VD: Nguyễn Văn A" class="form-control" required>
+                        <input id="fullname" name="fullname" type="text" placeholder="VD: Nguyễn Văn A" class="form-control" maxlength="20" required> 
                     </div>
                     <div class="form-group">
                         <label for="phone" class="form-label">Số điện thoại</label>
-                        <input id="phone" name="phone" type="text" placeholder="Nhập số điện thoại" class="form-control" required>
+                        <input id="phone" name="phone" type="text" placeholder="Nhập số điện thoại" class="form-control" maxlength="11" required>
                     </div>
                     <div class="form-group">
                         <label for="password" class="form-label">Mật khẩu</label>
-                        <input id="password" name="password" type="text" placeholder="Nhập mật khẩu" class="form-control" required>
+                        <input id="password" name="password" type="text" placeholder="Nhập mật khẩu" class="form-control" maxlength="20" required>
                     </div>
-          
+
                     <button class="form-submit add-account-e" id="signup-button">Đăng ký</button>
                 </form>
             </div>
         </div>
     </div>
-  
+
 </body>
 
 </html>

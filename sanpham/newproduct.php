@@ -13,15 +13,14 @@ $dbname = "admindoan";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 // Check connection
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
+include("../toast.php");
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo "<script>if (!confirm('Bạn có muốn thêm sản phẩm này?')) { window.location.href = 'sanpham.php'; }</script>";
     $tenXe = $conn->real_escape_string(htmlspecialchars($_POST['ten-mon'], ENT_QUOTES, 'UTF-8'));
     $dongXe = $conn->real_escape_string(htmlspecialchars($_POST['category'], ENT_QUOTES, 'UTF-8'));
     $giaBan = floatval($_POST['gia-ban']);
@@ -45,28 +44,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             VALUES ('$tenXe', '$dongXe', '$giaBan', '$thongTinSP', '$thongSoKT', '$mainImage', '$image2', '$image3')";
 
     if ($conn->query($sql) === TRUE) {
-        echo "<script>
-                alert('Thêm thông tin sản phẩm thành công!');
-                window.location.href = 'sanpham.php';
-              </script>";
+        $_SESSION['success'] = "Thêm sản phẩm thành công!";
+        header("Location: sanpham.php");
+        exit();
     } else {
-        echo "<script>
-                alert('Không thể thêm sản phẩm! Lỗi: " . $conn->error . "');
-                window.location.href = 'newproduct.php';
-              </script>";
+        $_SESSION['error'] = "Không thể thêm sản phẩm!";
+        header("Location: sanpham.php");
+        exit();
     }
 
-    // Close connection
-    $conn->close();
 }
 ?>
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 

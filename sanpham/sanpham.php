@@ -17,6 +17,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
+include("../toast.php");
 
 // Check if `id` is passed via POST (Handle deletion)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
@@ -26,17 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $sql = "DELETE FROM products WHERE id = $productId";
 
     if ($conn->query($sql) === TRUE) {
-        echo "<script>
-                alert('Sản phẩm đã được xóa thành công!');
-                window.location.href = 'sanpham.php';
-              </script>";
-    } else {
-        echo "<script>
-                alert('Không thể xóa sản phẩm! Lỗi: " . $conn->error . "');
-              </script>";
-    }
 
-    $conn->close();
+        $_SESSION['success'] = 'Xóa sản phẩm thành công!';
+        header('Location: sanpham.php');
+        exit();
+    } else {
+        $_SESSION['error'] = 'Không thể xóa sản phẩm!';
+        header('Location: sanpham.php');
+        exit();
+    }
 }
 ?>
 
@@ -57,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
 </head>
 
 <body>
+ 
     <header class="header">
         <button class="menu-icon-btn">
             <div class="menu-icon">
@@ -104,8 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                         </a>
                     </li>
                     <li class="sidebar-list-item tab-content">
-                    <a href="../thongkekh/thongkekh.php" class="sidebar-link">
-                    <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
+                        <a href="../thongkekh/thongkekh.php" class="sidebar-link">
+                            <div class="sidebar-icon"><i class="fa-light fa-chart-simple"></i></div>
                             <div class="hidden-sidebar">Thống kê khách hàng</div>
                         </a>
                     </li>
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
             <div class="section product-all">
                 <div class="admin-control">
                     <div class="admin-control-left">
-                        <select name="the-loai" id="the-loai" >
+                        <select name="the-loai" id="the-loai">
                             <option>Tất cả</option>
                             <option>Dòng Ninja</option>
                             <option>Dòng Z</option>
@@ -145,14 +145,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                         <form action="" class="form-search">
                             <span class="search-btn"><i class="fa-light fa-magnifying-glass"></i></span>
                             <input id="form-search-product" type="text" class="form-search-input"
-                                placeholder="Tìm kiếm tên xe..." >
+                                placeholder="Tìm kiếm tên xe...">
                         </form>
                     </div>
                     <div class="admin-control-right">
-                        <button class="btn-control-large" id="btn-cancel-product" ><i
+                        <button class="btn-control-large" id="btn-cancel-product"><i
                                 class="fa-light fa-rotate-right"></i> Làm mới</button>
                         <a href="newproduct.php"><button class="btn-control-large" id="btn-add-product"><i class="fa-light fa-plus"></i> Thêm xe
-                            mới</button></a>
+                                mới</button></a>
                     </div>
                 </div>
                 <div id="show-product"></div>
@@ -197,7 +197,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                         ';
                     }
                 } else {
-                    echo "<div class='no-products'>Không có sản phẩm nào!</div>";                }
+                    echo "<div class='no-products'>Không có sản phẩm nào!</div>";
+                }
                 ?>
             </div>
         </main>

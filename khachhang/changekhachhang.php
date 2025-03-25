@@ -19,6 +19,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
+include("../toast.php");
 
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -37,16 +38,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sqlUpdate = "UPDATE customer SET name='$tenMon', contact='$category', password='$mauXe', status='$giaBan' WHERE id=" . intval($_POST['id']);
 
     if ($conn->query($sqlUpdate) === TRUE) {
-        echo "<script>
-                alert('Chỉnh sửa thông tin khách hàng thành công!');
-                window.location.href = 'khachhang.php';
-              </script>";
+        $_SESSION['success'] = "Thay đổi thông tin thành công!";
+        header("Location: khachhang.php");
+        exit();
     } else {
-        echo "<script>
-                alert('Không thể chỉnh sửa khách hàng! Lỗi: " . $conn->error . "');
-                window.location.href = 'newkhachhang.php';
-              </script>";
+        $_SESSION['error'] = "Không thể đổi thông tin! Lỗi: " . $conn->error;
+        header("Location: khachhang.php");
+        exit();
     }
+    
 }
 
 // Fetch product details if `id` is present in URL
@@ -60,7 +60,6 @@ if ($productId > 0) {
     }
 }
 
-$conn->close();
 ?>
 
 <!DOCTYPE php>
@@ -76,7 +75,6 @@ $conn->close();
         <link rel="stylesheet" href="../assets/css/admin-responsive.css">
         <title>Quản lý cửa hàng</title>
     </head>
-
     <body>
         <header class="header">
             <button class="menu-icon-btn">
@@ -175,7 +173,7 @@ $conn->close();
                             <form action="" class="fillter-date">
                                 <div>
                                     <label for="time-start">Từ</label>
-                                    <input type="date" class="form-control-date" id="time-start-user" value="">
+                                    <input type="date" class="form-control-date" id="time-start-user" value="" >
                                 </div>
                                 <div>
                                     <label for="time-end">Đến</label>
@@ -203,18 +201,7 @@ $conn->close();
                             </thead>
                             <tbody id="show-user">
                                 <?php
-                                $servername = "localhost";
-                                $username = "root";
-                                $password = "";
-                                $dbname = "admindoan";
-
-                                $conn = new mysqli($servername, $username, $password, $dbname);
-
-                                if ($conn->connect_error) {
-                                    die("Kế nối thất bại: " . $conn->connect_error);
-                                }
-
-
+     
                                 $sql = "SELECT id, name, contact, joindate, status FROM customer";
                                 $result = $conn->query($sql);
                                 if ($result->num_rows > 0) {
@@ -233,12 +220,7 @@ $conn->close();
                                         echo "</tr>";
                                     }
                                 }
-
                                 ?>
-
-
-
-
                             </tbody>
                         </table>
                     </div>
@@ -256,19 +238,19 @@ $conn->close();
                         <input type="hidden" name="id" value="<?php echo htmlspecialchars($product['id']); ?>">
                         <div class="form-group">
                             <label for="fullname" class="form-label">Tên đầy đủ</label>
-                            <input id="fullname" name="fullname" type="text" placeholder="VD: Nhật Sinh"
+                            <input id="fullname" name="fullname" type="text" placeholder="VD: Nhật Sinh" maxlength="20"
                                 class="form-control" value="<?php echo htmlspecialchars($product['name']); ?>">
                             <span class="form-message-name form-message"></span>
                         </div>
                         <div class="form-group">
                             <label for="phone" class="form-label">Số điện thoại</label>
-                            <input id="phone" name="phone" type="text" placeholder="Nhập số điện thoại"
+                            <input id="phone" name="phone" type="text" placeholder="Nhập số điện thoại" maxlength="11"
                                 class="form-control" value="<?php echo htmlspecialchars($product['contact']); ?>">
                             <span class="form-message-phone form-message"></span>
                         </div>
                         <div class="form-group">
                             <label for="password" class="form-label">Mật khẩu</label>
-                            <input id="password" name="password" type="text" placeholder="Nhập mật khẩu"
+                            <input id="password" name="password" type="text" placeholder="Nhập mật khẩu" maxlength="20"
                                 class="form-control" value="<?php echo htmlspecialchars($product['password']); ?>">
                             <span class="form-message-password form-message"></span>
                         </div>
@@ -281,7 +263,7 @@ $conn->close();
                         </div>
 
                         <button class="form-submit add-account-e" id="change-signup-button">Chỉnh Sửa</button>
-                    </form>
+                    </form> 
                 </div>
             </div>
         </div>
@@ -289,5 +271,4 @@ $conn->close();
         <script src="../assets/js/admin.js"></script>
 
     </body>
-
 </php>
