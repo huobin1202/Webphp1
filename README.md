@@ -1,6 +1,5 @@
 **Index:** 
 - Tìm kiếm cơ bản + nâng cao
-- Giỏ hàng: địa chỉ tk/ địa chỉ mới( phần thanh toán)
 - Hiển thị hóa đơn ( sau khi thanh toán xong)
 
 **Admin:**
