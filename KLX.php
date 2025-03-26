@@ -9,14 +9,18 @@ if (isset($_SESSION['success'])) {
 
 // Xử lý đăng xuất
 if (isset($_GET['logout'])) {
+
     session_unset();
     session_destroy();
+
     header("Location: index.php");
     exit;
 }
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
+$total_price=0;
 $role = null;
+
 
 if ($username && !$customer_id) {
     $stmt = $conn->prepare("SELECT id, role FROM customer WHERE name = ?");
@@ -45,6 +49,14 @@ if ($username && !$customer_id) {
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="./assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css">
     <script src="https://fontawesome.com/v6/search" crossorigin="anonymous"></script>
+    <style>
+    
+        .display {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
     <title>BMT </title>
 </head>
 
@@ -126,14 +138,12 @@ if ($username && !$customer_id) {
                                         <!-- Dropdown -->
                                         <div class="dropdownb-menu">
                                             <?php if (isset($_SESSION['customer_id'])): ?>
-
                                                 <a href="thongtintk.php">
                                                     <div class="hd"><i class="fa-light fa-circle-user" style="font-size:20px"></i> Tài khoản của tôi</div>
                                                 </a>
                                                 <a href="hoadon.php">
-                                                    <div class="hd"><i class="fa-regular fa-bags-shopping" style="font-size:20px"> </i> Đơn hàng đã mua</div>
+                                                    <div class="hd"><i class="fa-regular fa-bags-shopping" style="font-size:20px"></i> Đơn hàng đã mua</div>
                                                 </a>
-
                                                 <a href="index.php?logout=1" onclick="return confirm('Bạn có muốn đăng xuất?')">
                                                     <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i> Đăng xuất</div>
                                                 </a>
@@ -151,6 +161,7 @@ if ($username && !$customer_id) {
                                                 </a>
                                             <?php endif; ?>
                                         </div>
+
                                     </div>
                                 </div>
 
@@ -308,7 +319,6 @@ if ($username && !$customer_id) {
 
                         <?php
                         $sql = "SELECT id, tensp, giaban, hinhanh FROM products WHERE dongsp='Dòng KLX'";
-
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
@@ -328,7 +338,7 @@ if ($username && !$customer_id) {
                                         <input type="hidden" name="product_img" value="' . $row["hinhanh"] . '">
                                         <div class=display style="display:flex;">
                                         <button type="submit" class="mua" name="add_to_cart">Thêm vào giỏ hàng</button>
-                                        <input type="number" min="1" value="1" name="quantity" class="num-input"></input>
+                                        <a href="thongtinsp.php?id=' . $row['id'] . '" class="mua" style="text-decoration: none; text-align: center; display: inline-block;color:white;">Xem chi tiết</a>
                                         </div>
                                     
                                     </div>
@@ -392,8 +402,6 @@ if ($username && !$customer_id) {
                     $stmt->close();
                 }
             }
-
-
             ?>
 
             <table>

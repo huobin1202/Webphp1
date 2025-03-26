@@ -49,6 +49,14 @@ if ($username && !$customer_id) {
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="./assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css">
     <script src="https://fontawesome.com/v6/search" crossorigin="anonymous"></script>
+    <style>
+    
+        .display {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
     <title>BMT </title>
 </head>
 
@@ -330,7 +338,7 @@ if ($username && !$customer_id) {
                                         <input type="hidden" name="product_img" value="' . $row["hinhanh"] . '">
                                         <div class=display style="display:flex;">
                                         <button type="submit" class="mua" name="add_to_cart">Thêm vào giỏ hàng</button>
-                                        <input type="number" min="1" value="1" name="quantity" class="num-input"></input>
+                                        <a href="thongtinsp.php?id=' . $row['id'] . '" class="mua" style="text-decoration: none; text-align: center; display: inline-block;color:white;">Xem chi tiết</a>
                                         </div>
                                     
                                     </div>
