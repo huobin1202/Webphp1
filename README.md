@@ -3,6 +3,7 @@
 - Hiển thị hóa đơn ( sau khi thanh toán xong)
 
 **Admin:**
+- Tìm kiếm khách hàng
 - Xóa xp: Kiểm tra nếu sp đã được bán ra thì ẩn sp hiển thị trên web, nếu sản phẩm chưa được bán ra thì hỏi lại và xóa
 - Quản lý đơn hàng:
 Tình trạng đơn hàng: đã giao( thành công/ hủy đơn),
@@ -14,5 +15,5 @@ Thông kê: cho phép admin nhập khoảng thời gian thống kê 5 kh có m�
 **Bug:**
 - trùng tên, sdt: newkhachhang.php, changekhachhang.php
 - lọc theo ngày trong admin
-- lỗi giỏ hàng khi chưa dn
+- lỗi giỏ hàng khi chưa dn: 
 
