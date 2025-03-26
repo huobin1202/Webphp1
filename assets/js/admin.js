@@ -227,53 +227,107 @@ document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("form-search-user");
     const statusFilter = document.getElementById("tinh-trang-user");
     const tableBody = document.getElementById("show-user");
-    const resetButton = document.querySelector(".btn-reset-order");
+    const resetButton = document.querySelector(".btn-reset-user");
+    const timeStart = document.getElementById("time-start-user");
+    const timeEnd = document.getElementById("time-end-user");
 
     // Dữ liệu gốc
     const rows = Array.from(tableBody.querySelectorAll("tr"));
 
     // Hàm chuẩn hóa chuỗi (loại bỏ khoảng trắng thừa và chuyển thành chữ thường)
     function normalizeString(str) {
-        return str.trim().toLowerCase().replace(/\s+/g, ""); // Loại bỏ khoảng trắng và chuẩn hóa chữ
+        if (!str) return "";
+        return str.toString().trim().toLowerCase();
     }
 
-    // Hàm lọc các hàng dựa trên đầu vào tìm kiếm và trạng thái
+    // Hàm kiểm tra ngày tháng
+    function isDateInRange(dateStr, startDate, endDate) {
+        if (!dateStr) return false;
+        if (!startDate && !endDate) return true;
+        
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return false;
+        
+        const start = startDate ? new Date(startDate) : null;
+        const end = endDate ? new Date(endDate) : null;
+
+        if (start && end) {
+            return date >= start && date <= end;
+        } else if (start) {
+            return date >= start;
+        } else if (end) {
+            return date <= end;
+        }
+        return true;
+    }
+
+    // Hàm lọc bảng
     function filterTable() {
-        const searchValue = normalizeString(searchInput.value); // Chuẩn hóa đầu vào người dùng
+        const searchTerm = normalizeString(searchInput.value);
         const selectedStatus = statusFilter.value;
+        const startDate = timeStart.value;
+        const endDate = timeEnd.value;
 
         rows.forEach(row => {
             const cells = row.querySelectorAll("td");
-            if (cells.length === 0) return; // Bỏ qua các dòng không có dữ liệu
+            if (cells.length < 6) return; // Bỏ qua nếu không đủ cột
 
-            const maKh = normalizeString(cells[0].textContent || ""); // Chuẩn hóa mã khách hàng
-            const hoVaTen = normalizeString(cells[1].textContent || ""); // Chuẩn hóa tên khách hàng
-            const status = cells[4]?.querySelector("span").classList.contains("status-no-complete") ? "0" : "1";
+            const customerId = normalizeString(cells[0]?.textContent);
+            const customerName = normalizeString(cells[1]?.textContent);
+            const phone = normalizeString(cells[2]?.textContent);
+            const email = normalizeString(cells[3]?.textContent);
+            const registerDate = cells[4]?.textContent;
+            const status = normalizeString(cells[5]?.textContent);
 
-            // Kiểm tra nếu dòng phù hợp với tìm kiếm và trạng thái
-            const matchesSearch = maKh.includes(searchValue) || hoVaTen.includes(searchValue);
-            const matchesStatus = selectedStatus === "2" || selectedStatus === status;
+            // Kiểm tra điều kiện tìm kiếm
+            const matchesSearch = !searchTerm || 
+                (customerId && customerId.includes(searchTerm)) ||
+                (customerName && customerName.includes(searchTerm)) ||
+                (phone && phone.includes(searchTerm)) ||
+                (email && email.includes(searchTerm));
 
-            // Hiển thị hoặc ẩn dòng dựa trên điều kiện
-            if (matchesSearch && matchesStatus) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
+            // Kiểm tra trạng thái
+            const matchesStatus = selectedStatus === "2" || // Tất cả
+                (selectedStatus === "1" && status && status.includes("hoạt động")) ||
+                (selectedStatus === "0" && status && status.includes("khóa"));
+
+            // Kiểm tra ngày tháng
+            const matchesDate = isDateInRange(registerDate, startDate, endDate);
+
+            // Hiển thị/Ẩn dòng dựa trên tất cả điều kiện
+            row.style.display = (matchesSearch && matchesStatus && matchesDate) ? "" : "none";
         });
     }
 
-    // Đặt lại tìm kiếm và lọc
+    // Hàm đặt lại bộ lọc
     function resetFilters() {
-        searchInput.value = ""; // Xóa ô tìm kiếm
-        statusFilter.value = "2"; // Đặt trạng thái lọc về "Tất cả"
-        rows.forEach(row => (row.style.display = "")); // Hiển thị tất cả các dòng
+        searchInput.value = "";
+        statusFilter.value = "2";
+        timeStart.value = "";
+        timeEnd.value = "";
+        filterTable();
     }
 
-    // Gắn sự kiện
-    searchInput.addEventListener("input", filterTable); // Khi nhập vào ô tìm kiếm
-    statusFilter.addEventListener("change", filterTable); // Khi thay đổi trạng thái lọc
-    resetButton.addEventListener("click", resetFilters); // Khi nhấn nút đặt lại
+    // Gắn sự kiện cho các phần tử
+    if (searchInput) {
+        searchInput.addEventListener("input", filterTable);
+    }
+    if (statusFilter) {
+        statusFilter.addEventListener("change", filterTable);
+    }
+    if (timeStart) {
+        timeStart.addEventListener("change", filterTable);
+    }
+    if (timeEnd) {
+        timeEnd.addEventListener("change", filterTable);
+    }
+    
+    if (resetButton) {
+        resetButton.addEventListener("click", (e) => {
+            e.preventDefault();
+            resetFilters();
+        });
+    }
 });
 
 // Thống kê sản phẩm, khách hàng

@@ -25,18 +25,41 @@ include('../toast.php');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Capture form data
     $tenMon = htmlspecialchars($_POST['fullname'], ENT_QUOTES, 'UTF-8');
-    $category = htmlspecialchars($_POST['phone'], ENT_QUOTES, 'UTF-8');
-    $mauXe = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
+    $phone = htmlspecialchars($_POST['phone'], ENT_QUOTES, 'UTF-8');
+    $password = htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8');
 
     // Sanitize inputs to prevent SQL injection
     $tenMon = $conn->real_escape_string($tenMon);
-    $category = $conn->real_escape_string($category);
-    $mauXe = $conn->real_escape_string($mauXe);
+    $phone = $conn->real_escape_string($phone);
+    $password = $conn->real_escape_string($password);
 
+    // Kiểm tra trùng số điện thoại
+    $check_phone = $conn->prepare("SELECT id FROM customer WHERE contact = ?");
+    $check_phone->bind_param("s", $phone);
+    $check_phone->execute();
+    $phone_result = $check_phone->get_result();
+    
+    if ($phone_result->num_rows > 0) {
+        $_SESSION['error'] = "Số điện thoại này đã được đăng ký!";
+        header("Location: newkhachhang.php");
+        exit();
+    }
+
+    // Kiểm tra trùng tên
+    $check_name = $conn->prepare("SELECT id FROM customer WHERE name = ?");
+    $check_name->bind_param("s", $tenMon);
+    $check_name->execute();
+    $name_result = $check_name->get_result();
+    
+    if ($name_result->num_rows > 0) {
+        $_SESSION['error'] = "Tên khách hàng này đã tồn tại!";
+        header("Location: newkhachhang.php");
+        exit();
+    }
 
     // Insert data into the database
     $sql = "INSERT INTO customer (name, contact, joindate, password, status)
-            VALUES ('$tenMon', '$category',NOW(), '$mauXe', 1)";
+            VALUES ('$tenMon', '$phone', NOW(), '$password', 1)";
 
     if ($conn->query($sql) === TRUE) {
         $_SESSION['success'] = "Thêm khách hàng thành công!";
@@ -44,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     } else {
         $_SESSION['error'] = "Không thể thêm khách hàng! Lỗi: " . $conn->error;
-        header("Location: khachhang.php");
+        header("Location: newkhachhang.php");
         exit();
     }
 }
@@ -258,6 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
+    <script src="../assets/js/admin.js"></script>
 
 </body>
 
