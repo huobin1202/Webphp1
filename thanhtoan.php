@@ -4,7 +4,7 @@ include('database.php');
 include('toast.php');
 
 if (!isset($_SESSION['customer_id'])) {
-    $_SESSION['success'] = "Bạn cần đăng nhập để thanh toán!";
+    $_SESSION['error'] = "Bạn cần đăng nhập để thanh toán!";
     header("Location: index.php");
     exit();
 }
@@ -25,6 +25,14 @@ $cart_result = $cart_query->get_result();
 while ($row = $cart_result->fetch_assoc()) {
     $cart[] = $row;
     $total += $row['soluong'] * $row['price'];
+}
+
+// Kiểm tra giỏ hàng trống
+if (empty($cart)) {
+    $_SESSION['error'] = "Vui lòng thêm sản phẩm ";
+    header("Location: index.php");
+
+    exit();
 }
 
 // Xử lý đặt hàng

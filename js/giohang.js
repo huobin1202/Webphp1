@@ -1,4 +1,3 @@
-
 const cartbtn = document.querySelector(".dong");
 const cartshow = document.querySelector(".ravao");
 cartshow.addEventListener("click", function () {
@@ -18,12 +17,20 @@ document.addEventListener("DOMContentLoaded", function () {
                 method: "POST",
                 body: formData
             })
-            .then(response => response.text())
+            .then(response => response.json())
             .then(data => {
-                alert("Sản phẩm đã được thêm vào giỏ hàng!");
-                updateCart();
+                alert(data.message);
+                if (data.success) {
+                    updateCart();
+                    document.querySelector(".cart").style.right = "0";
+                } else {
+                    window.location.href = 'dn.php';
+                }
             })
-            .catch(error => console.error("Lỗi khi thêm sản phẩm vào giỏ hàng:", error));
+            .catch(error => {
+                console.error("Lỗi khi thêm sản phẩm vào giỏ hàng:", error);
+                alert("Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!");
+            });
         });
     });
 
@@ -41,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: `cart_id=${cartId}&quantity=${newQuantity}`
             })
-            .then(response => response.text())
+            .then(response => response.json())
             .then(data => {
                 updateCart();
             })
@@ -53,13 +60,13 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".delete-item").forEach(button => {
         button.addEventListener("click", function () {
             let cartId = this.dataset.cartId;
-            if (confirm("Bạn có chắc muốn xóa sản phẩm này?") ){
+            if (confirm("Bạn có chắc muốn xóa sản phẩm này?")) {
                 fetch("update_cart.php", {
                     method: "POST",
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: `cart_id=${cartId}&delete=true`
                 })
-                .then(response => response.text())
+                .then(response => response.json())
                 .then(data => {
                     updateCart();
                 })
@@ -73,15 +80,13 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch("update_cart.php", { method: "POST" })
             .then(response => response.json())
             .then(data => {
-                document.querySelector("tbody").innerHTML = data.cart_html; 
-                document.querySelector(".price-total span").innerText = data.total_price; 
-                
-                setTimeout(attachEventListeners, 0); // Đợi một chút rồi gán lại sự kiện
+                document.querySelector("tbody").innerHTML = data.cart_html;
+                document.querySelector(".price-total span").innerText = data.total_price;
+                setTimeout(attachEventListeners, 0);
             })
             .catch(error => console.error("Lỗi khi tải giỏ hàng:", error));
     }
-    
-    
+
     // Hàm gán lại sự kiện sau mỗi lần cập nhật giỏ hàng
     function attachEventListeners() {
         document.querySelectorAll(".cart-quantity").forEach(input => {
@@ -97,10 +102,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     headers: { "Content-Type": "application/x-www-form-urlencoded" },
                     body: `cart_id=${cartId}&quantity=${newQuantity}`
                 })
-                .then(() => updateCart()); // Gọi updateCart() để cập nhật lại giao diện
+                .then(response => response.json())
+                .then(data => {
+                    updateCart();
+                })
+                .catch(error => console.error("Lỗi khi cập nhật số lượng:", error));
             });
         });
-    
+
         document.querySelectorAll(".delete-item").forEach(button => {
             button.addEventListener("click", function () {
                 let cartId = this.dataset.cartId;
@@ -110,14 +119,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: `cart_id=${cartId}&delete=true`
                     })
-                    .then(() => updateCart()); // Gọi updateCart() để cập nhật lại giao diện
+                    .then(response => response.json())
+                    .then(data => {
+                        updateCart();
+                    })
+                    .catch(error => console.error("Lỗi khi xóa sản phẩm:", error));
                 }
             });
         });
     }
-    
-    // Gọi lần đầu để gán sự kiện khi trang tải xong
-    document.addEventListener("DOMContentLoaded", attachEventListeners);
-    
-    
 });

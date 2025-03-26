@@ -334,7 +334,8 @@ if ($username && !$customer_id) {
             <?php
             if (isset($_POST['add_to_cart'])) {
                 if (!isset($_SESSION['customer_id'])) {
-                    echo "<script>alert('Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!'); window.location.href='dn.php';</script>";
+                    $_SESSION['error'] = "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!";
+                    header("Location: index.php");
                     exit();
                 }
 
