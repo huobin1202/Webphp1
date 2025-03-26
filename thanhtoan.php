@@ -4,12 +4,18 @@ include('database.php');
 include('toast.php');
 
 if (!isset($_SESSION['customer_id'])) {
-    $_SESSION['error'] = "Bạn cần đăng nhập để thanh toán!";
-    header("Location: index.php");
+    echo "<script>alert('Bạn cần đăng nhập để thanh toán!'); window.location.href='dn.php';</script>";
     exit();
 }
 
 $customer_id = $_SESSION['customer_id'];
+
+// Lấy thông tin địa chỉ của khách hàng
+$address_query = $conn->prepare("SELECT address FROM customer WHERE id = ?");
+$address_query->bind_param("i", $customer_id);
+$address_query->execute();
+$address_result = $address_query->get_result();
+$customer_address = $address_result->fetch_assoc()['address'] ?? '';
 
 // Lấy giỏ hàng
 $cart = [];
@@ -116,15 +122,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="content-group">
                         <div class="form-group">
                             <input id="tennguoinhan" name="tennguoinhan" type="text" value=""
-                                placeholder="Tên người nhận" class="form-control">
+                                placeholder="Tên người nhận" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <input id="sdtnhan" name="sdtnhan" type="text" value="" 
-                                placeholder="Số điện thoại" class="form-control">
+                                placeholder="Số điện thoại" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <input id="diachinhan" name="diachinhan" type="text" value=""
-                                placeholder="Địa chỉ nhận hàng" class="form-control chk-ship">
+                            <div class="address-selection" id="address-selection" style="display: none;">
+                                <div class="address-options">
+                                    <label>
+                                        <input type="radio" name="address_type" value="saved" checked> Sử dụng địa chỉ đã lưu
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="address_type" value="new"> Nhập địa chỉ mới
+                                    </label>
+                                </div>
+                                <div id="saved-address" class="form-group">
+                                    <input type="text" value="<?php echo htmlspecialchars($customer_address); ?>" readonly class="form-control">
+                                </div>
+                                <div id="new-address" class="form-group" style="display: none;">
+                                    <input id="diachinhan" name="diachinhan" type="text" value=""
+                                        placeholder="Địa chỉ nhận hàng" class="form-control chk-ship">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
