@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 24, 2025 at 05:56 PM
+-- Generation Time: Mar 26, 2025 at 08:52 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,59 +24,64 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `addresses`
---
-
-CREATE TABLE `addresses` (
-  `id` int(11) NOT NULL,
-  `customer_id` int(11) NOT NULL,
-  `address` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `customer`
 --
 
 CREATE TABLE `customer` (
   `id` int(20) NOT NULL,
   `name` varchar(20) NOT NULL,
-  `contact` varchar(11) NOT NULL,
+  `contact` text NOT NULL,
   `joindate` date NOT NULL,
   `status` int(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL
+  `email` varchar(255) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `role` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `customer`
 --
 
-INSERT INTO `customer` (`id`, `name`, `contact`, `joindate`, `status`, `password`, `email`) VALUES
-(41, '123', '123', '2025-03-02', 1, '123', ''),
-(42, '1234', '1234', '2025-03-02', 0, '1234', ''),
-(43, 'Hữu Bình', '12345', '2025-03-02', 1, '12345', ''),
-(44, '123456', '123456', '2025-03-02', 0, '123456', ''),
-(45, '321', '321', '2025-03-02', 1, '321', ''),
-(46, '11345134', '23462456', '2025-03-02', 0, '123', ''),
-(47, 'bình', '4321', '2025-03-02', 0, '4321', ''),
-(48, '234', '234', '2025-03-02', 1, '234', ''),
-(50, 'maxverstappen', '1234567', '2025-03-02', 0, '123', ''),
-(51, 'utf8', '2147483647', '2025-03-02', 1, '123', ''),
-(52, 'tudutudu', '57824584', '2025-03-02', 0, '123321', ''),
-(54, 'hahawtf', '23423434', '2025-03-02', 1, '123', ''),
-(55, 'lingang', '62162126', '2025-03-02', 1, '123', ''),
-(56, 'wata', '82244228', '2025-03-02', 1, '123', ''),
-(57, 'kaka', '876235482', '2025-03-02', 1, '123', ''),
-(60, '11111111111111111111', '123123144', '2025-03-03', 1, '1111111111111111111111111111111111', ''),
-(61, 'Hồ Phạm Hữu Bình iah', '1515151', '2025-03-03', 1, '123', ''),
-(62, 'omgnoway', '121212', '2025-03-07', 1, '123', ''),
-(65, 'hgf', '12312312312', '2025-03-22', 1, 'hgf', ''),
-(66, '22222222222222222222', '876', '2025-03-22', 1, '876', ''),
-(67, 'asdadsdafadbaebgaebr', '13462364563', '2025-03-22', 1, '123', ''),
-(68, '32132131', '12312315415', '2025-03-24', 1, '123', ''),
-(70, '12355', '54353', '2025-03-24', 1, 'beckham', '');
+INSERT INTO `customer` (`id`, `name`, `contact`, `joindate`, `status`, `password`, `email`, `address`, `role`) VALUES
+(41, '123', '532', '2025-03-02', 1, '321', 'anvabinh@dnai.com2', 'C5/10AB321', 'admin'),
+(42, '1234', '1234', '2025-03-02', 0, '1234', '', '', ''),
+(43, 'Hữu Bình', '12345', '2025-03-02', 1, '12345', '', '', ''),
+(44, '123456', '123456', '2025-03-02', 0, '123456', '', '', ''),
+(45, '321', '321', '2025-03-02', 1, '321', '', '', ''),
+(46, '11345134', '23462456', '2025-03-02', 0, '123', '', '', ''),
+(47, 'bình', '4321', '2025-03-02', 0, '4321', '', '', ''),
+(48, '234', '234', '2025-03-02', 1, '234', '', '', ''),
+(50, 'maxverstappen', '1234567', '2025-03-02', 0, '123', '', '', ''),
+(51, 'utf8', '2147483647', '2025-03-02', 1, '123', '', '', ''),
+(52, 'tudutudu', '57824584', '2025-03-02', 0, '123321', '', '', ''),
+(54, 'hahawtf', '23423434', '2025-03-02', 1, '123', '', '', ''),
+(55, 'lingang', '62162126', '2025-03-02', 1, '123', '', '', ''),
+(56, 'wata', '82244228', '2025-03-02', 1, '123', '', '', ''),
+(57, 'kaka', '876235482', '2025-03-02', 0, '123', '', '', ''),
+(60, '11111111111111111111', '123123144', '2025-03-03', 1, '1111111111111111111111111111111111', '', '', ''),
+(61, 'Hồ Phạm Hữu Bình iah', '1515151', '2025-03-03', 1, '123', '', '', ''),
+(62, 'omgnoway', '121212', '2025-03-07', 1, '123', '', '', ''),
+(65, 'hgf', '12312312312', '2025-03-22', 1, 'hgf', '', '', ''),
+(66, '22222222222222222222', '876', '2025-03-22', 0, '876', '', '', ''),
+(67, 'asdadsdafadbaebgaebr', '13462364563', '2025-03-22', 1, '123', '', '', ''),
+(68, '32132131', '12312315415', '2025-03-24', 1, '123', '', '', ''),
+(70, '12355', '54353', '2025-03-24', 1, 'beckham', '', '', ''),
+(71, '', '', '0000-00-00', 0, '', '', '', ''),
+(72, 'neymar', '654456', '2025-03-25', 1, '4321', 'WBF@GMAIL.COM', 'WEF', ''),
+(73, 'lingka', '34534536', '2025-03-25', 1, '123', '', '', ''),
+(74, 'jaja', '465378', '2025-03-25', 1, '321', 'anvabinh123@gmail.com', '7324', ''),
+(75, '6646456', '35235', '2025-03-25', 1, '123', '', '', ''),
+(76, '75674', '2646246', '2025-03-25', 1, '123', '', '', ''),
+(77, '3252', '532424', '2025-03-25', 1, '123', '', '', ''),
+(78, '5345234', '235626', '2025-03-25', 1, '234', '', '', ''),
+(79, '64564', '324', '2025-03-25', 1, '5325', '', '', ''),
+(80, '543', '235', '2025-03-25', 1, '235', '', '', ''),
+(81, '476568', 'sdf', '2025-03-25', 0, 'fgdfg', '', '', ''),
+(83, '534534', '12512515', '2025-03-25', 1, '321', '', '', 'user'),
+(84, 'asd123', '654234', '2025-03-26', 1, '123', '', '', 'user'),
+(85, 'liuliu', '2345262', '2025-03-26', 1, '123', 'haha@gmail.com', 'c5/10 a kk', 'user'),
+(86, '235234', '5152546', '2025-03-26', 1, '123', 'kk@gmail.com', 'c5 10 a', 'user');
 
 -- --------------------------------------------------------
 
@@ -88,7 +93,7 @@ CREATE TABLE `giohang` (
   `id` int(11) NOT NULL,
   `customer_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
-  `soluong` int(11) NOT NULL DEFAULT 1,
+  `soluong` int(255) NOT NULL DEFAULT 1,
   `price` int(255) NOT NULL,
   `img` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -98,7 +103,7 @@ CREATE TABLE `giohang` (
 --
 
 INSERT INTO `giohang` (`id`, `customer_id`, `product_id`, `soluong`, `price`, `img`) VALUES
-(87, 42, 78, 1, 456, '');
+(116, 74, 83, 16, 123123123, '');
 
 -- --------------------------------------------------------
 
@@ -130,7 +135,8 @@ CREATE TABLE `nhanvien` (
 --
 
 INSERT INTO `nhanvien` (`id`, `name`, `password`, `loainv`) VALUES
-(1, 'admin', 'admin', 1);
+(1, 'admin', 'admin', 1),
+(2, 'huobin', 'admin', 1);
 
 -- --------------------------------------------------------
 
@@ -157,7 +163,7 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`id`, `customer_id`, `total`, `note`, `payment_method`, `delivery_type`, `created_at`, `status`, `recipient_name`, `recipient_phone`, `address`) VALUES
-(51, 41, 6691146.00, 'qưeqwe', 'Chuyển khoản', 'Giao tận nơi', '2025-03-23', '1', 'qưeqwe', 'qưeqwe', 'ưqeqwe'),
+(51, 41, 6691146.00, 'qưeqwe', 'Chuyển khoản', 'Giao tận nơi', '2025-03-23', 'daxuly', 'qưeqwe', 'qưeqwe', 'ưqeqwe'),
 (52, 41, 6691146.00, '234', 'Tiền mặt', 'Giao tận nơi', '2025-03-23', '1', '324', '324234', ''),
 (53, 41, 6691146.00, '234234', 'Tiền mặt', 'Giao tận nơi', '2025-03-23', '1', '234234', '23424', ''),
 (54, 41, 6691146.00, '345', 'Tiền mặt', 'Giao tận nơi', '2025-03-23', '1', '5345345', '345345', '345345'),
@@ -167,7 +173,8 @@ INSERT INTO `orders` (`id`, `customer_id`, `total`, `note`, `payment_method`, `d
 (58, 41, 6234234.00, '234243', 'Tiền mặt', 'Giao tận nơi', '2025-03-23', '1', '324234', '234234', ''),
 (59, 41, 6234234.00, '', 'Tiền mặt', 'Giao tận nơi', '2025-03-23', '1', '543543', '345345', ''),
 (60, 41, 6234234.00, '45', 'Tiền mặt', 'Giao tận nơi', '2025-03-23', '1', '34234', '342234', '34'),
-(61, 41, 6234234.00, 'qưe', 'Tiền mặt', 'Giao tận nơi', '2025-03-23', '1', 'ưqe', 'qưe', '');
+(61, 41, 6234234.00, 'qưe', 'Tiền mặt', 'Giao tận nơi', '2025-03-23', 'daxuly', 'ưqe', 'qưe', ''),
+(69, 41, 912912.00, '23626', 'Tiền mặt', 'Giao tận nơi', '2025-03-26', '1', '5325', '23626', '');
 
 -- --------------------------------------------------------
 
@@ -210,7 +217,8 @@ INSERT INTO `order_details` (`id`, `order_id`, `product_id`, `soluong`, `price`)
 (75, 58, 74, 1, 6234234.00),
 (76, 59, 74, 1, 6234234.00),
 (77, 60, 74, 1, 6234234.00),
-(78, 61, 74, 1, 6234234.00);
+(78, 61, 74, 1, 6234234.00),
+(79, 69, 77, 2, 456456.00);
 
 -- --------------------------------------------------------
 
@@ -236,23 +244,15 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `tensp`, `dongsp`, `mauxe`, `giaban`, `thongtinsp`, `thongsokt`, `hinhanh`, `hinhanh2`, `hinhanh3`) VALUES
-(74, 'bruh', 'Dòng Ninja', NULL, 6234234, '234234', '235235', 'uploads/klx-230sm.png', 'uploads/klx-230.png', 'uploads/ninja-650.png'),
+(74, 'bruh', 'Dòng Ninja', NULL, 6234234, '234234432', '235235', 'uploads/klx-230sm.png', 'uploads/klx-230.png', 'uploads/ninja-650.png'),
 (77, '45645456', 'Dòng Ninja', NULL, 456456, '546', '456', '', '', ''),
 (78, '4563', 'Dòng Ninja', NULL, 456, '456', '456', '', '', ''),
 (79, '435', 'Dòng Ninja', NULL, 345, '345', '345', 'uploads/klx-300sm.png', '', ''),
-(80, '234234', 'Dòng Ninja', NULL, 2342, '234', '234234', 'uploads/klx-300sm.png', '', ''),
-(82, '4324234', 'Dòng Ninja', NULL, 234234, '234234', '234234', 'uploads/klx-230r.png', '', '');
+(83, '321', 'Dòng Ninja', NULL, 123123123, '123', '321', '', '', '');
 
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `addresses`
---
-ALTER TABLE `addresses`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `customer_id` (`customer_id`);
 
 --
 -- Indexes for table `customer`
@@ -260,7 +260,7 @@ ALTER TABLE `addresses`
 ALTER TABLE `customer`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`),
-  ADD UNIQUE KEY `contact` (`contact`);
+  ADD UNIQUE KEY `contact` (`contact`) USING HASH;
 
 --
 -- Indexes for table `giohang`
@@ -308,22 +308,16 @@ ALTER TABLE `products`
 --
 
 --
--- AUTO_INCREMENT for table `addresses`
---
-ALTER TABLE `addresses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
 
 --
 -- AUTO_INCREMENT for table `giohang`
 --
 ALTER TABLE `giohang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
 
 --
 -- AUTO_INCREMENT for table `loaiproducts`
@@ -335,35 +329,29 @@ ALTER TABLE `loaiproducts`
 -- AUTO_INCREMENT for table `nhanvien`
 --
 ALTER TABLE `nhanvien`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
 -- Constraints for dumped tables
 --
-
---
--- Constraints for table `addresses`
---
-ALTER TABLE `addresses`
-  ADD CONSTRAINT `addresses_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customer` (`id`);
 
 --
 -- Constraints for table `giohang`
