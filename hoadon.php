@@ -333,8 +333,9 @@ if ($username && !$customer_id) {
         <form action="" method="POST">
             <?php
             if (isset($_POST['add_to_cart'])) {
-                if (!$customer_id) {
-                    die("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
+                if (!isset($_SESSION['customer_id'])) {
+                    echo "<script>alert('Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!'); window.location.href='dn.php';</script>";
+                    exit();
                 }
 
                 $product_id = $_POST['product_id'];

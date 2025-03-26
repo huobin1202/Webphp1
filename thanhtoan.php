@@ -1,9 +1,11 @@
 <?php 
 session_start();
 include('database.php');
+include('toast.php');
 
 if (!isset($_SESSION['customer_id'])) {
-    header('Location: dn.php');
+    $_SESSION['success'] = "Bạn cần đăng nhập để thanh toán!";
+    header("Location: index.php");
     exit();
 }
 

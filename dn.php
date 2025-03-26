@@ -122,9 +122,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .nav-buttons {
+            margin-top: 10px;
+        }
+        .nav-buttons a {
+            display: flex;
+            padding: 10px;
+            margin: 5px;
+            text-decoration: none;
+            color: white;
+            background-color: #139b3a;
+            
+            border-radius: 5px;
+            position: sticky;
+            right:100%;
+            height:30px;
+            width:50px;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+
+        }
+        .nav-buttons a:hover {
+            background-color:darkgreen;
+            color:white;
+        }
+    </style>
 </head>
 
 <body>
+<div class="nav-buttons">
+                <a href="index.php">&#10094;</a>
+            </div>
     <?php include 'toast.php'; ?>
     <form method="post">
         <div class="login-container">
