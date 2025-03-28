@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $giaBan = floatval($_POST['gia-ban']);
     $thongTinSP = $conn->real_escape_string(htmlspecialchars($_POST['thong-tin-sp'], ENT_QUOTES, 'UTF-8'));
     $thongSoKT = $conn->real_escape_string(htmlspecialchars($_POST['thong-so-ky-thuat'], ENT_QUOTES, 'UTF-8'));
-
+    $status = 1; // Mặc định status = 1
 
     // Handle image uploads
     $uploadDir = "uploads/";
@@ -40,8 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($image3) move_uploaded_file($_FILES['up-hinh-anh3']['tmp_name'], $image3);
 
     // Insert data into the database
-    $sql = "INSERT INTO products (tensp, dongsp, giaban, thongtinsp, thongsokt, hinhanh, hinhanh2, hinhanh3) 
-            VALUES ('$tenXe', '$dongXe', '$giaBan', '$thongTinSP', '$thongSoKT', '$mainImage', '$image2', '$image3')";
+    $sql = "INSERT INTO products (tensp, dongsp, giaban, thongtinsp, thongsokt, hinhanh, hinhanh2, hinhanh3, status) 
+            VALUES ('$tenXe', '$dongXe', '$giaBan', '$thongTinSP', '$thongSoKT', '$mainImage', '$image2', '$image3', $status)";
 
     if ($conn->query($sql) === TRUE) {
         $_SESSION['success'] = "Thêm sản phẩm thành công!";
@@ -172,22 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 <div id="show-product"></div>
                 <?php
-                // Database configuration
-                $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "admindoan";
-
-                // Create connection
-                $conn = new mysqli($servername, $username, $password, $dbname);
-
-                // Check connection
-                if ($conn->connect_error) {
-                    die("Kết nối thất bại: " . $conn->connect_error);
-                }
-
                 // Fetch product data
-                $sql = "SELECT id, tensp, dongsp, giaban, thongtinsp, hinhanh FROM products";
+                $sql = "SELECT * FROM products ORDER BY id DESC";
                 $result = $conn->query($sql);
 
                 // Check if there are products to display
@@ -197,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         echo '
         <div class="list">
             <div class="list-left">
-                <img src="' . $row["hinhanh"] . '" alt="' . '">
+                <img src="' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
                 <div class="list-info">
                     <h4>' . $row["tensp"] . '</h4>
                     <p class="list-note">' . $row["thongtinsp"] . '</p>
@@ -208,12 +194,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="list-price">
                     <span class="list-current-price">' . number_format($row["giaban"], 0, ',', '.') . 'đ</span>
                 </div>
+                <div class="list-status" style="margin-top: 10px;">
+                    <span class="status-' . ($row["status"] == 1 ? "complete" : "no-complete") . '">' . 
+                    ($row["status"] == 1 ? "Đang hiển thị" : "Đã ẩn") . '</span>
+                </div>
                 <div class="list-control">
                     <div class="list-tool">
+                    
                         <a href="changeproduct.php?id=' . $row["id"] . '">
                             <button class="btn-edit"><i class="fa-light fa-pen-to-square"></i></button>
                         </a>
-                        <button class="btn-delete" onclick=""><i class="fa-regular fa-trash"></i></button>
+                        <form action="" method="POST" style="display: inline;">
+                            <input type="hidden" name="id" value="' . $row["id"] . '">
+                            <button type="submit" name="delete" class="btn-delete" onclick="return confirm(\'Bạn có chắc chắn muốn xóa sản phẩm này?\');">
+                                <i class="fa-regular fa-trash"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -221,11 +217,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ';
                     }
                 } else {
-                    echo "Không có sản phẩm nào!";
+                    echo "<div class='no-products'>Không có sản phẩm nào!</div>";
                 }
-
-                // Close connection
-                $conn->close();
                 ?>
             </div>
         </main>
@@ -277,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <div class="form-group">
                             <label for="thong-tin-sp" class="form-label">Thông tin sản phẩm</label>
-                            <textarea name="thong-tin-sp" class="product-desc" id="thong-tin-sp" placeholder="Nhập thông tin sản phẩm" style="width:100%;height:100%;"></textarea>
+                            <textarea name="thong-tin-sp" class="product-desc" id="thong-tin-sp" placeholder="Nhập thông tin sản phẩm" style="width:100%;height:185px;"></textarea>
                         </div>
                         <div class="form-group">
                             <label for="thong-so-ky-thuat" class="form-label">Thông số kỹ thuật</label>

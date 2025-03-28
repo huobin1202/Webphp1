@@ -204,10 +204,8 @@ if ($productId > 0) {
                 </div>
                 <div id="show-product"></div>
                 <?php
-
-
                 // Fetch product data
-                $sql = "SELECT id, tensp, dongsp, giaban, thongtinsp, hinhanh FROM products";
+                $sql = "SELECT * FROM products ORDER BY id DESC";
                 $result = $conn->query($sql);
 
                 // Check if there are products to display
@@ -217,7 +215,7 @@ if ($productId > 0) {
                         echo '
         <div class="list">
             <div class="list-left">
-                <img src="' . $row["hinhanh"] . '" alt="' . '">
+                <img src="' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
                 <div class="list-info">
                     <h4>' . $row["tensp"] . '</h4>
                     <p class="list-note">' . $row["thongtinsp"] . '</p>
@@ -228,12 +226,21 @@ if ($productId > 0) {
                 <div class="list-price">
                     <span class="list-current-price">' . number_format($row["giaban"], 0, ',', '.') . 'đ</span>
                 </div>
+                <div class="list-status" style="margin-top: 10px;">
+                    <span class="status-' . ($row["status"] == 1 ? "complete" : "no-complete") . '">' . 
+                    ($row["status"] == 1 ? "Đang hiển thị" : "Đã ẩn") . '</span>
+                </div>
                 <div class="list-control">
                     <div class="list-tool">
                         <a href="changeproduct.php?id=' . $row["id"] . '">
                             <button class="btn-edit"><i class="fa-light fa-pen-to-square"></i></button>
                         </a>
-                        <button class="btn-delete" onclick=""><i class="fa-regular fa-trash"></i></button>
+                        <form action="" method="POST" style="display: inline;">
+                            <input type="hidden" name="id" value="' . $row["id"] . '">
+                            <button type="submit" name="delete" class="btn-delete" onclick="return confirm(\'Bạn có chắc chắn muốn xóa sản phẩm này?\');">
+                                <i class="fa-regular fa-trash"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -241,10 +248,8 @@ if ($productId > 0) {
         ';
                     }
                 } else {
-                    echo "Không có sản phẩm nào!";
+                    echo "<div class='no-products'>Không có sản phẩm nào!</div>";
                 }
-
-                // Close connection
                 ?>
             </div>
         </main>
@@ -295,7 +300,7 @@ if ($productId > 0) {
                         </div>
                         <div class="form-group">
                             <label for="thong-tin-sp" class="form-label">Thông tin sản phẩm</label>
-                            <textarea class="product-desc" name="thong-tin-sp" id="thong-tin-sp" placeholder="Nhập thông tin sản phẩm" style="width:100%;height:100%;"><?php echo htmlspecialchars($product['thongtinsp']); ?></textarea>
+                            <textarea class="product-desc" name="thong-tin-sp" id="thong-tin-sp" placeholder="Nhập thông tin sản phẩm" style="width:100%;height:185px;"><?php echo htmlspecialchars($product['thongtinsp']); ?></textarea>
                         </div>
                         <div class="form-group">
                             <label for="thong-so-ky-thuat" class="form-label">Thông số kỹ thuật</label>

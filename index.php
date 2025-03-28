@@ -318,7 +318,7 @@ if ($username && !$customer_id) {
                     <div class="grid-container" id="product-list">
 
                         <?php
-                        $sql = "SELECT id, tensp, giaban, hinhanh FROM products";
+                        $sql = "SELECT id, tensp, giaban, hinhanh FROM products WHERE status = 1";
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
@@ -428,7 +428,7 @@ if ($username && !$customer_id) {
                         $sql = "SELECT g.id, g.product_id, g.soluong, g.price, g.img, p.tensp 
                                 FROM giohang g
                                 JOIN products p ON g.product_id = p.id
-                                WHERE g.customer_id = ?";
+                                WHERE g.customer_id = ? AND p.status = 1";
 
                         $stmt = $conn->prepare($sql);
                         $stmt->bind_param("i", $customer_id);

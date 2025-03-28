@@ -20,20 +20,24 @@ if ($conn->connect_error) {
 include("../toast.php");
 
 // Check if `id` is passed via POST (Handle deletion)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
-    $productId = intval($_POST['id']); // Sanitize input
-
-    // Prepare and execute delete query
-    $sql = "DELETE FROM products WHERE id = $productId";
-
-    if ($conn->query($sql) === TRUE) {
-
-        $_SESSION['success'] = 'Xóa sản phẩm thành công!';
-        header('Location: sanpham.php');
-        exit();
-    } else {
-        $_SESSION['error'] = 'Không thể xóa sản phẩm!';
-        header('Location: sanpham.php');
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['delete'])) {
+        $id = intval($_POST['id']);
+        
+        // Kiểm tra xem sản phẩm đã được bán ra chưa
+        $check_sold = $conn->prepare("SELECT COUNT(*) as count FROM order_details WHERE product_id = ?");
+        $check_sold->bind_param("i", $id);
+        $check_sold->execute();
+        $result = $check_sold->get_result();
+        $row = $result->fetch_assoc();
+        
+        if ($row['count'] > 0) {
+            // Sản phẩm đã được bán ra, chuyển hướng đến trang ẩn sản phẩm
+            header("Location: toggle_product.php?id=" . $id);
+        } else {
+            // Sản phẩm chưa được bán ra, chuyển hướng đến trang xóa sản phẩm
+            header("Location: delete_product.php?id=" . $id);
+        }
         exit();
     }
 }
@@ -158,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                 <div id="show-product"></div>
                 <?php
                 // Fetch product data
-                $sql = "SELECT id, tensp, dongsp, giaban, thongtinsp, hinhanh FROM products";
+                $sql = "SELECT * FROM products ORDER BY id DESC";
                 $result = $conn->query($sql);
 
                 // Check if there are products to display
@@ -175,24 +179,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
                                     <span class="list-category"> ' . $row["dongsp"] . '</span>
                                 </div>
                             </div>  
-                            <div class="list-right">
-                                <div class="list-price">
-                                    <span class="list-current-price">' . number_format($row["giaban"], 0, ',', '.') . 'đ</span>
-                                </div>
-                                <div class="list-control">
-                                    <div class="list-tool">
-                                        <a href="changeproduct.php?id=' . $row["id"] . '">
-                                            <button class="btn-edit"><i class="fa-light fa-pen-to-square"></i></button>
-                                        </a>
-                                        <form action="" method="POST" style="display: inline;">
-                                            <input type="hidden" name="id" value="' . $row["id"] . '">
-                                            <button type="submit" class="btn-delete" onclick="return confirm(\'Bạn có chắc chắn muốn xóa sản phẩm này?\');">
-                                                <i class="fa-regular fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                                   <div class="list-right">
+                <div class="list-price">
+                    <span class="list-current-price">' . number_format($row["giaban"], 0, ',', '.') . 'đ</span>
+                </div>
+                <div class="list-status" style="margin-top: 10px;">
+                    <span class="status-' . ($row["status"] == 1 ? "complete" : "no-complete") . '">' . 
+                    ($row["status"] == 1 ? "Đang hiển thị" : "Đã ẩn") . '</span>
+                </div>
+                <div class="list-control">
+                    <div class="list-tool">
+                    
+                        <a href="changeproduct.php?id=' . $row["id"] . '">
+                            <button class="btn-edit"><i class="fa-light fa-pen-to-square"></i></button>
+                        </a>
+                        <button type="button" class="btn-delete" onclick="checkProductStatus(' . $row["id"] . ');">
+                            <i class="fa-regular fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
                         </div>
                         ';
                     }
@@ -204,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
         </main>
     </div>
     <script src="../assets/js/admin.js"></script>
-
+    <script src="check_product.js"></script>
 </body>
 
 </html>

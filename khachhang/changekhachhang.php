@@ -28,14 +28,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $category = $_POST['phone'];
     $mauXe = $_POST['password'];
     $giaBan = isset($_POST['user-status']) && $_POST['user-status'] == '1' ? 1 : 0;
+    $id = intval($_POST['id']);
 
     // Sanitize inputs to prevent SQL injection
     $tenMon = $conn->real_escape_string($tenMon);
     $category = $conn->real_escape_string($category);
     $mauXe = $conn->real_escape_string($mauXe);
 
+    // Kiểm tra trùng số điện thoại (trừ chính khách hàng đang sửa)
+    $check_phone = $conn->prepare("SELECT id FROM customer WHERE contact = ? AND id != ?");
+    $check_phone->bind_param("si", $category, $id);
+    $check_phone->execute();
+    $phone_result = $check_phone->get_result();
+    
+    if ($phone_result->num_rows > 0) {
+        $_SESSION['error'] = "Số điện thoại này đã được đăng ký bởi khách hàng khác!";
+        header("Location: changekhachhang.php");
+        exit();
+    }
+
+    // Kiểm tra trùng tên (trừ chính khách hàng đang sửa)
+    $check_name = $conn->prepare("SELECT id FROM customer WHERE name = ? AND id != ?");
+    $check_name->bind_param("si", $tenMon, $id);
+    $check_name->execute();
+    $name_result = $check_name->get_result();
+    
+    if ($name_result->num_rows > 0) {
+        $_SESSION['error'] = "Tên khách hàng này đã tồn tại!";
+        header("Location: changekhachhang.php");
+        exit();
+    }
+
     // Update data into the database
-    $sqlUpdate = "UPDATE customer SET name='$tenMon', contact='$category', password='$mauXe', status='$giaBan' WHERE id=" . intval($_POST['id']);
+    $sqlUpdate = "UPDATE customer SET name='$tenMon', contact='$category', password='$mauXe', status='$giaBan' WHERE id=$id";
 
     if ($conn->query($sqlUpdate) === TRUE) {
         $_SESSION['success'] = "Thay đổi thông tin thành công!";
@@ -46,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: khachhang.php");
         exit();
     }
-    
 }
 
 // Fetch product details if `id` is present in URL
