@@ -4,7 +4,6 @@
 
 **Admin:**
 - Tìm kiếm khách hàng
-- Xóa xp: Kiểm tra nếu sp đã được bán ra thì ẩn sp hiển thị trên web, nếu sản phẩm chưa được bán ra thì hỏi lại và xóa
 - Quản lý đơn hàng:
 Tình trạng đơn hàng: đã giao( thành công/ hủy đơn),
 
