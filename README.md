@@ -13,7 +13,6 @@ Lọc đơn hàng: tình trạng, khoảng thời gian giao (day->day)/ theo đ/
 Thông kê: cho phép admin nhập khoảng thời gian thống kê 5 kh có mức mua hàng cao nhất trong tgian trên, liệt kê đơn hàng( theo tổng tiền)
   
 **Bug:**
-- trùng tên, sdt: newkhachhang.php, changekhachhang.php
 - lọc theo ngày trong admin
 - lỗi giỏ hàng khi chưa dn:
 - mất thông báo khi đổi trang admin
