@@ -33,8 +33,12 @@ $orderCountQuery = "SELECT COUNT(*) as order_count FROM orders";
 $orderCountResult = $conn->query($orderCountQuery);
 $orderCount = $orderCountResult->fetch_assoc()['order_count'];
 
-$conn->close();
+// Query to count doanh thu
+$revenueQuery = "SELECT SUM(soluong*price) as total_revenue FROM order_details";
+$revenueResult = $conn->query($revenueQuery);
+$revenue = $revenueResult->fetch_assoc()['total_revenue'];
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -166,7 +170,7 @@ $conn->close();
 
                     <div class="card-single">
                         <div class="box">
-                            <h2 id="doanh-thu">0đ</h2>
+                            <h2 id="doanh-thu"><?php echo number_format($revenue, 0, ',', '.'); ?>đ</h2>
                             <div class="on-box">
                                 <h3>Doanh thu</h3>
                             </div>

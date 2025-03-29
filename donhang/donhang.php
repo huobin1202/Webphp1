@@ -183,6 +183,7 @@ $conn->close();
                                 <input type="date" class="form-control-date" id="time-end">
                             </div>
                         </form>
+                        <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
                         <button class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></button>
                     </div>
                 </div>

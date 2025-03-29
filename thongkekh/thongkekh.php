@@ -248,7 +248,7 @@ $result->data_seek(0);
                                 <td>Mã KH</td>
                                 <td>Tên khách hàng</td>
                                 <td>Số đơn hàng</td>
-                                <td>Tổng doanh thu</td>
+                                <td>Số tiền đã chi</td>
                                 <td>Thao tác</td>
                             </tr>
                         </thead>

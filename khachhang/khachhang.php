@@ -100,18 +100,18 @@ include('../toast.php');
             <div class="section">
                 <div class="admin-control">
                     <div class="admin-control-left">
-                        <select name="tinh-trang-user" id="tinh-trang-user" >
+                        <select name="tinh-trang-user" id="tinh-trang-user">
                             <option value="2">Tất cả</option>
                             <option value="1">Hoạt động</option>
                             <option value="0">Bị khóa</option>
                         </select>
                     </div>
                     <div class="admin-control-center">
-                        <form action="" class="form-search">
+                        <div class="form-search">
                             <span class="search-btn"><i class="fa-light fa-magnifying-glass"></i></span>
-                            <input id="form-search-user" type="text" class="form-search-input"
-                                placeholder="Tìm kiếm mã khách hàng, tên khách hàng..." >
-                        </form>
+                            <input type="text" id="form-search-user" class="form-search-input"
+                                placeholder="Tìm kiếm mã khách hàng, tên khách hàng...">
+                        </div>
                     </div>
                     <div class="admin-control-right">
                         <form action="" class="fillter-date">
@@ -124,8 +124,11 @@ include('../toast.php');
                                 <input type="date" class="form-control-date" id="time-end-user" value="">
                             </div>
                         </form>
+                        <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
+
                         <button class="btn-reset-order" ><i
                                 class="fa-light fa-arrow-rotate-right"></i></button>
+
                         <a href="newkhachhang.php"><button id="btn-add-user" class="btn-control-large" ><i
                                 class="fa-light fa-plus"></i> <span>Thêm khách hàng</span></button></a>
                     </div>
@@ -140,52 +143,111 @@ include('../toast.php');
                                 <td>Ngày tham gia</td>
                                 <td>Tình trạng</td>
                                 <td>Thao tác</td>
-                                <td></td>
                             </tr>
                         </thead>
                         <tbody id="show-user">
                             <?php 
-                            $servername="localhost";
-                            $username="root";
-                            $password="";
-                            $dbname="admindoan";
-                            
-                            $conn = new mysqli($servername,$username,$password,$dbname);
+                            include('../database.php');
 
-                            if ($conn->connect_error){
-                                die("Kế nối thất bại: ".$conn->connect_error);
-
-                            }
-
-
-                            $sql="SELECT id, name, contact, joindate, status FROM customer";
+                            $sql = "SELECT id, name, contact, joindate, status FROM customer";
                             $result = $conn->query($sql);
+
                             if ($result->num_rows > 0) {
-                                while($row= $result->fetch_assoc()) {
-                                    
+                                while($row = $result->fetch_assoc()) {
                                     echo "<tr>";
                                     echo "<td>".$row["id"]."</td>";
                                     echo "<td>".$row["name"]."</td>";
                                     echo "<td>".$row["contact"]."</td>";
                                     echo "<td>".$row["joindate"]."</td>";
-                                    echo "<td><span class='status-".($row["status"]==1?"complete":"no-complete")."'>".($row["status"]==1?"Hoạt động":"Bị khóa")."</span></td>";
+                                    echo "<td><span class='status-".($row["status"]==1?"complete":"no-complete")."'>".
+                                         ($row["status"]==1?"Hoạt động":"Bị khóa")."</span></td>";
                                     echo "<td class='control control-table'>";
-                                    echo "<a href='changekhachhang.php?id=".$row["id"]."'><button class='btn-edit' id='edit-account'  >";
+                                    echo "<a href='changekhachhang.php?id=".$row["id"]."'><button class='btn-edit' id='edit-account'>";
                                     echo "<i class='fa-light fa-pen-to-square'></i></button></a>";
                                     echo "</td>";
                                     echo "</tr>";
-                                }} else {
-                                    echo "<div class='no-products'>Không có sản phẩm nào!</div>";                }
-                            
+                                }
+                            } else {
+                                echo "<tr><td colspan='6' class='no-products'>Không tìm thấy khách hàng nào!</td></tr>";
+                            }
+                            $conn->close();
                             ?>
                         </tbody>
                     </table>
                 </div>
-                <!-- </div> -->
             </div>
             
         </main>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('form-search-user');
+        const statusSelect = document.getElementById('tinh-trang-user');
+        const tableRows = document.querySelectorAll('#show-user tr:not(.no-results)');
+
+        function filterTable() {
+            const searchValue = searchInput.value.toLowerCase();
+            const statusValue = statusSelect.value;
+            let hasVisibleRows = false;
+
+            // Xóa thông báo không tìm thấy cũ nếu có
+            const existingNoResults = document.querySelector('.no-results');
+            if (existingNoResults) {
+                existingNoResults.remove();
+            }
+
+            tableRows.forEach(row => {
+                const id = row.cells[0]?.textContent.toLowerCase() || '';
+                const name = row.cells[1]?.textContent.toLowerCase() || '';
+                const contact = row.cells[2]?.textContent.toLowerCase() || '';
+                const status = row.querySelector('.status-complete') ? '1' : '0';
+
+                // Kiểm tra điều kiện tìm kiếm
+                const matchesSearch = !searchValue || 
+                    id.includes(searchValue) || 
+                    name.includes(searchValue) || 
+                    contact.includes(searchValue);
+
+                // Kiểm tra điều kiện trạng thái
+                const matchesStatus = statusValue === '2' || status === statusValue;
+
+                // Hiển thị hoặc ẩn dòng dựa trên kết quả
+                const isVisible = matchesSearch && matchesStatus;
+                row.style.display = isVisible ? '' : 'none';
+                
+                if (isVisible) {
+                    hasVisibleRows = true;
+                }
+            });
+
+            // Thêm thông báo không tìm thấy nếu không có dòng nào hiển thị
+            if (!hasVisibleRows) {
+                const tbody = document.getElementById('show-user');
+                const newRow = document.createElement('tr');
+                newRow.className = 'no-results';
+                newRow.innerHTML = '<td colspan="6" class="no-products">Không tìm thấy khách hàng nào!</td>';
+                tbody.appendChild(newRow);
+            }
+        }
+
+        // Thêm sự kiện lắng nghe cho input tìm kiếm
+        if (searchInput) {
+            searchInput.addEventListener('input', filterTable);
+        }
+
+        // Thêm sự kiện lắng nghe cho select trạng thái
+        if (statusSelect) {
+            statusSelect.addEventListener('change', filterTable);
+        }
+
+        // Hàm reset tìm kiếm
+        window.resetSearch = function() {
+            searchInput.value = '';
+            statusSelect.value = '2';
+            filterTable();
+        }
+    });
+    </script>
     <script src="../assets/js/admin.js"></script>
 </body>
 
