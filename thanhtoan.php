@@ -4,7 +4,8 @@ include('database.php');
 include('toast.php');
 
 if (!isset($_SESSION['customer_id'])) {
-    echo "<script>alert('Bạn cần đăng nhập để thanh toán!'); window.location.href='dn.php';</script>";
+    $_SESSION['error'] = "Đăng nhập để thanh toán!";
+    header("Location: index.php");
     exit();
 }
 

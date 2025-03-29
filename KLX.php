@@ -318,7 +318,7 @@ if ($username && !$customer_id) {
                     <div class="grid-container" id="product-list">
 
                         <?php
-                        $sql = "SELECT id, tensp, giaban, hinhanh FROM products WHERE dongsp='Dòng KLX'";
+                        $sql = "SELECT id, tensp, giaban, hinhanh FROM products WHERE status = 1 AND dongsp='Dòng KLX'";
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
@@ -368,38 +368,38 @@ if ($username && !$customer_id) {
             <?php
             if (isset($_POST['add_to_cart'])) {
                 if (!$customer_id) {
-                    die("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
-                }
-
-                $product_id = $_POST['product_id'];
-                $product_price = $_POST['product_price'];
-                $product_img = $_POST['product_img'];
-                $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
-
-                // Kiểm tra sản phẩm đã tồn tại chưa
-                $stmt = $conn->prepare("SELECT soluong FROM giohang WHERE product_id = ? AND customer_id = ?");
-                $stmt->bind_param("ii", $product_id, $customer_id);
-                $stmt->execute();
-                $stmt->store_result();
-
-                if ($stmt->num_rows > 0) {
-                    // Sản phẩm đã tồn tại, cập nhật số lượng
-                    $stmt->bind_result($current_quantity);
-                    $stmt->fetch();
-                    $new_quantity = $current_quantity + $quantity;
-                    $stmt->close();
-
-                    $update_stmt = $conn->prepare("UPDATE giohang SET soluong = ? WHERE product_id = ? AND customer_id = ?");
-                    $update_stmt->bind_param("iii", $new_quantity, $product_id, $customer_id);
-                    $update_stmt->execute();
-                    $update_stmt->close();
+                    $_SESSION['error'] = "Đăng nhập để thêm sản phẩm!";
                 } else {
-                    // Sản phẩm chưa có, thêm mới
-                    $stmt->close();
-                    $stmt = $conn->prepare("INSERT INTO giohang (customer_id, product_id, soluong, price, img) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->bind_param("iiiss", $customer_id, $product_id, $quantity, $product_price, $product_img);
+                    $product_id = $_POST['product_id'];
+                    $product_price = $_POST['product_price'];
+                    $product_img = $_POST['product_img'];
+                    $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
+
+                    // Kiểm tra sản phẩm đã tồn tại chưa
+                    $stmt = $conn->prepare("SELECT soluong FROM giohang WHERE product_id = ? AND customer_id = ?");
+                    $stmt->bind_param("ii", $product_id, $customer_id);
                     $stmt->execute();
-                    $stmt->close();
+                    $stmt->store_result();
+
+                    if ($stmt->num_rows > 0) {
+                        // Sản phẩm đã tồn tại, cập nhật số lượng
+                        $stmt->bind_result($current_quantity);
+                        $stmt->fetch();
+                        $new_quantity = $current_quantity + $quantity;
+                        $stmt->close();
+
+                        $update_stmt = $conn->prepare("UPDATE giohang SET soluong = ? WHERE product_id = ? AND customer_id = ?");
+                        $update_stmt->bind_param("iii", $new_quantity, $product_id, $customer_id);
+                        $update_stmt->execute();
+                        $update_stmt->close();
+                    } else {
+                        // Sản phẩm chưa có, thêm mới
+                        $stmt->close();
+                        $stmt = $conn->prepare("INSERT INTO giohang (customer_id, product_id, soluong, price, img) VALUES (?, ?, ?, ?, ?)");
+                        $stmt->bind_param("iiiss", $customer_id, $product_id, $quantity, $product_price, $product_img);
+                        $stmt->execute();
+                        $stmt->close();
+                    }
                 }
             }
             ?>
@@ -428,7 +428,7 @@ if ($username && !$customer_id) {
                         $sql = "SELECT g.id, g.product_id, g.soluong, g.price, g.img, p.tensp 
                                 FROM giohang g
                                 JOIN products p ON g.product_id = p.id
-                                WHERE g.customer_id = ?";
+                                WHERE g.customer_id = ? AND p.status = 1";
 
                         $stmt = $conn->prepare($sql);
                         $stmt->bind_param("i", $customer_id);
