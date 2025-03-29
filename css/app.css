@@ -1484,41 +1484,71 @@ li {
 
 #order-history-detail,
 .order-history-status-sp {
-    background-color: #eee;
+    background-color: #f0f0f0;
     padding: 5px 15px;
     border-radius: 15px;
     font-size: 14px;
-    color: var(--text-color);
+    color: #666;
     text-transform: uppercase;
     position: relative;
 }
 
-.order-history-status-sp.complete{
-    background-color: #27ae60;
-    color: var(--white);
+.order-history-status-sp.complete {
+    background-color: #4CAF50;
+    color: #fff;
     padding-left: 35px;
 }
 
-.order-history-status-sp.complete::before{
+.order-history-status-sp.complete::before {
     content: "\f00c";
     font-family: "Font Awesome 6 Pro";
     position: absolute;
-    left: 16px;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%);
 }
 
-.order-history-status-sp.no-complete{
-    background-color: #f04e2e;
-    color: white;
+.order-history-status-sp.no-complete {
+    background-color: #f44336;
+    color: #fff;
     padding-left: 35px;
 }
 
-.order-history-status-sp.no-complete::before{
-    content: "\e1d4";
+.order-history-status-sp.no-complete::before {
+    content: "\f00d";
     font-family: "Font Awesome 6 Pro";
     position: absolute;
-    left: 16px;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.order-history-status-sp.processing {
+    background-color: #2196F3;
+    color: #fff;
+    padding-left: 35px;
+}
+
+.order-history-status-sp.processing::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Pro";
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.order-history-status-sp.pending {
+    background-color: #FF9800;
+    color: #fff;
+    padding-left: 35px;
+}
+
+.order-history-status-sp.pending::before {
+    content: "\f017";
+    font-family: "Font Awesome 6 Pro";
+    position: absolute;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -2187,41 +2217,41 @@ li {
 
 #order-history-detail,
 .order-history-status-sp {
-    background-color: #eee;
+    background-color: #f0f0f0;
     padding: 5px 15px;
     border-radius: 15px;
     font-size: 14px;
-    color: var(--text-color);
+    color: #666;
     text-transform: uppercase;
     position: relative;
 }
 
-.order-history-status-sp.complete{
-    background-color: #27ae60;
-    color: var(--white);
+.order-history-status-sp.complete {
+    background-color: #4CAF50;
+    color: #fff;
     padding-left: 35px;
 }
 
-.order-history-status-sp.complete::before{
+.order-history-status-sp.complete::before {
     content: "\f00c";
     font-family: "Font Awesome 6 Pro";
     position: absolute;
-    left: 16px;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%);
 }
 
-.order-history-status-sp.no-complete{
-    background-color: #f04e2e;
-    color: var(--white);
+.order-history-status-sp.no-complete {
+    background-color: #f44336;
+    color: #fff;
     padding-left: 35px;
 }
 
-.order-history-status-sp.no-complete::before{
-    content: "\e1d4";
+.order-history-status-sp.no-complete::before {
+    content: "\f00d";
     font-family: "Font Awesome 6 Pro";
     position: absolute;
-    left: 16px;
+    left: 15px;
     top: 50%;
     transform: translateY(-50%);
 }

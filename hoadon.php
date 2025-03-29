@@ -262,8 +262,26 @@ if ($username && !$customer_id) {
                                     <div class="order-history-control">
                                         <div class="order-history-status">
                                             <?php
-                                            $status_class = ($order['status'] === '1') ? 'complete' : 'no-complete';
-                                            $status_text = ($order['status'] === '1') ? 'Đã xử lý' : 'Đang xử lý';
+                                            $status_class = '';
+                                            $status_text = '';
+                                            switch($order['status']) {
+                                                case 'chuaxuly':
+                                                    $status_class = 'no-complete';
+                                                    $status_text = 'Chưa xử lý';
+                                                    break;
+                                                case 'daxuly':
+                                                    $status_class = 'processing';
+                                                    $status_text = 'Đã xử lý';
+                                                    break;
+                                                case 'chuagiao':
+                                                    $status_class = 'pending';
+                                                    $status_text = 'Chưa giao';
+                                                    break;
+                                                case 'dagiao':
+                                                    $status_class = 'complete';
+                                                    $status_text = 'Đã giao';
+                                                    break;
+                                            }
                                             ?>
                                             <span class="order-history-status-sp <?= $status_class ?>"><?= $status_text ?></span>
 

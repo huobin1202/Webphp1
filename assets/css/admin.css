@@ -564,7 +564,7 @@ tbody tr td {
 }
 
 .list-note {
-    color: #0000008a;z
+    color: #0000008a;
     font-size: 14px;
     margin-right: 10px;
     display: -webkit-box;
@@ -1111,22 +1111,36 @@ label a {
     position: relative;
 }
 
-.status-complete {
-    background-color: #27ae60;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 15px;
-    display: inline-block;
-}
-
 .status-no-complete {
     background-color: #f04e2e;
-    color: #fff;
+    color: white;
     padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 15px;
-    display: inline-block;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+.status-processing {
+    background-color: #f39c12;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+.status-complete {
+    background-color: #27ae60;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+.status-pending {
+    background-color: #3498db;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
 }
 
 .btn-chuaxuly {
@@ -1141,14 +1155,33 @@ label a {
 }
 
 .btn-daxuly {
-    background-color: #27ae60;
+    background-color: #f39c12;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.btn-daxuly::before {
-    content: "\f00c";
-    font-family: "Font Awesome 6 Pro";
-    position: absolute;
-    left: 22px;
+.btn-daxuly:hover {
+    background-color: #d68910;
+}
+
+.btn-chuagiao {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-chuagiao:hover {
+    background-color: #2980b9;
 }
 
 .prod-img-title {
@@ -1326,4 +1359,54 @@ footer {
     font-size: 1,5rem;
     font-weight: bold;
     color: #333;
+}
+
+.status-buttons {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.status-buttons button {
+    border: none;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: white;
+}
+
+.btn-chuaxuly {
+    background-color: #e74c3c;
+}
+
+.btn-daxuly {
+    background-color: #f39c12;
+}
+
+.btn-chuagiao {
+    background-color: #3498db;
+}
+
+.btn-dagiao {
+    background-color: #27ae60;
+}
+
+.status-buttons button:hover {
+    opacity: 0.8;
+    transform: translateY(-1px);
+}
+
+.status-buttons button i {
+    font-size: 14px;
+}
+
+.modal.detail-modal .modal-container {
+    width: 800px;
+    height: 450px;
+    overflow: hidden;
 }

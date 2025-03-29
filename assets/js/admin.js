@@ -117,44 +117,83 @@ document.addEventListener("DOMContentLoaded", function () {
     const resetButton = document.querySelector(".btn-reset-order");
     const tableRows = document.querySelectorAll("#showOrder tr");
     
-    // Hàm lọc bảng
-    function filterTable() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        const selectedStatus = statusFilter.value;
+    // Hàm chuẩn hóa chuỗi để tìm kiếm không phân biệt chữ hoa/thường
+    function normalizeString(str) {
+        return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
 
+    // Hàm kiểm tra ngày có nằm trong khoảng không
+    function isDateInRange(dateStr, startDate, endDate) {
+        if (!startDate && !endDate) return true;
+        const date = new Date(dateStr);
+        const start = startDate ? new Date(startDate) : null;
+        const end = endDate ? new Date(endDate) : null;
+        
+        if (start && end) {
+            return date >= start && date <= end;
+        } else if (start) {
+            return date >= start;
+        } else if (end) {
+            return date <= end;
+        }
+        return true;
+    }
+
+    // Hàm lọc bảng đơn hàng
+    function filterTable() {
+        const searchTerm = normalizeString(searchInput.value);
+        const selectedStatus = statusFilter.value;
+        const startDate = document.getElementById('time-start').value;
+        const endDate = document.getElementById('time-end').value;
+        
         tableRows.forEach(row => {
             const cells = row.querySelectorAll("td");
             const orderID = cells[0].innerText.toLowerCase().trim(); // Mã đơn hàng
             const customerID = cells[1].innerText.toLowerCase().trim(); // Mã khách hàng
             const customerName = cells[2].innerText.toLowerCase().trim(); // Tên khách hàng
-            const statusText = cells[5].innerText.toLowerCase().trim(); // Trạng thái
+            const statusSelect = cells[5].querySelector('select'); // Select box trạng thái
+            const currentStatus = statusSelect ? statusSelect.value : '';
 
-            // Kiểm tra trạng thái
-            const matchesStatus = selectedStatus === "2" || // Tất cả
-                (selectedStatus === "1" && statusText.includes("đã xử lý")) ||
-                (selectedStatus === "0" && statusText.includes("chưa xử lý"));
-
-            // Kiểm tra thuật ngữ tìm kiếm
+            // Kiểm tra điều kiện tìm kiếm
             const matchesSearch = orderID.includes(searchTerm) ||
                 customerID.includes(searchTerm) ||
                 customerName.includes(searchTerm);
 
-            // Hiển thị/Ẩn dòng dựa trên điều kiện phù hợp
-            if (matchesStatus && matchesSearch) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
+            // Kiểm tra trạng thái
+            let matchesStatus = true;
+            if (selectedStatus !== "4") { // Nếu không phải "Tất cả"
+                switch(selectedStatus) {
+                    case "0": // Chưa xử lý
+                        matchesStatus = currentStatus === "chuaxuly";
+                        break;
+                    case "1": // Đã xử lý
+                        matchesStatus = currentStatus === "daxuly";
+                        break;
+                    case "2": // Chưa giao
+                        matchesStatus = currentStatus === "chuagiao";
+                        break;
+                    case "3": // Đã giao
+                        matchesStatus = currentStatus === "dagiao";
+                        break;
+                }
             }
+
+            // Kiểm tra ngày tháng
+            const matchesDate = isDateInRange(cells[3].innerText, startDate, endDate);
+
+            // Hiển thị/Ẩn dòng dựa trên điều kiện phù hợp
+            row.style.display = (matchesSearch && matchesStatus && matchesDate) ? '' : 'none';
         });
     }
 
-    // Hàm đặt lại bảng
-    function resetTable() {
-        searchInput.value = "";
-        statusFilter.value = "2";
-        tableRows.forEach(row => {
-            row.style.display = "";
-        });
+    // Hàm reset bộ lọc
+    function resetFilters() {
+        searchInput.value = '';
+        statusFilter.value = '4';
+        document.getElementById('time-start').value = '';
+        document.getElementById('time-end').value = '';
+        
+        tableRows.forEach(row => row.style.display = '');
     }
 
     // Gắn sự kiện
@@ -162,9 +201,10 @@ document.addEventListener("DOMContentLoaded", function () {
     statusFilter.addEventListener("change", filterTable);
     resetButton.addEventListener("click", (e) => {
         e.preventDefault(); // Ngăn hành vi mặc định của nút
-        resetTable();
+        resetFilters();
     });
 });
+
 document.querySelectorAll('.view-order-btn').forEach(button => {
     button.addEventListener('click', () => {
         const modal = document.querySelector('.modal.detail-order');
@@ -388,4 +428,28 @@ document.addEventListener('DOMContentLoaded', () => {
     sortDescBtn.addEventListener('click', () => sortTable(false));
     resetBtn.addEventListener('click', resetTable);
 });
+
+// Hàm cập nhật trạng thái đơn hàng
+function updateOrderStatus(orderId, newStatus) {
+        fetch('update_order_status.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `order_id=${orderId}&new_status=${newStatus}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi cập nhật trạng thái!');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi cập nhật trạng thái!');
+        });
+    
+}
 

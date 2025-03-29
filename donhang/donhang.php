@@ -19,8 +19,9 @@ if ($conn->connect_error) {
 // XỬ LÝ CẬP NHẬT TRẠNG THÁI NẾU POST
 if (isset($_POST['process_order'])) {
     $order_id = intval($_POST['order_id']);
-    $update = $conn->prepare("UPDATE orders SET status = 1 WHERE id = ?");
-    $update->bind_param("i", $order_id);
+    $new_status = $_POST['new_status'];
+    $update = $conn->prepare("UPDATE orders SET status = ? WHERE id = ?");
+    $update->bind_param("si", $new_status, $order_id);
     $update->execute();
     // Redirect để tránh resubmit form
     header("Location: " . $_SERVER['PHP_SELF']);
@@ -156,9 +157,12 @@ $conn->close();
                 <div class="admin-control">
                     <div class="admin-control-left">
                         <select name="tinh-trang" id="tinh-trang">
-                            <option value="2">Tất cả</option>
-                            <option value="1">Đã xử lý</option>
-                            <option value="0">Chưa xử lý</option>
+                        <option value="4">Tất cả</option>
+                        <option value="0">Chưa xử lý</option>
+                        <option value="1">Đã xử lý</option>
+                        <option value="2">Chưa giao</option>
+                        <option value="3">Đã giao</option>
+            
                         </select>
                     </div>
                     <div class="admin-control-center">
@@ -202,9 +206,21 @@ $conn->close();
                                 $customerName = htmlspecialchars($order['customer_name']);
                                 $createdDate = date('d/m/Y', strtotime($order['created_at']));
                                 $total = number_format($order['total'], 0, ',', '.') . 'đ';
-                                $statusText = $order['status'] == 1
-                                    ? '<span class="status-complete">Đã xử lý</span>'
-                                    : '<span class="status-no-complete">Chưa xử lý</span>';
+                                $statusText = '';
+                                switch($order['status']) {
+                                    case 'chuaxuly':
+                                        $statusText = '<span class="status-no-complete">Chưa xử lý</span>';
+                                        break;
+                                    case 'daxuly':
+                                        $statusText = '<span class="status-processing">Đã xử lý</span>';
+                                        break;
+                                    case 'dagiao':
+                                        $statusText = '<span class="status-complete">Đã giao</span>';
+                                        break;
+                                    case 'chuagiao':
+                                        $statusText = '<span class="status-pending">Chưa giao</span>';
+                                        break;
+                                }
                                 $details_json = htmlspecialchars(json_encode($order['details']), ENT_QUOTES, 'UTF-8');
                             ?>
                                 <tr>
@@ -213,7 +229,22 @@ $conn->close();
                                     <td><?= $customerName ?></td>
                                     <td><?= $createdDate ?></td>
                                     <td><?= $total ?></td>
-                                    <td><?= $statusText ?></td>
+                                    <td>
+                                        <select class="order-status-select" onchange="updateOrderStatus(<?php echo $orderId; ?>, this.value)">
+                                            <option value="chuaxuly" <?php echo $order['status'] == 'chuaxuly' ? 'selected' : ''; ?>>
+                                                <i class="fa-regular fa-clock"></i> Chưa xử lý
+                                            </option>
+                                            <option value="daxuly" <?php echo $order['status'] == 'daxuly' ? 'selected' : ''; ?>>
+                                                <i class="fa-regular fa-check"></i> Đã xử lý
+                                            </option>
+                                            <option value="chuagiao" <?php echo $order['status'] == 'chuagiao' ? 'selected' : ''; ?>>
+                                                <i class="fa-regular fa-truck"></i> Chưa giao
+                                            </option>
+                                            <option value="dagiao" <?php echo $order['status'] == 'dagiao' ? 'selected' : ''; ?>>
+                                                <i class="fa-regular fa-circle-check"></i> Đã giao
+                                            </option>
+                                        </select>
+                                    </td>
                                     <td class="control">
                                         <button class="btn-detail view-order-btn"
                                             data-order-id="<?= $orderId ?>"
@@ -290,11 +321,7 @@ $conn->close();
                             <span class="price"></span>
                         </div>
                     </div>
-                    <div class="modal-detail-bottom-right">
-                        <form>
-                            <button disabled class="modal-detail-btn btn-daxuly"></button>
-                        </form>
-                    </div>
+            
                 </div>
             </div>
         </div>
