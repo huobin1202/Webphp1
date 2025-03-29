@@ -1,6 +1,8 @@
 <?php
 session_start();
 include('database.php');
+include('toast.php');
+
 
 // Xử lý đăng xuất
 if (isset($_GET['logout'])) {
@@ -12,6 +14,11 @@ if (isset($_GET['logout'])) {
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
 
+if (!isset($_SESSION['customer_id'])) {
+    $_SESSION['error'] = "Bạn cần đăng nhập để thực hiện thao tác này!";
+    header("Location: dn.php");
+    exit();
+}
 // Nếu có username, lấy ID từ bảng customer
 if ($username && !$customer_id) {
     $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ?");

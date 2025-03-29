@@ -1,16 +1,7 @@
 <?php
 session_start();
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "admindoan";
-
-// Kết nối CSDL
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
-
+include('database.php');
+include('toast.php');
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
@@ -26,24 +17,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     $result = $stmt->get_result();
     
-    if ($result->num_rows ==1) {
+    if ($result->num_rows == 1) {
         $user = $result->fetch_assoc();
         
         if ($password == $user['password']) {
-            $_SESSION['username'] = $user['name'];
-            $_SESSION['role'] = $user['role'];
-            $_SESSION['id'] = $user['id'];
-
             if ($user['role'] == 'admin') {
+                $_SESSION['username'] = $user['name'];
+                $_SESSION['role'] = $user['role'];
+                $_SESSION['id'] = $user['id'];
                 header("Location: admin.php");
                 exit();
             } else {
-                echo "<script>alert('Bạn không có quyền truy cập!'); window.location='dnurl.php';</script>";
+                $_SESSION['error'] = "Tài khoản này không có quyền truy cập!";
+            header("Location: dnurl.php");
+            exit();
             }
         } else {
-            echo "<script>alert('Sai tài khoản hoặc mật khẩu!'); window.location='dnurl.php';</script>";
+            $_SESSION['error'] = "Tài khoản hoặc mật khẩu không chính xác!";
+            header("Location: dnurl.php");
+            exit();
         }
-    } 
+    } else {
+        $_SESSION['error'] = "Tài khoản hoặc mật khẩu không chính xác!";
+        header("Location: dnurl.php");
+        exit();
+    }
     
     $stmt->close();
     $conn->close();
@@ -59,9 +57,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="image/logo.png" rel="icon" type="image/x-icon" />
     <link rel="stylesheet" href="assets/css/style.css">
     <title>Đăng nhập</title>
-</head>
-<body>
     <style>
+        /* Thêm style cho nút quay về */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: #45a049;
+        }
+
         /* Reset một số kiểu mặc định của trình duyệt */
 * {
     margin: 0;
@@ -162,6 +176,11 @@ input:focus, button:focus {
 }
 
     </style>
+</head>
+<body>
+    <!-- Thêm nút quay về -->
+    <a href="index.php" class="back-button">← Quay về trang chủ</a>
+
     <div class="login-container">
         <h2>Đăng nhập vào hệ thống</h2>
         <form id="loginForm" method="POST">
