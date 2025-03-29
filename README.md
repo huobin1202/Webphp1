@@ -5,7 +5,6 @@
 **Admin:**
 - Tìm kiếm khách hàng
 - Quản lý đơn hàng:
-Tình trạng đơn hàng: đã giao( thành công/ hủy đơn),
 
 Lọc đơn hàng: tình trạng, khoảng thời gian giao (day->day)/ theo đ/c (vd: quận, huyện),
 
