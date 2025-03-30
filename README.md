@@ -28,4 +28,4 @@
 - Giao diện không quá xấu (-1)
 - Các nhãn hiệu quá nhỏ (tùy giáo viên chấm) (-1)
   
-**muốn ăn lẩu**
+**t muốn ăn lẩu**
