@@ -71,17 +71,18 @@ $result = $conn->query($query);
 
 // Tính toán tổng thống kê chỉ cho các khách hàng được hiển thị
 $total_customers = 0;
-$total_quantity = 0;
+$total_orders = 0;  // Đếm tổng số đơn hàng
 $total_revenue = 0;
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $total_customers++;
-        $total_quantity += $row['total_quantity'] ?? 0;
+        $total_orders += $row['total_orders'] ?? 0;  // Đếm tổng số đơn hàng
         $total_revenue += $row['total_revenue'] ?? 0;
     }
     $result->data_seek(0); // Reset con trỏ kết quả
 }
+
 
 // Phần xử lý chi tiết khách hàng khi click vào nút chi tiết
 if (isset($_GET['detail'])) {
@@ -105,7 +106,10 @@ if (isset($_GET['detail'])) {
     $stmt->execute();
     $customer_details = $stmt->get_result();
 }
+// Tính toán tổng thống kê chỉ cho các khách hàng được hiển thị
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -267,14 +271,15 @@ if (isset($_GET['detail'])) {
                         </div>
                     </div>
                     <div class="order-statistical-item">
-                        <div class="order-statistical-item-content">
-                            <p class="order-statistical-item-content-desc">Tổng số đơn hàng</p>
-                            <h4 class="order-statistical-item-content-h" id="quantity-order"><?php echo $total_quantity; ?></h4>
-                        </div>
-                        <div class="order-statistical-item-icon">
-                            <i class="fa-light fa-file-lines"></i>
-                        </div>
-                    </div>
+    <div class="order-statistical-item-content">
+        <p class="order-statistical-item-content-desc">Tổng số đơn hàng</p>
+        <h4 class="order-statistical-item-content-h" id="quantity-order"><?php echo $total_orders; ?></h4>
+    </div>
+    <div class="order-statistical-item-icon">
+        <i class="fa-light fa-file-lines"></i>
+    </div>
+</div>
+
                     <div class="order-statistical-item">
                         <div class="order-statistical-item-content">
                             <p class="order-statistical-item-content-desc">Tổng doanh thu</p>
@@ -377,19 +382,8 @@ if (isset($_GET['detail'])) {
     </div>
     <?php endif; ?>
 
-    <script>
-        // Chỉ giữ lại code cho đóng modal khi click bên ngoài
-        window.onclick = function(event) {
-            const modal = document.querySelector('.modal.detail-modal');
-            if (event.target == modal) {
-                window.location.href = '?' + new URLSearchParams(
-                    Object.fromEntries(
-                        Object.entries(Object.fromEntries(new URLSearchParams(window.location.search)))
-                        .filter(([key]) => key !== 'detail')
-                    )
-                ).toString();
-            }
-        }
-    </script>
+    <script src="../assets/js/admin.js"></script>
+      
+
 </body>
 </html> 

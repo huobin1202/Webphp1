@@ -342,18 +342,7 @@ $result = $stmt->get_result();
         </div>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const modalClose = document.querySelector('.modal-close');
-            const modal = document.querySelector('.modal');
-            
-            if (modalClose) {
-                modalClose.addEventListener('click', () => {
-                    modal.classList.remove('open');
-                });
-            }
-        });
-    </script>
+
     <script src="../assets/js/admin.js"></script>
 </body>
 

@@ -342,17 +342,7 @@ $sql .= " ORDER BY id DESC";
         </main>
     </div>
     <script src="../assets/js/admin.js"></script>
-    <script>
-        function previewImage(input, previewId) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById(previewId).src = e.target.result;
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-    </script>
+
 
     <!-- Modal thêm mới sản phẩm -->
     <div class="modal add-product <?php echo isset($_GET['add']) ? 'open' : ''; ?>">
