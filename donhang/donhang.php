@@ -157,12 +157,12 @@ $conn->close();
                 <div class="admin-control">
                     <div class="admin-control-left">
                         <select name="tinh-trang" id="tinh-trang">
-                        <option value="4">Tất cả</option>
-                        <option value="0">Chưa xử lý</option>
-                        <option value="1">Đã xử lý</option>
-                        <option value="2">Chưa giao</option>
-                        <option value="3">Đã giao</option>
-            
+                            <option value="4">Tất cả</option>
+                            <option value="0">Chưa xử lý</option>
+                            <option value="1">Đã xử lý</option>
+                            <option value="2">Chưa giao</option>
+                            <option value="3">Đã giao</option>
+
                         </select>
                     </div>
                     <div class="admin-control-center">
@@ -173,18 +173,20 @@ $conn->close();
                         </form>
                     </div>
                     <div class="admin-control-right">
-                        <form action="" class="fillter-date">
+                        <form action="" method="GET" class="fillter-date">
                             <div>
                                 <label for="time-start">Từ</label>
-                                <input type="date" class="form-control-date" id="time-start">
+                                <input type="date" class="form-control-date" id="time-start-tk" name="start_date"
+                                    value="<?php echo $start_date; ?>">
                             </div>
                             <div>
                                 <label for="time-end">Đến</label>
-                                <input type="date" class="form-control-date" id="time-end">
+                                <input type="date" class="form-control-date" id="time-end-tk" name="end_date"
+                                    value="<?php echo $end_date; ?>">
                             </div>
+                            <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
+                            <button><a href="donhang.php" class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></a></button>
                         </form>
-                        <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
-                        <button class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></button>
                     </div>
                 </div>
                 <div class="table">
@@ -208,7 +210,7 @@ $conn->close();
                                 $createdDate = date('d/m/Y', strtotime($order['created_at']));
                                 $total = number_format($order['total'], 0, ',', '.') . 'đ';
                                 $statusText = '';
-                                switch($order['status']) {
+                                switch ($order['status']) {
                                     case 'chuaxuly':
                                         $statusText = '<span class="status-no-complete">Chưa xử lý</span>';
                                         break;
@@ -322,11 +324,128 @@ $conn->close();
                             <span class="price"></span>
                         </div>
                     </div>
-            
+
                 </div>
             </div>
         </div>
         <script src="../assets/js/admin.js"></script>
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("form-search-order");
+            const statusFilter = document.getElementById("tinh-trang");
+            const startDate = document.getElementById('time-start-tk');
+            const endDate = document.getElementById('time-end-tk');
+            const tableRows = document.querySelectorAll("#showOrder tr");
+            
+            function normalizeString(str) {
+                return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            }
+
+            function isDateInRange(dateStr, startDate, endDate) {
+                if (!startDate && !endDate) return true;
+                
+                // Chuyển đổi định dạng ngày từ dd/mm/yyyy sang yyyy-mm-dd
+                const [day, month, year] = dateStr.split('/');
+                const date = new Date(year, month - 1, day);
+                
+                const start = startDate ? new Date(startDate) : null;
+                const end = endDate ? new Date(endDate) : null;
+                
+                if (start && end) {
+                    return date >= start && date <= end;
+                } else if (start) {
+                    return date >= start;
+                } else if (end) {
+                    return date <= end;
+                }
+                return true;
+            }
+
+            function filterTable() {
+                const searchTerm = normalizeString(searchInput.value);
+                const selectedStatus = statusFilter.value;
+                const startValue = startDate.value;
+                const endValue = endDate.value;
+                let hasVisibleRows = false;
+
+                tableRows.forEach(row => {
+                    const cells = row.querySelectorAll("td");
+                    if (cells.length === 0) return; // Bỏ qua hàng không có ô
+
+                    const orderId = cells[0].textContent.toLowerCase().trim();
+                    const customerId = cells[1].textContent.toLowerCase().trim();
+                    const customerName = cells[2].textContent.toLowerCase().trim();
+                    const orderDate = cells[3].textContent.trim();
+                    const statusSelect = cells[5].querySelector('select');
+                    const currentStatus = statusSelect ? statusSelect.value : '';
+
+                    // Kiểm tra điều kiện tìm kiếm
+                    const matchesSearch = orderId.includes(searchTerm) ||
+                        customerId.includes(searchTerm) ||
+                        customerName.includes(searchTerm);
+
+                    // Kiểm tra trạng thái
+                    let matchesStatus = true;
+                    if (selectedStatus !== "4") {
+                        switch(selectedStatus) {
+                            case "0": matchesStatus = currentStatus === "chuaxuly"; break;
+                            case "1": matchesStatus = currentStatus === "daxuly"; break;
+                            case "2": matchesStatus = currentStatus === "chuagiao"; break;
+                            case "3": matchesStatus = currentStatus === "dagiao"; break;
+                        }
+                    }
+
+                    // Kiểm tra ngày tháng
+                    const matchesDate = isDateInRange(orderDate, startValue, endValue);
+
+                    // Hiển thị/Ẩn dòng dựa trên điều kiện phù hợp
+                    const isVisible = matchesSearch && matchesStatus && matchesDate;
+                    row.style.display = isVisible ? '' : 'none';
+                    
+                    if (isVisible) {
+                        hasVisibleRows = true;
+                    }
+                });
+
+                // Hiển thị thông báo nếu không có kết quả
+                const noResultsRow = document.querySelector('.no-results');
+                if (!hasVisibleRows) {
+                    if (!noResultsRow) {
+                        const tbody = document.getElementById('showOrder');
+                        const newRow = document.createElement('tr');
+                        newRow.className = 'no-results';
+                        newRow.innerHTML = '<td colspan="7" class="no-products">Không tìm thấy đơn hàng nào!</td>';
+                        tbody.appendChild(newRow);
+                    }
+                } else if (noResultsRow) {
+                    noResultsRow.remove();
+                }
+            }
+
+            // Gắn sự kiện cho các elements
+            if (searchInput) {
+                searchInput.addEventListener("input", filterTable);
+            }
+            if (statusFilter) {
+                statusFilter.addEventListener("change", filterTable);
+            }
+            if (startDate) {
+                startDate.addEventListener("change", filterTable);
+            }
+            if (endDate) {
+                endDate.addEventListener("change", filterTable);
+            }
+
+            // Hàm reset bộ lọc
+            window.resetSearch = function() {
+                searchInput.value = '';
+                statusFilter.value = '4';
+                startDate.value = '';
+                endDate.value = '';
+                filterTable();
+            }
+        });
+        </script>
     </div>
 
 </body>

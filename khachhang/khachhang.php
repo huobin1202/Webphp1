@@ -19,6 +19,7 @@ include('../toast.php');
     <link rel="stylesheet" href="../assets/css/admin-responsive.css">
     <title>Quản lý cửa hàng</title>
 </head>
+
 <body>
     <header class="header">
         <button class="menu-icon-btn">
@@ -73,7 +74,7 @@ include('../toast.php');
                             <div class="hidden-sidebar">Thống kê khách hàng</div>
                         </a>
                     </li>
-                    
+
                     <div class="spacer" style="height:50px;width:1px"></div>
                     <li class="sidebar-list-item user-logout" style="border-top: 2px solid rgba(0,0,0,0.12);">
                         <a href="#" class="sidebar-link">
@@ -91,11 +92,11 @@ include('../toast.php');
                     </li>
                 </ul>
             </div>
-         
+
         </aside>
         <main class="content">
-            
-            
+
+
             <!-- Account  -->
             <div class="section">
                 <div class="admin-control">
@@ -114,23 +115,22 @@ include('../toast.php');
                         </div>
                     </div>
                     <div class="admin-control-right">
-                        <form action="" class="fillter-date">
+                        <form action="" method="GET" class="fillter-date">
                             <div>
                                 <label for="time-start">Từ</label>
-                                <input type="date" class="form-control-date" id="time-start-user" value="">
+                                <input type="date" class="form-control-date" id="time-start-user" name="start_date"
+                                    value="<?php echo $start_date; ?>">
                             </div>
                             <div>
                                 <label for="time-end">Đến</label>
-                                <input type="date" class="form-control-date" id="time-end-user" value="">
+                                <input type="date" class="form-control-date" id="time-end-user" name="end_date"
+                                    value="<?php echo $end_date; ?>">
                             </div>
+                            <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
+                            <button><a href="khachhang.php" class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></a></button>
                         </form>
-                        <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
-
-                        <button class="btn-reset-order" ><i
-                                class="fa-light fa-arrow-rotate-right"></i></button>
-
-                        <a href="newkhachhang.php"><button id="btn-add-user" class="btn-control-large" ><i
-                                class="fa-light fa-plus"></i> <span>Thêm khách hàng</span></button></a>
+                        <a href="newkhachhang.php"><button id="btn-add-user" class="btn-control-large"><i
+                                    class="fa-light fa-plus"></i> <span>Thêm khách hàng</span></button></a>
                     </div>
                 </div>
                 <div class="table">
@@ -146,23 +146,23 @@ include('../toast.php');
                             </tr>
                         </thead>
                         <tbody id="show-user">
-                            <?php 
+                            <?php
                             include('../database.php');
 
                             $sql = "SELECT id, name, contact, joindate, status FROM customer";
                             $result = $conn->query($sql);
 
                             if ($result->num_rows > 0) {
-                                while($row = $result->fetch_assoc()) {
+                                while ($row = $result->fetch_assoc()) {
                                     echo "<tr>";
-                                    echo "<td>".$row["id"]."</td>";
-                                    echo "<td>".$row["name"]."</td>";
-                                    echo "<td>".$row["contact"]."</td>";
-                                    echo "<td>".$row["joindate"]."</td>";
-                                    echo "<td><span class='status-".($row["status"]==1?"complete":"no-complete")."'>".
-                                         ($row["status"]==1?"Hoạt động":"Bị khóa")."</span></td>";
+                                    echo "<td>" . $row["id"] . "</td>";
+                                    echo "<td>" . $row["name"] . "</td>";
+                                    echo "<td>" . $row["contact"] . "</td>";
+                                    echo "<td>" . $row["joindate"] . "</td>";
+                                    echo "<td><span class='status-" . ($row["status"] == 1 ? "complete" : "no-complete") . "'>" .
+                                        ($row["status"] == 1 ? "Hoạt động" : "Bị khóa") . "</span></td>";
                                     echo "<td class='control control-table'>";
-                                    echo "<a href='changekhachhang.php?id=".$row["id"]."'><button class='btn-edit' id='edit-account'>";
+                                    echo "<a href='changekhachhang.php?id=" . $row["id"] . "'><button class='btn-edit' id='edit-account'>";
                                     echo "<i class='fa-light fa-pen-to-square'></i></button></a>";
                                     echo "</td>";
                                     echo "</tr>";
@@ -176,77 +176,105 @@ include('../toast.php');
                     </table>
                 </div>
             </div>
-            
+
         </main>
     </div>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('form-search-user');
-        const statusSelect = document.getElementById('tinh-trang-user');
-        const tableRows = document.querySelectorAll('#show-user tr:not(.no-results)');
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('form-search-user');
+            const statusSelect = document.getElementById('tinh-trang-user');
+            const startDate = document.getElementById('time-start-user');
+            const endDate = document.getElementById('time-end-user');
+            const tableRows = document.querySelectorAll('#show-user tr:not(.no-results)');
 
-        function filterTable() {
-            const searchValue = searchInput.value.toLowerCase();
-            const statusValue = statusSelect.value;
-            let hasVisibleRows = false;
+            function filterTable() {
+                const searchValue = searchInput.value.toLowerCase();
+                const statusValue = statusSelect.value;
+                const startValue = startDate.value;
+                const endValue = endDate.value;
+                let hasVisibleRows = false;
 
-            // Xóa thông báo không tìm thấy cũ nếu có
-            const existingNoResults = document.querySelector('.no-results');
-            if (existingNoResults) {
-                existingNoResults.remove();
-            }
-
-            tableRows.forEach(row => {
-                const id = row.cells[0]?.textContent.toLowerCase() || '';
-                const name = row.cells[1]?.textContent.toLowerCase() || '';
-                const contact = row.cells[2]?.textContent.toLowerCase() || '';
-                const status = row.querySelector('.status-complete') ? '1' : '0';
-
-                // Kiểm tra điều kiện tìm kiếm
-                const matchesSearch = !searchValue || 
-                    id.includes(searchValue) || 
-                    name.includes(searchValue) || 
-                    contact.includes(searchValue);
-
-                // Kiểm tra điều kiện trạng thái
-                const matchesStatus = statusValue === '2' || status === statusValue;
-
-                // Hiển thị hoặc ẩn dòng dựa trên kết quả
-                const isVisible = matchesSearch && matchesStatus;
-                row.style.display = isVisible ? '' : 'none';
-                
-                if (isVisible) {
-                    hasVisibleRows = true;
+                // Xóa thông báo không tìm thấy cũ
+                const existingNoResults = document.querySelector('.no-results');
+                if (existingNoResults) {
+                    existingNoResults.remove();
                 }
-            });
 
-            // Thêm thông báo không tìm thấy nếu không có dòng nào hiển thị
-            if (!hasVisibleRows) {
-                const tbody = document.getElementById('show-user');
-                const newRow = document.createElement('tr');
-                newRow.className = 'no-results';
-                newRow.innerHTML = '<td colspan="6" class="no-products">Không tìm thấy khách hàng nào!</td>';
-                tbody.appendChild(newRow);
+                tableRows.forEach(row => {
+                    const id = row.cells[0]?.textContent.toLowerCase() || '';
+                    const name = row.cells[1]?.textContent.toLowerCase() || '';
+                    const contact = row.cells[2]?.textContent.toLowerCase() || '';
+                    const joinDate = row.cells[3]?.textContent || '';
+                    const status = row.querySelector('.status-complete') ? '1' : '0';
+
+                    // Kiểm tra điều kiện tìm kiếm
+                    const matchesSearch = !searchValue || 
+                        id.includes(searchValue) || 
+                        name.includes(searchValue) || 
+                        contact.includes(searchValue);
+
+                    // Kiểm tra điều kiện trạng thái
+                    const matchesStatus = statusValue === '2' || status === statusValue;
+
+                    // Kiểm tra điều kiện ngày tháng
+                    let matchesDate = true;
+                    if (startValue || endValue) {
+                        const rowDate = new Date(joinDate);
+                        if (startValue && endValue) {
+                            matchesDate = rowDate >= new Date(startValue) && rowDate <= new Date(endValue);
+                        } else if (startValue) {
+                            matchesDate = rowDate >= new Date(startValue);
+                        } else if (endValue) {
+                            matchesDate = rowDate <= new Date(endValue);
+                        }
+                    }
+
+                    // Hiển thị hoặc ẩn dòng dựa trên tất cả điều kiện
+                    const isVisible = matchesSearch && matchesStatus && matchesDate;
+                    row.style.display = isVisible ? '' : 'none';
+                    
+                    if (isVisible) {
+                        hasVisibleRows = true;
+                    }
+                });
+
+                // Thêm thông báo không tìm thấy nếu không có dòng nào hiển thị
+                if (!hasVisibleRows) {
+                    const tbody = document.getElementById('show-user');
+                    const newRow = document.createElement('tr');
+                    newRow.className = 'no-results';
+                    newRow.innerHTML = '<td colspan="6" class="no-products">Không tìm thấy khách hàng nào!</td>';
+                    tbody.appendChild(newRow);
+                }
             }
-        }
 
-        // Thêm sự kiện lắng nghe cho input tìm kiếm
-        if (searchInput) {
-            searchInput.addEventListener('input', filterTable);
-        }
+            // Thêm sự kiện lắng nghe cho input tìm kiếm
+            if (searchInput) {
+                searchInput.addEventListener('input', filterTable);
+            }
 
-        // Thêm sự kiện lắng nghe cho select trạng thái
-        if (statusSelect) {
-            statusSelect.addEventListener('change', filterTable);
-        }
+            // Thêm sự kiện lắng nghe cho select trạng thái
+            if (statusSelect) {
+                statusSelect.addEventListener('change', filterTable);
+            }
 
-        // Hàm reset tìm kiếm
-        window.resetSearch = function() {
-            searchInput.value = '';
-            statusSelect.value = '2';
-            filterTable();
-        }
-    });
+            // Thêm sự kiện lắng nghe cho input ngày
+            if (startDate) {
+                startDate.addEventListener('change', filterTable);
+            }
+            if (endDate) {
+                endDate.addEventListener('change', filterTable);
+            }
+
+            // Hàm reset tìm kiếm
+            window.resetSearch = function() {
+                searchInput.value = '';
+                statusSelect.value = '2';
+                startDate.value = '';
+                endDate.value = '';
+                filterTable();
+            }
+        });
     </script>
     <script src="../assets/js/admin.js"></script>
 </body>
