@@ -215,7 +215,7 @@ if ($username && !$customer_id) {
         <div class="container">
             <ul class="menu-list">
                 <li class="menu-list-item"><a href="index.php" class="menu-link">Trang chủ</a></li>
-
+                                                        
                 <div class="dropdown">
                     <span>Sản phẩm</span>
                     <div class="dropdown-content">

@@ -86,12 +86,111 @@ if ($result->num_rows > 0) {
     .preview {
         flex: 1;
         padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
-    .preview img {
-        width: 50%;
+    .main-image {
+        width: 100%;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .zoom-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        z-index: 10;
+    }
+
+    .zoom-btn {
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        transition: all 0.3s ease;
+    }
+
+    .zoom-btn:hover {
+        background: #139b3a;
+        color: white;
+        border-color: #139b3a;
+    }
+
+    .main-image img {
+        width: 100%;
+        max-height: 400px;
+        object-fit: contain;
         border-radius: 8px;
+        transition: transform 0.3s ease;
+        transform-origin: center center;
+    }
+
+    .thumbnail-section {
+        width: 100%;
+        margin-top: 20px;
+        border-top: 1px dashed #ccc;
+        padding-top: 20px;
+    }
+
+    .thumbnail-title {
+        text-align: center;
+        font-size: 14px;
+        color: #76767c;
+        margin-bottom: 15px;
+        font-weight: 500;
+        position: relative;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .thumbnail-title:before,
+    .thumbnail-title:after {
+        content: "―";
+        display: inline-block;
+        position: relative;
+        top: -3px;
+        padding: 0 10px;
+        color: #76767c;
+    }
+
+    .thumbnail-images {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .thumb {
+        width: 120px;
+        height: 80px;
         object-fit: cover;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        padding: 3px;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .thumb:hover {
+        border-color: #139b3a;
+    }
+
+    .thumb.active {
+        border-color: #139b3a;
+        border-width: 2px;
     }
 
     .details {
@@ -276,6 +375,14 @@ if ($result->num_rows > 0) {
             width: 100%;
         }
 
+        .main-image img {
+            max-height: 300px;
+        }
+        
+        .thumb {
+            width: 80px;
+            height: 60px;
+        }
     }
 </style>
 
@@ -430,9 +537,25 @@ if ($result->num_rows > 0) {
                     <form name="frmsanphamchitiet11" id="frmsanphamchitiet11" method="POST">
                         <div class="wrapper row">
                             <div class="preview col-md-6">
-                                <img src="sanpham/<?php echo $row['hinhanh']; ?>" alt="<?php echo $row['tensp']; ?>">
-                                <img src="sanpham/<?php echo $row['hinhanh2']; ?>" alt="">
-                                <img src="sanpham/<?php echo $row['hinhanh3']; ?>" alt="">
+                                <div class="main-image">
+                                    <div class="zoom-controls">
+                                        <button type="button" onclick="zoomIn()" class="zoom-btn">
+                                            <i class="fa-light fa-plus"></i>
+                                        </button>
+                                        <button type="button" onclick="zoomOut()" class="zoom-btn">
+                                            <i class="fa-light fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    <img id="mainImage" src="sanpham/<?php echo $row['hinhanh']; ?>" alt="<?php echo $row['tensp']; ?>">
+                                </div>
+                                <div class="thumbnail-section">
+                                    <p class="thumbnail-title">CHỌN GÓC NHÌN</p>
+                                    <div class="thumbnail-images">
+                                        <img class="thumb active" src="sanpham/<?php echo $row['hinhanh']; ?>" alt="<?php echo $row['tensp']; ?>" onclick="changeImage(this)">
+                                        <img class="thumb" src="sanpham/<?php echo $row['hinhanh2']; ?>" alt="<?php echo $row['tensp']; ?>" onclick="changeImage(this)">
+                                        <img class="thumb" src="sanpham/<?php echo $row['hinhanh3']; ?>" alt="<?php echo $row['tensp']; ?>" onclick="changeImage(this)">
+                                    </div>
+                                </div>
                             </div>
                             <div class="details col-md-6">
                                 <h3><?php echo $row["tensp"]; ?></h3>
@@ -580,6 +703,46 @@ if ($result->num_rows > 0) {
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
+    <script>
+    function changeImage(element) {
+        // Cập nhật ảnh chính
+        document.getElementById('mainImage').src = element.src;
+        
+        // Xóa class active từ tất cả thumbnails
+        document.querySelectorAll('.thumb').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        
+        // Thêm class active vào thumbnail được chọn
+        element.classList.add('active');
+    }
+    </script>
+
+    <script>
+    let currentZoom = 1;
+    const ZOOM_STEP = 0.1;
+    const MAX_ZOOM = 1.5;
+    const MIN_ZOOM = 1;
+
+    function zoomIn() {
+        if (currentZoom < MAX_ZOOM) {
+            currentZoom = Math.min(currentZoom + ZOOM_STEP, MAX_ZOOM);
+            updateZoom();
+        }
+    }
+
+    function zoomOut() {
+        if (currentZoom > MIN_ZOOM) {
+            currentZoom = Math.max(currentZoom - ZOOM_STEP, MIN_ZOOM);
+            updateZoom();
+        }
+    }
+
+    function updateZoom() {
+        const mainImage = document.getElementById('mainImage');
+        mainImage.style.transform = `scale(${currentZoom})`;
+    }
+    </script>
 
 
 
