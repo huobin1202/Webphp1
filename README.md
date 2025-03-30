@@ -1,5 +1,5 @@
 **1. Các chức năng cho người dùng cuối (end-user) - 5.0 điểm**
-- Hiển thị sản phẩm theo phân loại (0.5)
+X Hiển thị sản phẩm theo phân loại (0.5)
 - Hiển thị chi tiết sản phẩm (0.5)
 - Tìm kiếm cơ bản theo tên sản phẩm (tìm tương đối) (0.25)
 - Tìm kiếm nâng cao (kết hợp nhiều điều kiện cùng 1 lần tìm kiếm): theo tên sản phẩm, có chọn phân loại và khoảng giá (0.5)
