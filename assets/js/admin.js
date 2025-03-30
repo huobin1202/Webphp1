@@ -59,57 +59,6 @@ menuIconButton.addEventListener("click", () => {
     localStorage.setItem("sidebarOpen", isCurrentlyOpen); // Lưu trạng thái vào LocalStorage
 });
 
-// Sản phẩm
-function filterProducts() {
-    // Lấy giá trị từ ô tìm kiếm và danh mục lọc
-    const searchInput = document.getElementById('form-search-product').value.toLowerCase().trim();
-    const selectedCategory = document.getElementById('the-loai').value;
-
-    // Lấy danh sách sản phẩm
-    const productItems = document.querySelectorAll('.list');
-
-    productItems.forEach(product => {
-        // Lấy thông tin sản phẩm: tên xe và danh mục
-        const productName = product.querySelector('.list-info h4')?.innerText.toLowerCase().trim();
-        const productCategory = product.querySelector('.list-category')?.innerText.trim();
-
-        // Kiểm tra điều kiện tìm kiếm và lọc
-        const matchesSearch = !searchInput || productName.includes(searchInput);
-        const matchesCategory = selectedCategory === 'Tất cả' || productCategory === selectedCategory;
-
-        // Hiển thị sản phẩm nếu cả hai điều kiện đều đúng
-        product.style.display = (matchesSearch && matchesCategory) ? 'flex' : 'none';
-    });
-}
-
-// Đặt lại tìm kiếm và lọc
-function resetProductFilter() {
-    document.getElementById('form-search-product').value = ''; // Xóa nội dung tìm kiếm
-    document.getElementById('the-loai').value = 'Tất cả'; // Đặt danh mục về 'Tất cả'
-    filterProducts(); // Hiển thị lại tất cả sản phẩm
-}
-
-// Gắn sự kiện cho các phần tử liên quan
-document.addEventListener('DOMContentLoaded', () => {
-    // Tìm kiếm khi nhập vào ô tìm kiếm
-    const searchInput = document.getElementById('form-search-product');
-    if (searchInput) {
-        searchInput.addEventListener('input', filterProducts);
-    }
-
-    // Lọc khi thay đổi danh mục
-    const categoryFilter = document.getElementById('the-loai');
-    if (categoryFilter) {
-        categoryFilter.addEventListener('change', filterProducts);
-    }
-
-    // Đặt lại khi nhấn nút reset
-    const resetButton = document.querySelector('.btn-control-large');
-    if (resetButton) {
-        resetButton.addEventListener('click', resetProductFilter);
-    }
-});
-
 // Đơn hàng
 document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("form-search-order");
@@ -440,6 +389,18 @@ document.addEventListener("DOMContentLoaded", function() {
     // Thêm sự kiện cho select trạng thái
     if (statusFilter) {
         statusFilter.addEventListener("change", updateSearch);
+    }
+});
+
+// Chỉ giữ lại code cho modal
+document.addEventListener("DOMContentLoaded", () => {
+    const modalClose = document.querySelector('.modal-close');
+    const modal = document.querySelector('.modal');
+    
+    if (modalClose) {
+        modalClose.addEventListener('click', () => {
+            modal.classList.remove('open');
+        });
     }
 });
 
