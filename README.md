@@ -3,8 +3,7 @@
 - Hiển thị hóa đơn ( sau khi thanh toán xong)
 
 **Admin:**
-- Tìm kiếm khách hàng
-- Quản lý đơn hàng:
+- Quản lý đơn hàng: 
 
 Lọc đơn hàng: khoảng thời gian giao (day->day)/ theo đ/c (vd: quận, huyện),
 
