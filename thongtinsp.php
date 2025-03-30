@@ -366,7 +366,7 @@ if ($result->num_rows > 0) {
                                                 <a href="hoadon.php">
                                                     <div class="hd"><i class="fa-regular fa-bags-shopping" style="font-size:20px"> </i> Đơn hàng đã mua</div>
                                                 </a>
-                                               
+
                                                 <a href="index.php?logout=1" onclick="return confirm('Bạn có muốn đăng xuất?')">
                                                     <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i> Đăng xuất</div>
                                                 </a>
@@ -431,8 +431,8 @@ if ($result->num_rows > 0) {
                         <div class="wrapper row">
                             <div class="preview col-md-6">
                                 <img src="sanpham/<?php echo $row['hinhanh']; ?>" alt="<?php echo $row['tensp']; ?>">
-                                <img src="sanpham/<?php echo $row['hinhanh2']; ?>" alt="<?php echo $row['tensp']; ?>">
-                                <img src="sanpham/<?php echo $row['hinhanh3']; ?>" alt="<?php echo $row['tensp']; ?>">
+                                <img src="sanpham/<?php echo $row['hinhanh2']; ?>" alt="">
+                                <img src="sanpham/<?php echo $row['hinhanh3']; ?>" alt="">
                             </div>
                             <div class="details col-md-6">
                                 <h3><?php echo $row["tensp"]; ?></h3>
@@ -459,44 +459,44 @@ if ($result->num_rows > 0) {
                                 <!-- <div>Đóng</div> -->
                                 <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
                                 <form action="" method="POST">
-                                <?php
-if (isset($_POST['add_to_cart'])) {
-    if (!$customer_id) {
-        die("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
-    }
+                                    <?php
+                                    if (isset($_POST['add_to_cart'])) {
+                                        if (!$customer_id) {
+                                            die("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
+                                        }
 
-    $product_id = $_POST['product_id'];
-    $product_price = $_POST['product_price'];
-    $product_img = $_POST['product_img'];
-    $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
+                                        $product_id = $_POST['product_id'];
+                                        $product_price = $_POST['product_price'];
+                                        $product_img = $_POST['product_img'];
+                                        $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
 
-    // Kiểm tra sản phẩm đã tồn tại chưa
-    $stmt = $conn->prepare("SELECT soluong FROM giohang WHERE product_id = ? AND customer_id = ?");
-    $stmt->bind_param("ii", $product_id, $customer_id);
-    $stmt->execute();
-    $stmt->store_result();
+                                        // Kiểm tra sản phẩm đã tồn tại chưa
+                                        $stmt = $conn->prepare("SELECT soluong FROM giohang WHERE product_id = ? AND customer_id = ?");
+                                        $stmt->bind_param("ii", $product_id, $customer_id);
+                                        $stmt->execute();
+                                        $stmt->store_result();
 
-    if ($stmt->num_rows > 0) {
-        // Sản phẩm đã tồn tại, cập nhật số lượng
-        $stmt->bind_result($current_quantity);
-        $stmt->fetch();
-        $new_quantity = $current_quantity + $quantity;
-        $stmt->close();
+                                        if ($stmt->num_rows > 0) {
+                                            // Sản phẩm đã tồn tại, cập nhật số lượng
+                                            $stmt->bind_result($current_quantity);
+                                            $stmt->fetch();
+                                            $new_quantity = $current_quantity + $quantity;
+                                            $stmt->close();
 
-        $update_stmt = $conn->prepare("UPDATE giohang SET soluong = ? WHERE product_id = ? AND customer_id = ?");
-        $update_stmt->bind_param("iii", $new_quantity, $product_id, $customer_id);
-        $update_stmt->execute();
-        $update_stmt->close();
-    } else {
-        // Sản phẩm chưa có, thêm mới
-        $stmt->close();
-        $stmt = $conn->prepare("INSERT INTO giohang (customer_id, product_id, soluong, price, img) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("iiiss", $customer_id, $product_id, $quantity, $product_price, $product_img);
-        $stmt->execute();
-        $stmt->close();
-    }
-}
-?>
+                                            $update_stmt = $conn->prepare("UPDATE giohang SET soluong = ? WHERE product_id = ? AND customer_id = ?");
+                                            $update_stmt->bind_param("iii", $new_quantity, $product_id, $customer_id);
+                                            $update_stmt->execute();
+                                            $update_stmt->close();
+                                        } else {
+                                            // Sản phẩm chưa có, thêm mới
+                                            $stmt->close();
+                                            $stmt = $conn->prepare("INSERT INTO giohang (customer_id, product_id, soluong, price, img) VALUES (?, ?, ?, ?, ?)");
+                                            $stmt->bind_param("iiiss", $customer_id, $product_id, $quantity, $product_price, $product_img);
+                                            $stmt->execute();
+                                            $stmt->close();
+                                        }
+                                    }
+                                    ?>
 
 
                                     <table>

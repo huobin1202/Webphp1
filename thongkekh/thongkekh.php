@@ -22,10 +22,7 @@ $search_term = isset($_GET['search']) ? trim($_GET['search']) : '';
 $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
 $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 $sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'desc';
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 5; // Mặc định hiển thị top 5
-
-// Thêm biến cho trạng thái
-$status = isset($_GET['status']) ? $_GET['status'] : 'all';
+$limit = isset($_GET['limit']) ? ($_GET['limit'] === 'all' ? null : (int)$_GET['limit']) : 5; // Mặc định hiển thị top 5
 
 // Validate date range
 if ($start_date && $end_date && $start_date > $end_date) {
@@ -63,8 +60,11 @@ if (!empty($end_date)) {
 // Group by và having để lọc ra khách hàng có doanh thu
 $query .= " GROUP BY c.id, c.name
 HAVING total_revenue > 0
-ORDER BY total_revenue " . ($sort_order === 'asc' ? 'ASC' : 'DESC') . "
-LIMIT " . $limit;
+ORDER BY total_revenue " . ($sort_order === 'asc' ? 'ASC' : 'DESC');
+
+if ($limit !== null) {
+    $query .= " LIMIT " . $limit;
+}
 
 // Thực thi truy vấn
 $result = $conn->query($query);
@@ -97,12 +97,34 @@ if (isset($_GET['detail'])) {
     FROM orders o
     LEFT JOIN order_details od ON o.id = od.order_id
     LEFT JOIN products p ON od.product_id = p.id
-    WHERE o.customer_id = ?
-    GROUP BY o.id
-    ORDER BY o.created_at DESC";
+    WHERE o.customer_id = ?";
+
+    // Thêm điều kiện lọc theo ngày
+    if (!empty($start_date)) {
+        $detail_query .= " AND DATE(o.created_at) >= ?";
+    }
+    if (!empty($end_date)) {
+        $detail_query .= " AND DATE(o.created_at) <= ?";
+    }
+
+    $detail_query .= " GROUP BY o.id ORDER BY o.created_at DESC";
     
     $stmt = $conn->prepare($detail_query);
-    $stmt->bind_param("i", $customer_id);
+
+    // Xử lý bind_param động dựa trên số lượng điều kiện
+    $types = "i"; // Bắt đầu với customer_id
+    $params = [$customer_id];
+    
+    if (!empty($start_date)) {
+        $types .= "s";
+        $params[] = $start_date;
+    }
+    if (!empty($end_date)) {
+        $types .= "s";
+        $params[] = $end_date;
+    }
+
+    $stmt->bind_param($types, ...$params);
     $stmt->execute();
     $customer_details = $stmt->get_result();
 }
@@ -198,12 +220,12 @@ if (isset($_GET['detail'])) {
             <div class="section">
                 <div class="admin-control">
                     <div class="admin-control-left">
-                        <form action="" method="GET">
+                        <form action="" method="GET" style="display: inline-block;">
                             <select name="limit" onchange="this.form.submit()" class="form-control">
-                                <option value="5" <?php echo $limit === 5 ? 'selected' : ''; ?>>Top 5 khách hàng</option>
-                                <option value="10" <?php echo $limit === 10 ? 'selected' : ''; ?>>Top 10 khách hàng</option>
+                                <option value="all" <?php echo !isset($_GET['limit']) || $_GET['limit'] === 'all' ? 'selected' : ''; ?>>Tất cả khách hàng</option>
+                                <option value="5" <?php echo isset($_GET['limit']) && $_GET['limit'] === '5' ? 'selected' : ''; ?>>Top 5 khách hàng</option>
+                                <option value="10" <?php echo isset($_GET['limit']) && $_GET['limit'] === '10' ? 'selected' : ''; ?>>Top 10 khách hàng</option>
                             </select>
-                            <!-- Giữ lại các tham số tìm kiếm khác -->
                             <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_term); ?>">
                             <input type="hidden" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
                             <input type="hidden" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>">

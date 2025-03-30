@@ -17,26 +17,20 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get date range from request
-$start_date = isset($_GET['start_date']) && $_GET['start_date'] !== '' ? $_GET['start_date'] : '';
-$end_date = isset($_GET['end_date']) && $_GET['end_date'] !== '' ? $_GET['end_date'] : '';
-
-// Validate date range
-if ($start_date && $end_date && $start_date > $end_date) {
-    $temp = $start_date;
-    $start_date = $end_date;
-    $end_date = $temp;
-}
-
-// Get search term
-$search_term = isset($_GET['search']) ? $_GET['search'] : '';
+// Lấy các tham số từ URL
+$search_term = isset($_GET['search']) ? trim($_GET['search']) : '';
+$start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
+$end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
+$detail_id = isset($_GET['detail']) ? (int)$_GET['detail'] : 0;
+$limit = isset($_GET['limit']) ? ($_GET['limit'] === 'all' ? null : (int)$_GET['limit']) : 5; // Mặc định hiển thị top 5
+$sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'desc';
 
 // Base query for product statistics
 $query = "SELECT 
     p.id,
     p.tensp,
     p.hinhanh,
-    COUNT(od.product_id) as total_sold,
+    COUNT(DISTINCT o.id) as total_orders,
     SUM(od.soluong) as total_quantity,
     SUM(od.soluong * od.price) as total_revenue
 FROM products p
@@ -44,58 +38,69 @@ LEFT JOIN order_details od ON p.id = od.product_id
 LEFT JOIN orders o ON od.order_id = o.id
 WHERE 1=1";
 
-$params = [];
-$types = "";
+// Add search condition
+if (!empty($search_term)) {
+    $search_term = $conn->real_escape_string($search_term);
+    $query .= " AND p.tensp LIKE '%$search_term%'";
+}
 
-// Add date range condition if dates are provided
+// Add date range condition
 if (!empty($start_date)) {
-    $query .= " AND o.created_at >= ?";
-    $params[] = $start_date;
-    $types .= "s";
+    $query .= " AND DATE(o.created_at) >= '$start_date'";
 }
 if (!empty($end_date)) {
-    $query .= " AND o.created_at <= ?";
-    $params[] = $end_date;
-    $types .= "s";
+    $query .= " AND DATE(o.created_at) <= '$end_date'";
 }
 
-// Add search condition if search term exists
-if (!empty($search_term)) {
-    $query .= " AND p.tensp LIKE ?";
-    $params[] = "%$search_term%";
-    $types .= "s";
+$query .= " GROUP BY p.id, p.tensp, p.hinhanh 
+            HAVING total_revenue > 0 
+            ORDER BY total_revenue " . ($sort_order === 'asc' ? 'ASC' : 'DESC');
+
+if ($limit !== null) {
+    $query .= " LIMIT " . $limit;
 }
 
-$query .= " GROUP BY p.id, p.tensp, p.hinhanh ORDER BY total_revenue DESC";
+$result = $conn->query($query);
 
-// Prepare and execute query
-$stmt = $conn->prepare($query);
-if (!$stmt) {
-    die("Error preparing query: " . $conn->error);
-}
-
-if (!empty($params)) {
-    $stmt->bind_param($types, ...$params);
-}
-if (!$stmt->execute()) {
-    die("Error executing query: " . $stmt->error);
-}
-
-$result = $stmt->get_result();
-
-// Calculate total statistics
+// Calculate totals
 $total_products = 0;
-$total_quantity = 0;
+$total_orders = 0;
 $total_revenue = 0;
 
-while ($row = $result->fetch_assoc()) {
-    $total_products++;
-    $total_quantity += $row['total_quantity'];
-    $total_revenue += $row['total_revenue'];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $total_products++;
+        $total_orders += $row['total_orders'];
+        $total_revenue += $row['total_revenue'];
+    }
+    $result->data_seek(0);
 }
 
-// Reset result pointer
-$result->data_seek(0);
+// Query for detail modal if detail_id is set
+if ($detail_id > 0) {
+    $detail_query = "SELECT 
+        o.id as order_id,
+        od.soluong as quantity,
+        od.price,
+        o.created_at as order_date
+    FROM orders o
+    JOIN order_details od ON o.id = od.order_id
+    WHERE od.product_id = ?";
+
+    if (!empty($start_date)) {
+        $detail_query .= " AND DATE(o.created_at) >= '$start_date'";
+    }
+    if (!empty($end_date)) {
+        $detail_query .= " AND DATE(o.created_at) <= '$end_date'";
+    }
+
+    $detail_query .= " ORDER BY o.created_at DESC";
+    
+    $stmt = $conn->prepare($detail_query);
+    $stmt->bind_param("i", $detail_id);
+    $stmt->execute();
+    $detail_result = $stmt->get_result();
+}
 ?>
 
 <!DOCTYPE html>
@@ -184,27 +189,63 @@ $result->data_seek(0);
         <main class="content">
             <div class="section">
                 <div class="admin-control">
+                    <div class="admin-control-left">
+                        <form action="" method="GET" style="display: inline-block; margin-right: 10px;">
+                            <select name="limit" onchange="this.form.submit()" class="form-control">
+                                <option value="all" <?php echo !isset($_GET['limit']) || $_GET['limit'] === 'all' ? 'selected' : ''; ?>>Tất cả sản phẩm</option>
+                                <option value="5" <?php echo isset($_GET['limit']) && $_GET['limit'] === '5' ? 'selected' : ''; ?>>Top 5 bán chạy</option>
+                                <option value="10" <?php echo isset($_GET['limit']) && $_GET['limit'] === '10' ? 'selected' : ''; ?>>Top 10 bán chạy</option>
+                            </select>
+                            <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_term); ?>">
+                            <input type="hidden" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
+                            <input type="hidden" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>">
+                            <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort_order); ?>">
+                        </form>
+                    </div>
                     <div class="admin-control-center">
                         <form action="" method="GET" class="form-search">
                             <span class="search-btn"><i class="fa-light fa-magnifying-glass"></i></span>
-                            <input id="form-search-tk" name="search" type="text" class="form-search-input"
-                                placeholder="Tìm kiếm tên xe..." value="<?php echo htmlspecialchars($search_term); ?>">
+                            <input name="search" type="text" class="form-search-input"
+                                placeholder="Tìm kiếm tên xe..." 
+                                value="<?php echo htmlspecialchars($search_term); ?>">
+                            <input type="hidden" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
+                            <input type="hidden" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>">
                         </form>
                     </div>
                     <div class="admin-control-right">
                         <form action="" method="GET" class="fillter-date">
                             <div>
-                                <label for="time-start">Từ</label>
-                                <input type="date" class="form-control-date" id="time-start-tk" name="start_date"
-                                    value="<?php echo $start_date; ?>">
+                                <label for="start_date">Từ</label>
+                                <input type="date" name="start_date" class="form-control-date"
+                                    value="<?php echo htmlspecialchars($start_date); ?>">
                             </div>
                             <div>
-                                <label for="time-end">Đến</label>
-                                <input type="date" class="form-control-date" id="time-end-tk" name="end_date"
-                                    value="<?php echo $end_date; ?>">
+                                <label for="end_date">Đến</label>
+                                <input type="date" name="end_date" class="form-control-date"
+                                    value="<?php echo htmlspecialchars($end_date); ?>">
                             </div>
-                            <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
-                            <button><a href="thongke.php" class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></a></button>
+                            <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_term); ?>">
+                            <button type="submit" class="btn-reset-order">
+                                <i class="fa-light fa-filter"></i>
+                            </button>
+                            
+                            <button><a href="?<?php 
+                                $params = $_GET;
+                                $params['sort'] = 'asc';
+                                echo http_build_query($params);
+                            ?>" class="btn-reset-order">
+                                <i class="fa-regular fa-arrow-up-short-wide"></i>
+                            </a></button>
+                            <button><a href="?<?php 
+                                $params = $_GET;
+                                $params['sort'] = 'desc';
+                                echo http_build_query($params);
+                            ?>" class="btn-reset-order">
+                                <i class="fa-regular fa-arrow-down-wide-short"></i>
+                            </button>
+                            <button><a href="thongke.php" class="btn-reset-order">
+                                <i class="fa-light fa-arrow-rotate-right"></i>
+                            </a></button>
                         </form>
                     </div>
                 </div>
@@ -212,7 +253,7 @@ $result->data_seek(0);
                 <div class="order-statistical" id="order-statistical">
                     <div class="order-statistical-item">
                         <div class="order-statistical-item-content">
-                            <p class="order-statistical-item-content-desc">Sản phẩm được bán ra</p>
+                            <p class="order-statistical-item-content-desc">Tổng sản phẩm được bán ra</p>
                             <h4 class="order-statistical-item-content-h" id="quantity-product"><?php echo $total_products; ?></h4>
                         </div>
                         <div class="order-statistical-item-icon">
@@ -221,8 +262,8 @@ $result->data_seek(0);
                     </div>
                     <div class="order-statistical-item">
                         <div class="order-statistical-item-content">
-                            <p class="order-statistical-item-content-desc">Số lượng bán ra</p>
-                            <h4 class="order-statistical-item-content-h" id="quantity-order"><?php echo $total_quantity; ?></h4>
+                            <p class="order-statistical-item-content-desc">Tổng số lượng bán</p>
+                            <h4 class="order-statistical-item-content-h" id="quantity-order"><?php echo $total_orders; ?></h4>
                         </div>
                         <div class="order-statistical-item-icon">
                             <i class="fa-light fa-file-lines"></i>
@@ -230,7 +271,7 @@ $result->data_seek(0);
                     </div>
                     <div class="order-statistical-item">
                         <div class="order-statistical-item-content">
-                            <p class="order-statistical-item-content-desc">Doanh thu</p>
+                            <p class="order-statistical-item-content-desc">Tổng doanh thu</p>
                             <h4 class="order-statistical-item-content-h" id="quantity-sale"><?php echo number_format($total_revenue, 0, ',', '.'); ?>đ</h4>
                         </div>
                         <div class="order-statistical-item-icon">
@@ -263,12 +304,16 @@ $result->data_seek(0);
                                         <p><?php echo htmlspecialchars($row['tensp']); ?></p>
                                     </div>
                                 </td>
-                                <td><?php echo $row['total_quantity']; ?></td>
+                                <td><?php echo $row['total_orders']; ?></td>
                                 <td><?php echo number_format($row['total_revenue'], 0, ',', '.'); ?>đ</td>
                                 <td>
-                                    <button class="btn-detail product-order-detail" onclick="openDetailModal(<?php echo $row['id']; ?>)">
+                                    <a href="?<?php 
+                                        $params = $_GET;
+                                        $params['detail'] = $row['id'];
+                                        echo http_build_query($params);
+                                    ?>" class="btn-detail product-order-detail">
                                         <i class="fa-regular fa-eye"></i> Chi tiết
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
                             <?php endwhile; ?>
@@ -279,14 +324,16 @@ $result->data_seek(0);
         </main>
     </div>
 
-    <!-- Modal Chi Tiết Thống Kê -->
-    <div class="modal detail-modal">
+    <!-- Modal -->
+    <?php if ($detail_id > 0 && isset($detail_result)): ?>
+    <div class="modal detail-modal open">
         <div class="modal-container">
             <div class="modal-container-title">
                 <h2>Chi tiết thống kê sản phẩm</h2>
-                <button class="modal-close" onclick="closeModal()">
+                <a href="?<?php echo http_build_query(array_diff_key($_GET, ['detail' => ''])); ?>" 
+                   class="modal-close">
                     <i class="fa-light fa-xmark"></i>
-                </button>
+                </a>
             </div>
             <div class="table">
                 <table width="100%">
@@ -298,125 +345,34 @@ $result->data_seek(0);
                             <td>Ngày đặt</td>
                         </tr>
                     </thead>
-                    <tbody id="modal-sales-history">
+                    <tbody>
+                        <?php while ($detail = $detail_result->fetch_assoc()): ?>
                         <tr>
-                            <td colspan="5" class="loading">Đang tải...</td>
+                            <td>DH<?php echo $detail['order_id']; ?></td>
+                            <td><?php echo $detail['quantity']; ?></td>
+                            <td><?php echo number_format($detail['price'], 0, ',', '.'); ?>đ</td>
+                            <td><?php echo date('d/m/Y', strtotime($detail['order_date'])); ?></td>
                         </tr>
+                        <?php endwhile; ?>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+    <?php endif; ?>
 
     <script>
-        // Hàm mở modal
-        function openDetailModal(productId) {
-            // Show loading state
-            const modal = document.querySelector('.modal.detail-modal');
-            modal.classList.add('open');
-            document.getElementById('modal-sales-history').innerHTML = '<tr><td colspan="5" class="loading">Đang tải...</td></tr>';
-
-            // Lấy giá trị ngày từ form
-            const startDate = document.getElementById('time-start-tk').value;
-            const endDate = document.getElementById('time-end-tk').value;
-
-            // Tạo URL với tham số ngày nếu có
-            let url = 'get_product_stats.php?id=' + productId;
-            if (startDate) {
-                url += '&start_date=' + startDate;
-            }
-            if (endDate) {
-                url += '&end_date=' + endDate;
-            }
-
-            // Gửi AJAX request để lấy chi tiết thống kê
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Hiển thị lịch sử bán hàng
-                    if (data.sales_history && data.sales_history.length > 0) {
-                        const historyHtml = data.sales_history.map(sale => `
-                            <tr>
-                                <td>DH${sale.order_id}</td>
-                                <td>${sale.quantity}</td>
-                                <td>${new Intl.NumberFormat('vi-VN').format(sale.price)}đ</td>
-                                <td>${sale.order_date}</td>
-                            </tr>
-                        `).join('');
-                        document.getElementById('modal-sales-history').innerHTML = historyHtml;
-                    } else {
-                        document.getElementById('modal-sales-history').innerHTML = 
-                            '<tr><td colspan="5" class="no-data">Không có dữ liệu bán hàng trong khoảng thời gian này</td></tr>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('modal-sales-history').innerHTML = 
-                        '<tr><td colspan="5" class="error">Có lỗi xảy ra khi tải thông tin chi tiết!</td></tr>';
-                });
+    window.onclick = function(event) {
+        const modal = document.querySelector('.modal.detail-modal');
+        if (event.target == modal) {
+            window.location.href = '?' + new URLSearchParams(
+                Object.fromEntries(
+                    Object.entries(Object.fromEntries(new URLSearchParams(window.location.search)))
+                    .filter(([key]) => key !== 'detail')
+                )
+            ).toString();
         }
-
-        // Hàm đóng modal
-        function closeModal() {
-            document.querySelector('.modal.detail-modal').classList.remove('open');
-        }
-
-        // Đóng modal khi click bên ngoài
-        window.onclick = function(event) {
-            const modal = document.querySelector('.modal.detail-modal');
-            if (event.target == modal) {
-                closeModal();
-            }
-        }
-
-        // Xử lý tìm kiếm
-        document.getElementById('form-search-tk').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const table = document.getElementById('showTk');
-            const rows = table.getElementsByTagName('tr');
-
-            for (let row of rows) {
-                const productName = row.querySelector('.prod-img-title p')?.textContent.toLowerCase() || '';
-                const quantity = row.cells[2]?.textContent.toLowerCase() || '';
-                const revenue = row.cells[3]?.textContent.toLowerCase() || '';
-
-                if (productName.includes(searchTerm) || 
-                    quantity.includes(searchTerm) || 
-                    revenue.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-
-            // Cập nhật tổng số sản phẩm hiển thị
-            updateTotalStats();
-        });
-
-        // Hàm cập nhật tổng thống kê
-        function updateTotalStats() {
-            const table = document.getElementById('showTk');
-            const visibleRows = table.querySelectorAll('tr:not([style*="display: none"])');
-            
-            let totalProducts = 0;
-            let totalQuantity = 0;
-            let totalRevenue = 0;
-
-            visibleRows.forEach(row => {
-                totalProducts++;
-                totalQuantity += parseInt(row.cells[2].textContent) || 0;
-                totalRevenue += parseInt(row.cells[3].textContent.replace(/[^0-9]/g, '')) || 0;
-            });
-
-            document.getElementById('quantity-product').textContent = totalProducts;
-            document.getElementById('quantity-order').textContent = totalQuantity;
-            document.getElementById('quantity-sale').textContent = new Intl.NumberFormat('vi-VN').format(totalRevenue) + 'đ';
-        }
+    }
     </script>
 </body>
 </html>

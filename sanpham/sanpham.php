@@ -21,69 +21,175 @@ $category = isset($_GET['category']) ? $_GET['category'] : 'Tất cả';
 // Xử lý thêm sản phẩm mới
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'add') {
-        $tenXe = $conn->real_escape_string(htmlspecialchars($_POST['ten-mon'], ENT_QUOTES, 'UTF-8'));
-        $dongXe = $conn->real_escape_string(htmlspecialchars($_POST['category'], ENT_QUOTES, 'UTF-8'));
-        $giaBan = floatval($_POST['gia-ban']);
-        $thongTinSP = $conn->real_escape_string(htmlspecialchars($_POST['thong-tin-sp'], ENT_QUOTES, 'UTF-8'));
-        $thongSoKT = $conn->real_escape_string(htmlspecialchars($_POST['thong-so-ky-thuat'], ENT_QUOTES, 'UTF-8'));
-        $status = 1;
+        try {
+            // Lấy dữ liệu từ form
+            $tenXe = trim($_POST['ten-mon']);
+            $dongXe = trim($_POST['category']);
+            $giaBan = floatval($_POST['gia-ban']);
+            $thongTinSP = trim($_POST['thong-tin-sp']);
+            $thongSoKT = trim($_POST['thong-so-ky-thuat']);
+            $status = 1;
 
-        // Xử lý upload hình ảnh
-        $uploadDir = "uploads/";
-        $mainImage = isset($_FILES['up-hinh-anh']['name']) ? $uploadDir . basename($_FILES['up-hinh-anh']['name']) : '';
-        $image2 = isset($_FILES['up-hinh-anh2']['name']) ? $uploadDir . basename($_FILES['up-hinh-anh2']['name']) : '';
-        $image3 = isset($_FILES['up-hinh-anh3']['name']) ? $uploadDir . basename($_FILES['up-hinh-anh3']['name']) : '';
+            // Xử lý upload hình ảnh
+            $uploadDir = "uploads/";
+            $mainImage = '';
+            $image2 = '';
+            $image3 = '';
 
-        if ($mainImage) move_uploaded_file($_FILES['up-hinh-anh']['tmp_name'], $mainImage);
-        if ($image2) move_uploaded_file($_FILES['up-hinh-anh2']['tmp_name'], $image2);
-        if ($image3) move_uploaded_file($_FILES['up-hinh-anh3']['tmp_name'], $image3);
+            // Upload hình ảnh chính
+            if (!empty($_FILES['up-hinh-anh']['name'])) {
+                $mainImage = $uploadDir . basename($_FILES['up-hinh-anh']['name']);
+                move_uploaded_file($_FILES['up-hinh-anh']['tmp_name'], $mainImage);
+            }
 
-        $sql = "INSERT INTO products (tensp, dongsp, giaban, thongtinsp, thongsokt, hinhanh, hinhanh2, hinhanh3, status) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssdsssssi", $tenXe, $dongXe, $giaBan, $thongTinSP, $thongSoKT, $mainImage, $image2, $image3, $status);
+            // Upload hình ảnh 2
+            if (!empty($_FILES['up-hinh-anh2']['name'])) {
+                $image2 = $uploadDir . basename($_FILES['up-hinh-anh2']['name']);
+                move_uploaded_file($_FILES['up-hinh-anh2']['tmp_name'], $image2);
+            }
 
-        if ($stmt->execute()) {
+            // Upload hình ảnh 3
+            if (!empty($_FILES['up-hinh-anh3']['name'])) {
+                $image3 = $uploadDir . basename($_FILES['up-hinh-anh3']['name']);
+                move_uploaded_file($_FILES['up-hinh-anh3']['tmp_name'], $image3);
+            }
+
+            // Debug: In ra các giá trị để kiểm tra
+            /*
+            echo "<pre>";
+            var_dump([
+                'tenXe' => $tenXe,
+                'dongXe' => $dongXe,
+                'giaBan' => $giaBan,
+                'thongTinSP' => $thongTinSP,
+                'thongSoKT' => $thongSoKT,
+                'mainImage' => $mainImage,
+                'image2' => $image2,
+                'image3' => $image3,
+                'status' => $status
+            ]);
+            echo "</pre>";
+            die();
+            */
+
+            // Chuẩn bị câu lệnh SQL
+            $sql = "INSERT INTO products (tensp, dongsp, giaban, thongtinsp, thongsokt, hinhanh, hinhanh2, hinhanh3, status) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            if (!($stmt = $conn->prepare($sql))) {
+                throw new Exception("Lỗi prepare statement: " . $conn->error);
+            }
+
+            // Bind các tham số - đảm bảo số lượng type indicators khớp với số tham số
+            $types = "ssdsssssi"; // 9 ký tự cho 9 tham số
+            if (!$stmt->bind_param($types, 
+                $tenXe,      // string (s)
+                $dongXe,     // string (s)
+                $giaBan,     // double (d)
+                $thongTinSP, // string (s)
+                $thongSoKT,  // string (s)
+                $mainImage,  // string (s)
+                $image2,     // string (s)
+                $image3,     // string (s)
+                $status      // integer (i)
+            )) {
+                throw new Exception("Lỗi bind_param: " . $stmt->error);
+            }
+
+            // Thực thi câu lệnh
+            if (!$stmt->execute()) {
+                throw new Exception("Lỗi execute: " . $stmt->error);
+            }
+
             $_SESSION['success'] = "Thêm sản phẩm thành công!";
-        } else {
-            $_SESSION['error'] = "Không thể thêm sản phẩm!";
+            $stmt->close();
+
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Lỗi: " . $e->getMessage();
         }
+
         header("Location: sanpham.php");
         exit();
     } elseif ($_POST['action'] === 'edit') {
-        $productId = intval($_POST['product-id']);
-        $tenXe = $conn->real_escape_string($_POST['ten-mon']);
-        $dongXe = $conn->real_escape_string($_POST['category']);
-        $giaBan = floatval($_POST['gia-ban']);
-        $thongTinSP = $conn->real_escape_string($_POST['thong-tin-sp']);
-        $thongSoKT = $conn->real_escape_string($_POST['thong-so-ky-thuat']);
+        try {
+            $productId = intval($_POST['product-id']);
+            $tenXe = trim($_POST['ten-mon']);
+            $dongXe = trim($_POST['category']);
+            $giaBan = floatval($_POST['gia-ban']);
+            $thongTinSP = trim($_POST['thong-tin-sp']);
+            $thongSoKT = trim($_POST['thong-so-ky-thuat']);
 
-        // Lấy thông tin hình ảnh hiện tại
-        $stmt = $conn->prepare("SELECT hinhanh, hinhanh2, hinhanh3 FROM products WHERE id = ?");
-        $stmt->bind_param("i", $productId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $currentImages = $result->fetch_assoc();
+            // Lấy thông tin hình ảnh hiện tại
+            $stmt = $conn->prepare("SELECT hinhanh, hinhanh2, hinhanh3 FROM products WHERE id = ?");
+            $stmt->bind_param("i", $productId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $currentImages = $result->fetch_assoc();
+            $stmt->close();
 
-        // Xử lý upload hình ảnh mới
-        $uploadDir = "uploads/";
-        $mainImage = !empty($_FILES['up-hinh-anh']['name']) ? $uploadDir . basename($_FILES['up-hinh-anh']['name']) : $currentImages['hinhanh'];
-        $image2 = !empty($_FILES['up-hinh-anh2']['name']) ? $uploadDir . basename($_FILES['up-hinh-anh2']['name']) : $currentImages['hinhanh2'];
-        $image3 = !empty($_FILES['up-hinh-anh3']['name']) ? $uploadDir . basename($_FILES['up-hinh-anh3']['name']) : $currentImages['hinhanh3'];
+            // Xử lý upload hình ảnh mới
+            $uploadDir = "uploads/";
+            $mainImage = !empty($_FILES['up-hinh-anh']['name']) ? 
+                $uploadDir . basename($_FILES['up-hinh-anh']['name']) : 
+                $currentImages['hinhanh'];
+            $image2 = !empty($_FILES['up-hinh-anh2']['name']) ? 
+                $uploadDir . basename($_FILES['up-hinh-anh2']['name']) : 
+                $currentImages['hinhanh2'];
+            $image3 = !empty($_FILES['up-hinh-anh3']['name']) ? 
+                $uploadDir . basename($_FILES['up-hinh-anh3']['name']) : 
+                $currentImages['hinhanh3'];
 
-        if (!empty($_FILES['up-hinh-anh']['name'])) move_uploaded_file($_FILES['up-hinh-anh']['tmp_name'], $mainImage);
-        if (!empty($_FILES['up-hinh-anh2']['name'])) move_uploaded_file($_FILES['up-hinh-anh2']['tmp_name'], $image2);
-        if (!empty($_FILES['up-hinh-anh3']['name'])) move_uploaded_file($_FILES['up-hinh-anh3']['tmp_name'], $image3);
+            // Upload các file mới nếu có
+            if (!empty($_FILES['up-hinh-anh']['name'])) {
+                move_uploaded_file($_FILES['up-hinh-anh']['tmp_name'], $mainImage);
+            }
+            if (!empty($_FILES['up-hinh-anh2']['name'])) {
+                move_uploaded_file($_FILES['up-hinh-anh2']['tmp_name'], $image2);
+            }
+            if (!empty($_FILES['up-hinh-anh3']['name'])) {
+                move_uploaded_file($_FILES['up-hinh-anh3']['tmp_name'], $image3);
+            }
 
-        $sql = "UPDATE products SET tensp=?, dongsp=?, giaban=?, thongtinsp=?, thongsokt=?, hinhanh=?, hinhanh2=?, hinhanh3=? WHERE id=?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssdssssssi", $tenXe, $dongXe, $giaBan, $thongTinSP, $thongSoKT, $mainImage, $image2, $image3, $productId);
+            // Cập nhật thông tin sản phẩm
+            $sql = "UPDATE products SET 
+                    tensp = ?, 
+                    dongsp = ?, 
+                    giaban = ?, 
+                    thongtinsp = ?, 
+                    thongsokt = ?, 
+                    hinhanh = ?, 
+                    hinhanh2 = ?, 
+                    hinhanh3 = ? 
+                    WHERE id = ?";
 
-        if ($stmt->execute()) {
+            $stmt = $conn->prepare($sql);
+            if (!$stmt) {
+                throw new Exception("Lỗi prepare statement: " . $conn->error);
+            }
+
+            $stmt->bind_param("ssdsssssi", 
+                $tenXe,      // string (s)
+                $dongXe,     // string (s)
+                $giaBan,     // double (d)
+                $thongTinSP, // string (s)
+                $thongSoKT,  // string (s)
+                $mainImage,  // string (s)
+                $image2,     // string (s)
+                $image3,     // string (s)
+                $productId   // integer (i)
+            );
+
+            if (!$stmt->execute()) {
+                throw new Exception("Lỗi khi cập nhật sản phẩm: " . $stmt->error);
+            }
+
             $_SESSION['success'] = "Cập nhật sản phẩm thành công!";
-        } else {
-            $_SESSION['error'] = "Không thể cập nhật sản phẩm!";
+            $stmt->close();
+
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Lỗi: " . $e->getMessage();
         }
+
         header("Location: sanpham.php");
         exit();
     }

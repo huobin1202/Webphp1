@@ -199,7 +199,7 @@ $result = $stmt->get_result();
                 <div class="admin-control">
                     <form method="GET" action="" class="admin-control-wrapper">
                         <div class="admin-control-left">
-                            <select name="status" id="tinh-trang-user">
+                            <select name="status" id="tinh-trang-user" onchange="this.form.submit()">
                                 <option value="2" <?php echo (!isset($_GET['status']) || $_GET['status'] === '2') ? 'selected' : ''; ?>>Tất cả</option>
                                 <option value="1" <?php echo (isset($_GET['status']) && $_GET['status'] === '1') ? 'selected' : ''; ?>>Hoạt động</option>
                                 <option value="0" <?php echo (isset($_GET['status']) && $_GET['status'] === '0') ? 'selected' : ''; ?>>Bị khóa</option>
@@ -226,7 +226,7 @@ $result = $stmt->get_result();
                                         value="<?php echo isset($_GET['end_date']) ? htmlspecialchars($_GET['end_date']) : ''; ?>">
                                 </div>
                                 <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
-                                <a href="khachhang.php" class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></a>
+                                <button><a href="khachhang.php" class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></a></button>
                             </div>
                             <a href="?add=1">
                                 <button type="button" id="btn-add-user" class="btn-control-large">

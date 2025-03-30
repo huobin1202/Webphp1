@@ -177,7 +177,7 @@ $conn->close();
                 <div class="admin-control">
                     <form method="GET" action="" class="admin-control-wrapper" style="width: 100%;display: flex;justify-content: space-between;">
                         <div class="admin-control-left">
-                            <select name="status" id="tinh-trang">
+                            <select name="status" id="tinh-trang" onchange="this.form.submit()">
                                 <option value="4" <?php echo (isset($_GET['status']) && $_GET['status'] == '4') ? 'selected' : ''; ?>>Tất cả</option>
                                 <option value="chuaxuly" <?php echo (isset($_GET['status']) && $_GET['status'] == 'chuaxuly') ? 'selected' : ''; ?>>Chưa xử lý</option>
                                 <option value="daxuly" <?php echo (isset($_GET['status']) && $_GET['status'] == 'daxuly') ? 'selected' : ''; ?>>Đã xử lý</option>
