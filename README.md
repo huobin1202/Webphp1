@@ -3,7 +3,7 @@
 - Hiển thị chi tiết sản phẩm (0.5) ✅
 - Tìm kiếm cơ bản theo tên sản phẩm (tìm tương đối) (0.25) ❌
 - Tìm kiếm nâng cao (kết hợp nhiều điều kiện cùng 1 lần tìm kiếm): theo tên sản phẩm, có chọn phân loại và khoảng giá (0.5) ❌
-- Hiển thị sản phẩm theo phân loại và kết quả tìm kiếm đang phân trang (0.5)
+- Hiển thị sản phẩm theo phân loại và kết quả tìm kiếm đang phân trang (0.5) ❌
 - Đăng ký làm người mua hàng (giao diện trên người dùng đầu cuối) (0.5) ✅
 - Bán hàng phải có ghi hóa đơn (tham khảo các web bán hàng trực tuyến) (1.0) 
 - Yêu cầu phải đăng nhập vào hệ thống thì người dùng mới thấy được thông tin ✅
