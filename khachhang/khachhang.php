@@ -182,7 +182,7 @@ $result = $stmt->get_result();
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="" class="sidebar-link">
+                        <a class="sidebar-link" style="cursor:pointer">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>
@@ -199,7 +199,7 @@ $result = $stmt->get_result();
                 <div class="admin-control">
                     <form method="GET" action="" class="admin-control-wrapper">
                         <div class="admin-control-left">
-                            <select name="status" id="tinh-trang-user" onchange="this.form.submit()">
+                            <select name="status" id="tinh-trang-user" class="form-control" onchange="this.form.submit()">
                                 <option value="2" <?php echo (!isset($_GET['status']) || $_GET['status'] === '2') ? 'selected' : ''; ?>>Tất cả</option>
                                 <option value="1" <?php echo (isset($_GET['status']) && $_GET['status'] === '1') ? 'selected' : ''; ?>>Hoạt động</option>
                                 <option value="0" <?php echo (isset($_GET['status']) && $_GET['status'] === '0') ? 'selected' : ''; ?>>Bị khóa</option>
@@ -277,6 +277,7 @@ $result = $stmt->get_result();
 
         </main>
     </div>
+    
     <div class="modal signup <?php echo isset($_GET['add']) ? 'open' : ''; ?>">
         <div class="modal-container">
             <h3 class="modal-container-title add-account-e">THÊM KHÁCH HÀNG MỚI</h3>

@@ -207,7 +207,7 @@ if (isset($_GET['detail'])) {
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="" class="sidebar-link">
+                        <a class="sidebar-link" style="cursor:pointer">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>
@@ -221,7 +221,7 @@ if (isset($_GET['detail'])) {
                 <div class="admin-control">
                     <div class="admin-control-left">
                         <form action="" method="GET" style="display: inline-block;">
-                            <select name="limit" onchange="this.form.submit()" class="form-control">
+                            <select name="limit" class="form-control" onchange="this.form.submit()">
                                 <option value="all" <?php echo !isset($_GET['limit']) || $_GET['limit'] === 'all' ? 'selected' : ''; ?>>Tất cả khách hàng</option>
                                 <option value="5" <?php echo isset($_GET['limit']) && $_GET['limit'] === '5' ? 'selected' : ''; ?>>Top 5 khách hàng</option>
                                 <option value="10" <?php echo isset($_GET['limit']) && $_GET['limit'] === '10' ? 'selected' : ''; ?>>Top 10 khách hàng</option>

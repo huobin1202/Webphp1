@@ -163,7 +163,7 @@ $conn->close();
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="" class="sidebar-link">
+                        <a class="sidebar-link" style="cursor:pointer">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>
@@ -177,7 +177,7 @@ $conn->close();
                 <div class="admin-control">
                     <form method="GET" action="" class="admin-control-wrapper" style="width: 100%;display: flex;justify-content: space-between;">
                         <div class="admin-control-left">
-                            <select name="status" id="tinh-trang" onchange="this.form.submit()">
+                            <select name="status"  class="form-control" onchange="this.form.submit()">
                                 <option value="4" <?php echo (isset($_GET['status']) && $_GET['status'] == '4') ? 'selected' : ''; ?>>Tất cả</option>
                                 <option value="chuaxuly" <?php echo (isset($_GET['status']) && $_GET['status'] == 'chuaxuly') ? 'selected' : ''; ?>>Chưa xử lý</option>
                                 <option value="daxuly" <?php echo (isset($_GET['status']) && $_GET['status'] == 'daxuly') ? 'selected' : ''; ?>>Đã xử lý</option>
@@ -188,7 +188,7 @@ $conn->close();
                         <div class="admin-control-center">
                             <div class="form-search">
                                 <span class="search-btn"><i class="fa-light fa-magnifying-glass"></i></span>
-                                <input type="text" name="search" class="form-search-input" 
+                                <input type="text" name="search" class="form-search-input"
                                     value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
                                     placeholder="Tìm kiếm mã đơn, mã khách hàng, tên khách hàng...">
                             </div>
@@ -197,12 +197,12 @@ $conn->close();
                             <div class="fillter-date">
                                 <div>
                                     <label for="time-start">Từ</label>
-                                    <input type="date" name="start_date" class="form-control-date" 
+                                    <input type="date" name="start_date" class="form-control-date"
                                         value="<?php echo isset($_GET['start_date']) ? $_GET['start_date'] : ''; ?>">
                                 </div>
                                 <div>
                                     <label for="time-end">Đến</label>
-                                    <input type="date" name="end_date" class="form-control-date" 
+                                    <input type="date" name="end_date" class="form-control-date"
                                         value="<?php echo isset($_GET['end_date']) ? $_GET['end_date'] : ''; ?>">
                                 </div>
                                 <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
@@ -278,75 +278,80 @@ $conn->close();
             }
             if ($current_order):
             ?>
-            <div class="modal detail-order open">
-                <div class="modal-container">
-                    <h3 class="modal-container-title">CHI TIẾT ĐƠN HÀNG #<?php echo $order_id; ?></h3>
-                    <a href="donhang.php" class="modal-close"><i class="fa-regular fa-xmark"></i></a>
-                    <div class="modal-detail-order">
-                        <div class="modal-detail-left">
-                            <div class="order-item-group">
-                                <?php foreach ($current_order['details'] as $detail): ?>
-                                    <div class="order-product">
-                                        <div class="order-product-left">
-                                            <img src="../uploads/<?php echo htmlspecialchars($detail['hinhanh']); ?>" alt="">
-                                            <div class="order-product-info">
-                                                <h4><?php echo htmlspecialchars($detail['tensp']); ?></h4>
-                                                <p class="order-product-quantity">SL: <?php echo $detail['soluong']; ?></p>
+                <div class="modal detail-order open">
+                    <div class="modal-container">
+                        <h3 class="modal-container-title">CHI TIẾT ĐƠN HÀNG #<?php echo $order_id; ?></h3>
+                        <a href="donhang.php" class="modal-close"><i class="fa-regular fa-xmark"></i></a>
+                        <div class="modal-detail-order">
+                            <div class="modal-detail-left">
+                                <div class="order-item-group">
+                                    <?php foreach ($current_order['details'] as $detail): ?>
+                                        <div class="order-product">
+                                            <div class="order-product-left">
+                                                <img src="../sanpham/<?php echo htmlspecialchars($detail['hinhanh']); ?>" alt="">
+                                                <div class="order-product-info">
+                                                    <h4><?php echo htmlspecialchars($detail['tensp']); ?></h4>
+                                                    <p class="order-product-quantity">SL: <?php echo $detail['soluong']; ?></p>
+                                                </div>
+                                            </div>
+                                            <div class="order-product-right">
+                                                <div class="order-product-price">
+                                                    <span class="order-product-current-price">
+                                                        <?php echo number_format($detail['price'], 0, ',', '.') . 'đ'; ?>
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="order-product-right">
-                                            <div class="order-product-price">
-                                                <span class="order-product-current-price">
-                                                    <?php echo number_format($detail['price'], 0, ',', '.') . 'đ'; ?>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <div class="modal-detail-right">
+                                <ul class="detail-order-group">
+                                    <li class="detail-order-item">
+                                        <span class="detail-order-item-left"><i class="fa-light fa-calendar-days"></i> Ngày đặt</span>
+                                        <span class="detail-order-item-right"><?php echo date('d/m/Y', strtotime($current_order['created_at'])); ?></span>
+                                    </li>
+                                    <li class="detail-order-item">
+                                        <span class="detail-order-item-left"><i class="fa-light fa-truck"></i> Hình thức giao</span>
+                                        <span class="detail-order-item-right"><?php echo htmlspecialchars($current_order['delivery_type']); ?></span>
+                                    </li>
+                                    <li class="detail-order-item">
+                                        <span class="detail-order-item-left"><i class="fa-thin fa-person"></i> Người nhận</span>
+                                        <span class="detail-order-item-right"><?php echo htmlspecialchars($current_order['recipient_name']); ?></span>
+                                    </li>
+                                    <li class="detail-order-item">
+                                        <span class="detail-order-item-left"><i class="fa-light fa-phone"></i> Số điện thoại</span>
+                                        <span class="detail-order-item-right"><?php echo htmlspecialchars($current_order['recipient_phone']); ?></span>
+                                    </li>
+                                    <li class="detail-order-item tb">
+                                        <span class="detail-order-item-left"><i class="fa-light fa-clock"></i> Thời gian giao</span>
+                                        <p class="detail-order-item-b"></p>
+                                    </li>
+                                    <li class="detail-order-item tb">
+                                        <span class="detail-order-item-t"><i class="fa-light fa-location-dot"></i> Địa chỉ</span>
+                                        <p class="detail-order-item-b"><?php echo htmlspecialchars($current_order['address']); ?></p>
+                                    </li>
+                                    <li class="detail-order-item tb">
+                                        <span class="detail-order-item-t"><i class="fa-light fa-note-sticky"></i> Ghi chú</span>
+                                        <p class="detail-order-item-b"><?php echo htmlspecialchars($current_order['note']) ?: 'Không có'; ?></p>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
-                        <div class="modal-detail-right">
-                            <ul class="detail-order-group">
-                                <li class="detail-order-item">
-                                    <span class="detail-order-item-left"><i class="fa-light fa-calendar-days"></i> Ngày đặt</span>
-                                    <span class="detail-order-item-right"><?php echo date('d/m/Y', strtotime($current_order['created_at'])); ?></span>
-                                </li>
-                                <li class="detail-order-item">
-                                    <span class="detail-order-item-left"><i class="fa-light fa-truck"></i> Hình thức giao</span>
-                                    <span class="detail-order-item-right"><?php echo htmlspecialchars($current_order['delivery_type']); ?></span>
-                                </li>
-                                <li class="detail-order-item">
-                                    <span class="detail-order-item-left"><i class="fa-thin fa-person"></i> Người nhận</span>
-                                    <span class="detail-order-item-right"><?php echo htmlspecialchars($current_order['recipient_name']); ?></span>
-                                </li>
-                                <li class="detail-order-item">
-                                    <span class="detail-order-item-left"><i class="fa-light fa-phone"></i> Số điện thoại</span>
-                                    <span class="detail-order-item-right"><?php echo htmlspecialchars($current_order['recipient_phone']); ?></span>
-                                </li>
-                                <li class="detail-order-item tb">
-                                    <span class="detail-order-item-t"><i class="fa-light fa-location-dot"></i> Địa chỉ</span>
-                                    <p class="detail-order-item-b"><?php echo htmlspecialchars($current_order['address']); ?></p>
-                                </li>
-                                <li class="detail-order-item tb">
-                                    <span class="detail-order-item-t"><i class="fa-light fa-note-sticky"></i> Ghi chú</span>
-                                    <p class="detail-order-item-b"><?php echo htmlspecialchars($current_order['note']) ?: 'Không có'; ?></p>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="modal-detail-bottom">
-                        <div class="modal-detail-bottom-left">
-                            <div class="price-total">
-                                <span class="thanhtien">Thành tiền</span>
-                                <span class="price"><?php echo number_format($current_order['total'], 0, ',', '.') . 'đ'; ?></span>
+                        <div class="modal-detail-bottom">
+                            <div class="modal-detail-bottom-left">
+                                <div class="price-total">
+                                    <span class="thanhtien">Thành tiền</span>
+                                    <span class="price"><?php echo number_format($current_order['total'], 0, ',', '.') . 'đ'; ?></span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             <?php endif; ?>
         <?php endif; ?>
     </div>
+    <script src="../assets/js/admin.js"></script>
 
 </body>
 

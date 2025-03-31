@@ -358,7 +358,7 @@ $sql .= " ORDER BY id DESC";
                 <div class="admin-control">
                     <div class="admin-control-left">
                         <form method="GET" action="" style="display: inline;">
-                            <select name="category" onchange="this.form.submit()">
+                            <select name="category" class="form-control" onchange="this.form.submit()">
                                 <option value="Tất cả" <?php echo $category === 'Tất cả' ? 'selected' : ''; ?>>Tất cả</option>
                                 <option value="Dòng Ninja" <?php echo $category === 'Dòng Ninja' ? 'selected' : ''; ?>>Dòng Ninja</option>
                                 <option value="Dòng Z" <?php echo $category === 'Dòng Z' ? 'selected' : ''; ?>>Dòng Z</option>
@@ -447,7 +447,6 @@ $sql .= " ORDER BY id DESC";
             </div>
         </main>
     </div>
-    <script src="../assets/js/admin.js"></script>
 
 
     <!-- Modal thêm mới sản phẩm -->
@@ -576,6 +575,8 @@ $sql .= " ORDER BY id DESC";
             </div>
         </div>
     </div>
+    <script src="../assets/js/admin.js"></script>
+
 </body>
 
 </html>

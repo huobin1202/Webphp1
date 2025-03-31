@@ -22,14 +22,15 @@ $search_term = isset($_GET['search']) ? trim($_GET['search']) : '';
 $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
 $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 $detail_id = isset($_GET['detail']) ? (int)$_GET['detail'] : 0;
-$limit = isset($_GET['limit']) ? ($_GET['limit'] === 'all' ? null : (int)$_GET['limit']) : 5; // Mặc định hiển thị top 5
 $sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'desc';
+$category = isset($_GET['category']) ? $_GET['category'] : 'Tất cả';
 
 // Base query for product statistics
 $query = "SELECT 
     p.id,
     p.tensp,
     p.hinhanh,
+    p.dongsp,
     COUNT(DISTINCT o.id) as total_orders,
     SUM(od.soluong) as total_quantity,
     SUM(od.soluong * od.price) as total_revenue
@@ -37,6 +38,12 @@ FROM products p
 LEFT JOIN order_details od ON p.id = od.product_id
 LEFT JOIN orders o ON od.order_id = o.id
 WHERE 1=1";
+
+// Add category condition
+if ($category !== 'Tất cả') {
+    $category = $conn->real_escape_string($category);
+    $query .= " AND p.dongsp = '$category'";
+}
 
 // Add search condition
 if (!empty($search_term)) {
@@ -52,13 +59,9 @@ if (!empty($end_date)) {
     $query .= " AND DATE(o.created_at) <= '$end_date'";
 }
 
-$query .= " GROUP BY p.id, p.tensp, p.hinhanh 
+$query .= " GROUP BY p.id, p.tensp, p.hinhanh, p.dongsp 
             HAVING total_revenue > 0 
             ORDER BY total_revenue " . ($sort_order === 'asc' ? 'ASC' : 'DESC');
-
-if ($limit !== null) {
-    $query .= " LIMIT " . $limit;
-}
 
 $result = $conn->query($query);
 
@@ -177,7 +180,7 @@ if ($detail_id > 0) {
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="" class="sidebar-link">
+                        <a class="sidebar-link" style="cursor:pointer">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>
@@ -191,10 +194,11 @@ if ($detail_id > 0) {
                 <div class="admin-control">
                     <div class="admin-control-left">
                         <form action="" method="GET" style="display: inline-block; margin-right: 10px;">
-                            <select name="limit" onchange="this.form.submit()" class="form-control">
-                                <option value="all" <?php echo !isset($_GET['limit']) || $_GET['limit'] === 'all' ? 'selected' : ''; ?>>Tất cả sản phẩm</option>
-                                <option value="5" <?php echo isset($_GET['limit']) && $_GET['limit'] === '5' ? 'selected' : ''; ?>>Top 5 bán chạy</option>
-                                <option value="10" <?php echo isset($_GET['limit']) && $_GET['limit'] === '10' ? 'selected' : ''; ?>>Top 10 bán chạy</option>
+                            <select name="category" class="form-control" onchange="this.form.submit()">
+                                <option value="Tất cả">Tất cả</option>
+                                <option value="Dòng Ninja" <?php echo $category === 'Dòng Ninja' ? 'selected' : ''; ?>>Dòng Ninja</option>
+                                <option value="Dòng Z" <?php echo $category === 'Dòng Z' ? 'selected' : ''; ?>>Dòng Z</option>
+                                <option value="Dòng KLX" <?php echo $category === 'Dòng KLX' ? 'selected' : ''; ?>>Dòng KLX</option>
                             </select>
                             <input type="hidden" name="search" value="<?php echo htmlspecialchars($search_term); ?>">
                             <input type="hidden" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
@@ -360,6 +364,7 @@ if ($detail_id > 0) {
         </div>
     </div>
     <?php endif; ?>
+    <script src="../assets/js/admin.js"></script>
 
     <script>
     window.onclick = function(event) {

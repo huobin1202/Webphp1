@@ -14,7 +14,7 @@ if (isset($_GET['logout'])) {
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
 $role = null;
-$total_price=0;
+$total_price = 0;
 
 if ($username && !$customer_id) {
     $stmt = $conn->prepare("SELECT id, role FROM customer WHERE name = ?");
@@ -217,8 +217,8 @@ if ($username && !$customer_id) {
 
                 <div class="dropdown">
                     <span>Sản phẩm</span>
-                  <div class="dropdown-content">
-        
+                    <div class="dropdown-content">
+
                         </li>
                         <li class="menu-list-item">
                             <a href="index.php?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
@@ -266,7 +266,7 @@ if ($username && !$customer_id) {
                                 $order_id = $order['id'];
                     ?>
                                 <div class="order-history-group">
-                                    
+
                                     <?php
                                     // Chi tiết đơn hàng
                                     $sql_details = "SELECT od.*, p.tensp, p.hinhanh
@@ -300,7 +300,7 @@ if ($username && !$customer_id) {
                                             <?php
                                             $status_class = '';
                                             $status_text = '';
-                                            switch($order['status']) {
+                                            switch ($order['status']) {
                                                 case 'chuaxuly':
                                                     $status_class = 'no-complete';
                                                     $status_text = 'Chưa xử lý';
@@ -359,6 +359,10 @@ if ($username && !$customer_id) {
                     <li class="detail-order-item">
                         <span class="detail-order-item-left"><i class="fa-light fa-truck"></i> Hình thức giao</span>
                         <span class="detail-order-item-right" id="modal-delivery-type"></span>
+                    </li>
+                    <li class="detail-order-item">
+                        <span class="detail-order-item-left"><i class="fa-light fa-clock"></i> Ngày nhận hàng</span>
+                        <span class="detail-order-item-right">01/04/2025</span>
                     </li>
                     <li class="detail-order-item">
                         <span class="detail-order-item-left"><i class="fa-light fa-location-dot"></i> Địa điểm nhận</span>
