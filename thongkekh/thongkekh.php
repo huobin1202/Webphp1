@@ -207,7 +207,7 @@ if (isset($_GET['detail'])) {
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="../index.php" class="sidebar-link">
+                        <a href="" class="sidebar-link">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>

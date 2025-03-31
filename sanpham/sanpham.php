@@ -75,14 +75,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             // Chuẩn bị câu lệnh SQL
             $sql = "INSERT INTO products (tensp, dongsp, giaban, thongtinsp, thongsokt, hinhanh, hinhanh2, hinhanh3, status) 
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            
+
             if (!($stmt = $conn->prepare($sql))) {
                 throw new Exception("Lỗi prepare statement: " . $conn->error);
             }
 
             // Bind các tham số - đảm bảo số lượng type indicators khớp với số tham số
             $types = "ssdsssssi"; // 9 ký tự cho 9 tham số
-            if (!$stmt->bind_param($types, 
+            if (!$stmt->bind_param(
+                $types,
                 $tenXe,      // string (s)
                 $dongXe,     // string (s)
                 $giaBan,     // double (d)
@@ -103,7 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             $_SESSION['success'] = "Thêm sản phẩm thành công!";
             $stmt->close();
-
         } catch (Exception $e) {
             $_SESSION['error'] = "Lỗi: " . $e->getMessage();
         }
@@ -129,14 +129,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             // Xử lý upload hình ảnh mới
             $uploadDir = "uploads/";
-            $mainImage = !empty($_FILES['up-hinh-anh']['name']) ? 
-                $uploadDir . basename($_FILES['up-hinh-anh']['name']) : 
+            $mainImage = !empty($_FILES['up-hinh-anh']['name']) ?
+                $uploadDir . basename($_FILES['up-hinh-anh']['name']) :
                 $currentImages['hinhanh'];
-            $image2 = !empty($_FILES['up-hinh-anh2']['name']) ? 
-                $uploadDir . basename($_FILES['up-hinh-anh2']['name']) : 
+            $image2 = !empty($_FILES['up-hinh-anh2']['name']) ?
+                $uploadDir . basename($_FILES['up-hinh-anh2']['name']) :
                 $currentImages['hinhanh2'];
-            $image3 = !empty($_FILES['up-hinh-anh3']['name']) ? 
-                $uploadDir . basename($_FILES['up-hinh-anh3']['name']) : 
+            $image3 = !empty($_FILES['up-hinh-anh3']['name']) ?
+                $uploadDir . basename($_FILES['up-hinh-anh3']['name']) :
                 $currentImages['hinhanh3'];
 
             // Upload các file mới nếu có
@@ -167,7 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 throw new Exception("Lỗi prepare statement: " . $conn->error);
             }
 
-            $stmt->bind_param("ssdsssssi", 
+            $stmt->bind_param(
+                "ssdsssssi",
                 $tenXe,      // string (s)
                 $dongXe,     // string (s)
                 $giaBan,     // double (d)
@@ -185,7 +186,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             $_SESSION['success'] = "Cập nhật sản phẩm thành công!";
             $stmt->close();
-
         } catch (Exception $e) {
             $_SESSION['error'] = "Lỗi: " . $e->getMessage();
         }
@@ -201,14 +201,14 @@ if (isset($_GET['action'])) {
 
     switch ($_GET['action']) {
         case 'delete':
-        // Kiểm tra xem sản phẩm đã được bán ra chưa
-        $check_sold = $conn->prepare("SELECT COUNT(*) as count FROM order_details WHERE product_id = ?");
-        $check_sold->bind_param("i", $id);
-        $check_sold->execute();
-        $result = $check_sold->get_result();
-        $row = $result->fetch_assoc();
-        
-        if ($row['count'] > 0) {
+            // Kiểm tra xem sản phẩm đã được bán ra chưa
+            $check_sold = $conn->prepare("SELECT COUNT(*) as count FROM order_details WHERE product_id = ?");
+            $check_sold->bind_param("i", $id);
+            $check_sold->execute();
+            $result = $check_sold->get_result();
+            $row = $result->fetch_assoc();
+
+            if ($row['count'] > 0) {
                 $_SESSION['error'] = "Không thể xóa sản phẩm đã được bán!";
             } else {
                 $sql = "DELETE FROM products WHERE id = ?";
@@ -238,15 +238,15 @@ if (isset($_GET['action'])) {
 
                 if ($update_stmt->execute()) {
                     $_SESSION['success'] = $new_status == 1 ? "Sản phẩm đã được hiển thị!" : "Sản phẩm đã được ẩn!";
-        } else {
+                } else {
                     $_SESSION['error'] = "Không thể cập nhật trạng thái sản phẩm!";
                 }
             }
             break;
     }
     header("Location: sanpham.php");
-        exit();
-    }
+    exit();
+}
 
 // Xây dựng câu truy vấn SQL với điều kiện tìm kiếm
 $sql = "SELECT * FROM products WHERE 1=1";
@@ -279,7 +279,7 @@ $sql .= " ORDER BY id DESC";
 </head>
 
 <body>
- 
+
     <header class="header">
         <button class="menu-icon-btn">
             <div class="menu-icon">
@@ -343,7 +343,7 @@ $sql .= " ORDER BY id DESC";
                         </a>
                     </li>
                     <li class="sidebar-list-item user-logout">
-                        <a href="../index.php" class="sidebar-link">
+                        <a class="sidebar-link" style="cursor:pointer">
                             <div class="sidebar-icon"><i class="fa-light fa-arrow-right-from-bracket"></i></div>
                             <div class="hidden-sidebar" id="logoutacc">Đăng xuất</div>
                         </a>
@@ -363,7 +363,7 @@ $sql .= " ORDER BY id DESC";
                                 <option value="Dòng Ninja" <?php echo $category === 'Dòng Ninja' ? 'selected' : ''; ?>>Dòng Ninja</option>
                                 <option value="Dòng Z" <?php echo $category === 'Dòng Z' ? 'selected' : ''; ?>>Dòng Z</option>
                                 <option value="Dòng KLX" <?php echo $category === 'Dòng KLX' ? 'selected' : ''; ?>>Dòng KLX</option>
-                        </select>
+                            </select>
                         </form>
                     </div>
                     <div class="admin-control-center">
@@ -423,8 +423,8 @@ $sql .= " ORDER BY id DESC";
                     <span class="list-current-price">' . number_format($row["giaban"], 0, ',', '.') . 'đ</span>
                 </div>
                 <div class="list-status" style="margin-top: 10px;">
-                    <span class="status-' . ($row["status"] == 1 ? "complete" : "no-complete") . '">' . 
-                    ($row["status"] == 1 ? "Đang hiển thị" : "Đã ẩn") . '</span>
+                    <span class="status-' . ($row["status"] == 1 ? "complete" : "no-complete") . '">' .
+                            ($row["status"] == 1 ? "Đang hiển thị" : "Đã ẩn") . '</span>
                 </div>
                 <div class="list-control">
                     <div class="list-tool">

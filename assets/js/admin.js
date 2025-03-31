@@ -4,7 +4,17 @@ document.addEventListener("DOMContentLoaded", () => {
         changeLogOut.addEventListener("click", () => {
             if (confirm("Bạn có muốn thoát tài khoản quản trị và trở về trang chủ?") == true) {
                 alert("Đã thoát!");
-                window.location.href = "index.php";
+                // Kiểm tra đường dẫn hiện tại để xác định đường dẫn logout phù hợp
+                const currentPath = window.location.pathname;
+                if (currentPath.includes('/sanpham/') || 
+                    currentPath.includes('/khachhang/') || 
+                    currentPath.includes('/donhang/') || 
+                    currentPath.includes('/thongkesp/') || 
+                    currentPath.includes('/thongkekh/')) {
+                    window.location.href = "../index.php"; // Đường dẫn cho các trang con
+                } else {
+                    window.location.href = "./index.php"; // Đường dẫn cho trang admin chính
+                }
             }
         });
     }
