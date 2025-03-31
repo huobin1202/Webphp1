@@ -541,114 +541,126 @@ li {
 }
 
 .mySlides {
-    display: none;
+    position: absolute; /* Định vị tuyệt đối trong container */
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.mySlides.fade {
+    opacity: 0;
+}
+
+.mySlides.fade[style*="display: block"] {
+    opacity: 1;
 }
 
 /* Slideshow container */
 .slideshow-container {
-    display: relative;
-    margin-left: 10%;
-    margin-right: 10%;
-
-
+    position: relative;
+    width: 80%;
+    max-width: 1450px;
+    margin: 20px auto 0;
+    height: 500px;
+    overflow: hidden;
 }
 
 .slideshow-container img {
-    height: 500px;
     width: 100%;
+    height: 100%;
     object-fit: cover;
-    border-radius: 5px;
+    border-radius: 8px;
 }
 
-/* The dots/bullets/indicators */
-.dot-wrapper {
-    margin-left: 46%;
-    margin-right: 46%;
+/* Nút điều hướng */
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
 
+.prev {
+    left: 20px;
+}
+
+.next {
+    right: 20px;
+}
+
+.prev:hover, .next:hover {
+    background: rgba(19, 155, 58, 0.8);
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Dots */
+.dot-wrapper {
+    position: relative;
+    text-align: center;
+    margin: 15px auto;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 0;
 }
 
 .dot {
-    height: 15px;
-    width: 15px;
-    margin: 0 2px;
-    background-color: #bbb;
+    width: 12px;
+    height: 12px;
+    background-color: #ddd;
     border-radius: 50%;
     display: inline-block;
-    transition: background-color 0.6s ease;
-
-
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
 }
 
-.active {
-    background-color: #717171;
+.dot:hover {
+    background-color: #139b3a;
+    transform: scale(1.2);
 }
 
-/* Fading animation */
-.fade {
-    -webkit-animation-name: fade;
-    -webkit-animation-duration: 1.5s;
-    animation-name: fade;
-    animation-duration: 1.5s;
+.dot.active {
+    background-color: #139b3a;
+    transform: scale(1.2);
+    border-color: #0f7a2d;
+    box-shadow: 0 0 5px rgba(19, 155, 58, 0.3);
 }
 
-@-webkit-keyframes fade {
-    from {
-        opacity: .4
-    }
-
-    to {
-        opacity: 1
-    }
-}
-
+/* Animation */
 @keyframes fade {
     from {
-        opacity: .4
+        opacity: 0.4;
     }
-
     to {
-        opacity: 1
+        opacity: 1;
     }
 }
 
-/* On smaller screens, decrease text size */
-@media only screen and (max-width: 300px) {
-
-    .prev,
-    .next,
-    .text {
-        font-size: 11px
+/* Responsive */
+@media (max-width: 768px) {
+    .slideshow-container {
+        width: 90%;
+        height: 400px;
     }
-}
-
-/* Next & previous buttons */
-.prev,
-.next {
-    cursor: pointer;
-    position: absolute;
-    top: 400px;
-    width: auto;
-    padding: 16px;
-    margin-top: -22px;
-    color: #fff;
-    font-weight: bold;
-    font-size: 18px;
-    transition: 0.6s ease;
-    border-radius: 0 3px 3px 0;
-    user-select: none;
-}
-
-/* Position the "next button" to the right */
-.next {
-    right: 0;
-    border-radius: 3px 0 0 3px;
-    margin-right:10%;
-}
-
-/* On hover, add a black background color with a little bit see-through */
-.prev:hover,
-.next:hover {
-    background-color: rgba(0, 0, 0, 0.8);
+    
+    .prev, .next {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
 }
 
 .home-title-block {
@@ -791,8 +803,8 @@ li {
     }
 
     .page-btn,
-    #prevBtn,
-    #nextBtn {
+#prevBtn,
+#nextBtn {
         min-width: 35px;
         height: 35px;
         font-size: 13px;
