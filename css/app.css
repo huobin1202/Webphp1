@@ -280,6 +280,12 @@ header {
     margin: 1px 0px 0px 0px;
 
 }
+.green-line-footer {
+    background-color: #139b3a;
+    height: 4px;
+    padding: 6px 0px 0px 0px;
+    margin: 77px 0px 0px 0px;
+}
 
 nav ul {
     display: flex;
@@ -1621,7 +1627,7 @@ li {
 .main-account {
     width: 100%;
     border: 1px solid #dae2e6;
-    padding: 20px;
+    padding: 20px 75px;
 }
 
 .main-account.active {
@@ -2388,45 +2394,6 @@ a.account-link {
     margin-right: 5px;
 }
 
-.main-account {
-    width: 80%;
-    border: 1px solid #dae2e6;
-    padding: 20px;
-}
-
-.main-account.active {
-    display: block;
-}
-
-
-.main-account-header {
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.main-account-body {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.main-account-body-row {
-    width: 100%;
-    display: flex;
-}
-
-.main-account-body-row>div {
-    width: 50%;
-}
-
-
-.main-account-body-col {
-    padding-top: 10px;
-    width: 50%;
-}
-
-.main-account-body-col .form-group {
-    margin-right: 30px;
-}
 
 #save-password,
 #save-info-user {

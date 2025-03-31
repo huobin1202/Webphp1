@@ -511,7 +511,6 @@ if ($selected_category != '') {
         </form>
     </section>
 
-    <div class="green-line-header"></div>
     <?php include 'footer.php' ?>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
