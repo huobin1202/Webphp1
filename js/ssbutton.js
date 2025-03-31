@@ -1,75 +1,67 @@
-        var timeOut = 0o0;
-        var slideIndex = 0;
-        var autoOn = true;
+var timeOut = 0o0;
+var slideIndex = 0;
+var autoOn = true;
 
-        autoSlides();
+autoSlides();
 
-        function autoSlides() {
-            timeOut = timeOut - 20;
+function autoSlides() {
+    timeOut = timeOut - 20;
 
-            if (autoOn == true && timeOut < 0) {
-                showSlides();
-            }
-            setTimeout(autoSlides, 20);
-        }
+    if (autoOn == true && timeOut < 0) {
+        showSlides();
+    }
+    setTimeout(autoSlides, 20);
+}
 
-        function prevSlide() {
+function prevSlide() {
 
-            timeOut = 2000;
+    timeOut = 2000;
 
-            var slides = document.getElementsByClassName("mySlides");
-            var dots = document.getElementsByClassName("dot");
+    var slides = document.getElementsByClassName("mySlides");
+    var dots = document.getElementsByClassName("dot");
 
-            for (i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-                dots[i].className = dots[i].className.replace(" active", "");
-            }
-            slideIndex--;
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+        dots[i].className = dots[i].className.replace(" active", "");
+    }
+    slideIndex--;
 
-            if (slideIndex > slides.length) {
-                slideIndex = 1
-            }
-            if (slideIndex == 0) {
-                slideIndex = 3
-            }
-            slides[slideIndex - 1].style.display = "block";
-            dots[slideIndex - 1].className += " active";
-        }
+    if (slideIndex > slides.length) {
+        slideIndex = 1
+    }
+    if (slideIndex == 0) {
+        slideIndex = 3
+    }
+    slides[slideIndex - 1].style.display = "block";
+    dots[slideIndex - 1].className += " active";
+}
 
-        function showSlides() {
+function showSlides() {
 
-            timeOut = 2000;
+    timeOut = 2000;
 
-            var slides = document.getElementsByClassName("mySlides");
-            var dots = document.getElementsByClassName("dot");
+    var slides = document.getElementsByClassName("mySlides");
+    var dots = document.getElementsByClassName("dot");
 
-            for (i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-                dots[i].className = dots[i].className.replace(" active", "");
-            }
-            slideIndex++;
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+        dots[i].className = dots[i].className.replace(" active", "");
+    }
+    slideIndex++;
 
-            if (slideIndex > slides.length) {
-                slideIndex = 1
-            }
-            slides[slideIndex - 1].style.display = "block";
-            dots[slideIndex - 1].className += " active";
-        }
-
-
-
-
-
-
-
-
-document.querySelector(".filter-btn").addEventListener("click",(e) => {
+    if (slideIndex > slides.length) {
+        slideIndex = 1
+    }
+    slides[slideIndex - 1].style.display = "block";
+    dots[slideIndex - 1].className += " active";
+}
+document.querySelector(".filter-btn").addEventListener("click", (e) => {
     e.preventDefault();
     document.querySelector(".advanced-search").classList.toggle("open");
     document.getElementById("home-service").scrollIntoView();
 })
 
-document.querySelector(".form-search-input").addEventListener("click",(e) => {
+document.querySelector(".form-search-input").addEventListener("click", (e) => {
     e.preventDefault();
     document.getElementById("home-service").scrollIntoView();
 })
