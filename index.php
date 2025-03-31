@@ -36,6 +36,14 @@ if ($username && !$customer_id) {
     $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
 }
 
+// Khởi tạo biến category
+$selected_category = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Xây dựng câu truy vấn SQL dựa trên category được chọn
+$sql = "SELECT id, tensp, giaban, hinhanh, dongsp FROM products WHERE status = 1";
+if ($selected_category != '') {
+    $sql .= " AND dongsp = '" . mysqli_real_escape_string($conn, $selected_category) . "'";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -56,6 +64,31 @@ if ($username && !$customer_id) {
             gap: 10px;
             margin-top: 10px;
         }
+        .menu-link.active {
+            color: #139b3a !important;
+            font-weight: bold;
+        }
+
+        .menu-link.active::after {
+            width: 100%;
+        }
+
+        .no-products {
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Thêm hiệu ứng transition cho menu links */
+        .menu-link {
+            transition: color 0.3s ease;
+        }
+
+        .menu-link:hover {
+            color: #139b3a !important;
+        }
     </style>
     <title>BMT </title>
 </head>
@@ -66,7 +99,7 @@ if ($username && !$customer_id) {
             <div class="container">
                 <div class="header-middle-left">
                     <div class="header-logo">
-                        <a href="" id="logo">
+                        <a href="index.php" id="logo">
                             <img src="image/logo.png" alt="BMT">
                         </a>
                     </div>
@@ -219,9 +252,23 @@ if ($username && !$customer_id) {
                 <div class="dropdown">
                     <span>Sản phẩm</span>
                     <div class="dropdown-content">
-                        <li class="menu-list-item"><a href="NINJA.php" class="menu-link">Dòng Ninja</a></li>
-                        <li class="menu-list-item"><a href="Z.php" class="menu-link">Dòng Z</a></li>
-                        <li class="menu-list-item"><a href="KLX.php" class="menu-link">Dòng KLX</a></li>
+        
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                                Dòng Ninja
+                            </a>
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Z' ? 'active' : ''; ?>">
+                                Dòng Z
+                            </a>
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
+                                Dòng KLX
+                            </a>
+                        </li>
                     </div>
                 </div>
                 <li class="menu-list-item"><a href="index.php" class="menu-link">Tin tức </a></li>
@@ -309,13 +356,12 @@ if ($username && !$customer_id) {
                     <div class="grid-container" id="product-list">
 
                         <?php
-                        $sql = "SELECT id, tensp, giaban, hinhanh FROM products WHERE status = 1";
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 echo '
                                 <form method="POST" action="">
-                                    <div class="card page-1" id="invoiceModal">
+                                    <div class="card page-1">
                                         <a href="thongtinsp.php?id=' . $row["id"] . '">
                                             <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
                                         </a>
@@ -328,13 +374,14 @@ if ($username && !$customer_id) {
                                         <input type="hidden" name="product_price" value="' . $row["giaban"] . '">
                                         <input type="hidden" name="product_img" value="' . $row["hinhanh"] . '">
                                         <div class=display style="display:flex;">
-                                        <button type="submit" class="mua" name="add_to_cart">Thêm vào giỏ hàng</button>
-                                        <a href="thongtinsp.php?id=' . $row['id'] . '" class="mua" style="text-decoration: none; text-align: center; display: inline-block;color:white;">Xem chi tiết</a>
+                                            <button type="submit" class="mua" name="add_to_cart">Thêm vào giỏ hàng</button>
+                                            <a href="thongtinsp.php?id=' . $row['id'] . '" class="mua" style="text-decoration: none; text-align: center; display: inline-block;color:white;">Xem chi tiết</a>
                                         </div>
-                                    
                                     </div>
                                 </form>';
                             }
+                        } else {
+                            echo '<p class="no-products">Không có sản phẩm nào trong danh mục này</p>';
                         }
                         ?>
 
@@ -470,6 +517,7 @@ if ($username && !$customer_id) {
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
+    <script src="js/filter.js"></script>
 
 
 
