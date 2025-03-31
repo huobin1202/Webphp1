@@ -155,17 +155,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="checkout-row">
                 <div class="checkout-col-title">Thông tin đơn hàng</div>
                 <div class="checkout-col-content">
-                    <div class="content-group  ">
+                    <div class="content-group">
                         <p class="checkout-content-label">Hình thức giao nhận</p>
                         <div class="checkout-type-order">
-                        <input type="button" class="type-order-btn active " id="tudenlay" value="Tự đến lấy"  ></input>
-                        <input type="button" class="type-order-btn " id="giaotannoi" value="Giao tận nơi"></input>
-                        <input type="hidden" name="delivery_mode" id="delivery_mode" value="Mua trực tiếp">
-                        <input type="hidden" name="delivery_mode" id="delivery_mode" value="Giao tận nơi">
+                            <button type="button" class="type-order-btn active" id="tudenlay" onclick="switchDeliveryMode('tudenlay')">
+                                <i class="fa-regular fa-shop"></i>Tự đến lấy
+                            </button>
+                            <button type="button" class="type-order-btn" id="giaotannoi" onclick="switchDeliveryMode('giaotannoi')">
+                                <i class="fa-regular fa-truck"></i>Giao tận nơi
+                            </button>
+                            <input type="hidden" name="delivery_mode" id="delivery_mode" value="Mua trực tiếp">
                         </div>
                     </div>
 
-                    <div class="content-group chk-ship" id="giaotannoi-group">
+                    <div class="content-group" id="address-selection" style="display: none;">
+                        <div class="address-options">
+                            <label>
+                                <input type="radio" name="address_type" value="saved" checked> Sử dụng địa chỉ đã lưu
+                            </label>
+                            <label>
+                                <input type="radio" name="address_type" value="new"> Nhập địa chỉ mới
+                            </label>
+                        </div>
+                        <div id="saved-address" class="form-group">
+                            <input type="text" value="<?php echo htmlspecialchars($customer_address); ?>" readonly class="form-control">
+                        </div>
+                        <div id="new-address" class="form-group" style="display: none;">
+                            <input id="diachinhan" name="diachinhan" type="text" placeholder="Địa chỉ nhận hàng" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="content-group chk-ship" id="giaotannoi-group" style="display: none;">
                         <p class="checkout-content-label">Phương thức thanh toán</p>
                         <div class="delivery-time">
                             <input type="radio" name="payment_method" value="Tiền mặt" id="giaongay" class="radio" checked>
@@ -175,9 +195,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="radio" name="payment_method" value="Chuyển khoản" id="deliverytime" class="radio">
                             <label for="deliverytime">Thanh toán bằng chuyển khoản</label>
                         </div>
+                        
+                        <div id="bank-info" style="display: none; margin-top: 15px; padding: 15px; background: #f8f8f8; border-radius: 5px; border: 1px solid #e0e0e0;">
+                            <p style="font-weight: 600; color: #139b3a; margin-bottom: 10px;">Thông tin chuyển khoản:</p>
+                            <div style="margin-bottom: 15px;">
+                                <p style="margin: 5px 0;"><strong>Ngân hàng:</strong> Vietcombank</p>
+                                <p style="margin: 5px 0;"><strong>Số tài khoản:</strong> 1234567890</p>
+                                <p style="margin: 5px 0;"><strong>Chủ tài khoản:</strong> CÔNG TY TNHH BMT</p>
+                                <p style="margin: 5px 0;"><strong>Chi nhánh:</strong> TP.HCM</p>
+                            </div>
+                            <div style="background: #fff3cd; padding: 10px; border-radius: 4px; border: 1px solid #ffeeba;">
+                                <p style="color: #856404; margin: 0;">
+                                    <i class="fa-light fa-triangle-exclamation" style="margin-right: 5px;"></i>
+                                    Vui lòng ghi rõ nội dung chuyển khoản: "Tên người mua + Số điện thoại"
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="content-group" id="tudenlay-group">
+                        <p class="checkout-content-label">Phương thức thanh toán</p>
+                        <div class="delivery-time">
+                            <input type="radio" name="payment_method_store" value="Tiền mặt" id="tienmat_store" class="radio" checked>
+                            <label for="tienmat_store">Thanh toán bằng tiền mặt khi nhận hàng</label>
+                        </div>
+                        <div class="delivery-time">
+                            <input type="radio" name="payment_method_store" value="Chuyển khoản" id="chuyenkhoan_store" class="radio">
+                            <label for="chuyenkhoan_store">Thanh toán bằng chuyển khoản</label>
+                        </div>
+
+                        <div id="bank-info-store" style="display: none; margin: 15px 0 25px; padding: 15px; background: #f8f8f8; border-radius: 5px; border: 1px solid #e0e0e0;">
+                            <p style="font-weight: 600; color: #139b3a; margin-bottom: 10px;">Thông tin chuyển khoản:</p>
+                            <div style="margin-bottom: 15px;">
+                                <p style="margin: 5px 0;"><strong>Ngân hàng:</strong> Vietcombank</p>
+                                <p style="margin: 5px 0;"><strong>Số tài khoản:</strong> 1234567890</p>
+                                <p style="margin: 5px 0;"><strong>Chủ tài khoản:</strong> CÔNG TY TNHH BMT</p>
+                                <p style="margin: 5px 0;"><strong>Chi nhánh:</strong> TP.HCM</p>
+                            </div>
+                            <div style="background: #fff3cd; padding: 10px; border-radius: 4px; border: 1px solid #ffeeba;">
+                                <p style="color: #856404; margin: 0;">
+                                    <i class="fa-light fa-triangle-exclamation" style="margin-right: 5px;"></i>
+                                    Vui lòng ghi rõ nội dung chuyển khoản: "Tên người mua + Số điện thoại"
+                                </p>
+                            </div>
+                        </div>
+
                         <p class="checkout-content-label">Lấy hàng tại chi nhánh</p>
                         <div class="delivery-time">
                             <input type="radio" name="delivery_type" value="273 An Dương Vương" id="chinhanh-1" class="radio" checked>
@@ -227,5 +289,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
 <script src="js/checkout.js"></script>
+
+
 </body>
 </html>

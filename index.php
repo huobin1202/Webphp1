@@ -236,35 +236,27 @@ if ($username && !$customer_id) {
     <main class="main-wrapper">
         <div class="slideshow-container">
             <div class="mySlides fade">
-
-                <img src="image/web1.jpg">
-
+                <img src="image/web1.jpg" alt="Slide 1">
             </div>
             <div class="mySlides fade">
-
-                <img src="image/web2.jpg">
-
+                <img src="image/web2.jpg" alt="Slide 2">
             </div>
             <div class="mySlides fade">
-
-                <img src="image/web3.png">
-
+                <img src="image/web3.png" alt="Slide 3">
             </div>
             <div class="mySlides fade">
-
-                <img src="image/web4.jpg">
-
+                <img src="image/web4.jpg" alt="Slide 4">
             </div>
-            <div class="dot-wrapper">
-
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-
-            </div>
+            
             <a class="prev" onclick="prevSlide()">&#10094;</a>
-            <a class="next" onclick="showSlides()">&#10095;</a>
+            <a class="next" onclick="nextSlide()">&#10095;</a>
+
+            <div class="dot-wrapper">
+                <span class="dot" onclick="currentSlide(0)"></span>
+                <span class="dot" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+                <span class="dot" onclick="currentSlide(3)"></span>
+            </div>
         </div>
         <div class="container" id="trangchu">
 

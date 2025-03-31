@@ -2189,13 +2189,6 @@ li {
     display: flex;
 }
 
-.order-history-left img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    margin-right: 14px;
-    border-radius: 5px;
-}
 
 .order-history-info p {
     margin-top: 7px;
@@ -2479,4 +2472,82 @@ input[type=number] {
 #new-address input {
     background-color: white;
 }
+.type-order-btn {
+    width: 50%;
+    height: 50px;
+    cursor: pointer;
+    font-size: 16px;
+    background-color: #f6f6f6;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.type-order-btn.active {
+    background-color: white;
+    border-color: #139b3a;
+    color: #139b3a;
+}
+
+.type-order-btn:hover {
+    background-color: #e9e9e9;
+}
+
+.type-order-btn i {
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+.checkout-type-order {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+#address-selection,
+#giaotannoi-group,
+#tudenlay-group {
+    transition: all 0.3s ease;
+}
+
+#bank-info,
+#bank-info-store {
+    transition: all 0.3s ease;
+    margin: 15px 0;
+    padding: 15px;
+    background: #f8f8f8;
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+}
+
+#bank-info p,#bank-info-store p {
+    line-height: 1.5;
+}
+
+#bank-info strong, #bank-info-store strong {
+    color: #333;
+    display: inline-block;
+    width: 135px;
+}
+
+.delivery-time {
+    margin-bottom: 10px;
+}
+
+.delivery-time input[type="radio"] {
+    margin-right: 10px;
+}
+
+.delivery-time label {
+    cursor: pointer;
+}
+
+.checkout-content-label {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    font-weight: 600;
 }
