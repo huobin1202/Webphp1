@@ -261,16 +261,16 @@ if (!isset($_SESSION['customer_id'])) {
                                             $status_text = '';
                                             switch ($order['status']) {
                                                 case 'chuaxuly':
-                                                    $status_class = 'no-complete';
+                                                    $status_class = 'pending';
                                                     $status_text = 'Chưa xử lý';
                                                     break;
                                                 case 'daxuly':
                                                     $status_class = 'processing';
                                                     $status_text = 'Đã xử lý';
                                                     break;
-                                                case 'chuagiao':
-                                                    $status_class = 'pending';
-                                                    $status_text = 'Chưa giao';
+                                                case 'dahuy':
+                                                    $status_class = 'no-complete';
+                                                    $status_text = 'Đã hủy';
                                                     break;
                                                 case 'dagiao':
                                                     $status_class = 'complete';

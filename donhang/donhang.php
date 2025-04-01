@@ -181,7 +181,7 @@ $conn->close();
                                 <option value="4" <?php echo (isset($_GET['status']) && $_GET['status'] == '4') ? 'selected' : ''; ?>>Tất cả</option>
                                 <option value="chuaxuly" <?php echo (isset($_GET['status']) && $_GET['status'] == 'chuaxuly') ? 'selected' : ''; ?>>Chưa xử lý</option>
                                 <option value="daxuly" <?php echo (isset($_GET['status']) && $_GET['status'] == 'daxuly') ? 'selected' : ''; ?>>Đã xử lý</option>
-                                <option value="chuagiao" <?php echo (isset($_GET['status']) && $_GET['status'] == 'chuagiao') ? 'selected' : ''; ?>>Chưa giao</option>
+                                <option value="dahuy" <?php echo (isset($_GET['status']) && $_GET['status'] == 'dahuy') ? 'selected' : ''; ?>>Đã hủy</option>
                                 <option value="dagiao" <?php echo (isset($_GET['status']) && $_GET['status'] == 'dagiao') ? 'selected' : ''; ?>>Đã giao</option>
                             </select>
                         </div>
@@ -239,7 +239,7 @@ $conn->close();
                                                 <select name="new_status" onchange="this.form.submit()">
                                                     <option value="chuaxuly" <?php echo $order['status'] == 'chuaxuly' ? 'selected' : ''; ?>>Chưa xử lý</option>
                                                     <option value="daxuly" <?php echo $order['status'] == 'daxuly' ? 'selected' : ''; ?>>Đã xử lý</option>
-                                                    <option value="chuagiao" <?php echo $order['status'] == 'chuagiao' ? 'selected' : ''; ?>>Chưa giao</option>
+                                                    <option value="dahuy" <?php echo $order['status'] == 'dahuy' ? 'selected' : ''; ?>>Đã hủy</option>
                                                     <option value="dagiao" <?php echo $order['status'] == 'dagiao' ? 'selected' : ''; ?>>Đã giao</option>
                                                 </select>
                                             </form>

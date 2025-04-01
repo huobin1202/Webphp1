@@ -388,7 +388,7 @@ if (isset($_GET['detail'])) {
                                     switch($detail['status']) {
                                         case 'chuaxuly': echo 'Chưa xử lý'; break;
                                         case 'daxuly': echo 'Đã xử lý'; break;
-                                        case 'chuagiao': echo 'Chưa giao'; break;
+                                        case 'dahuy': echo 'Đã hủy'; break;
                                         case 'dagiao': echo 'Đã giao'; break;
                                         default: echo $detail['status'];
                                     }
