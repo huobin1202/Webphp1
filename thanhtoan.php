@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $delete_cart->bind_param("i", $customer_id);
     $delete_cart->execute();
 
-    header('Location: index.php');
+    header('Location: mua_thanhcong.php');
     exit();
 }
 ?>
@@ -219,7 +219,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="price-final" id="checkout-cart-price-final"><?php echo number_format($total); ?>₫</div>
                 </div>
             </div>
-            <button type="submit" class="complete-checkout-btn">Đặt hàng</button>
+            
+            <a href="mua_thanhcong.php"><button type="submit" class="complete-checkout-btn">Đặt hàng</button></a>
         </div>
         </form>
     </main>
