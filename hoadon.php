@@ -75,17 +75,12 @@ if ($username && !$customer_id) {
                 </div>
                 <div class="header-middle-center">
                     <form action="" class="form-search">
-                        <span class="search-btn">
-                            <a href="">
+                    <button class="filter-btn">
                                 <i class="fa-light fa-magnifying-glass"></i>
-                            </a>
-                        </span>
+                        </button>
                         <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
-                        <button class="filter-btn">
-                            <i class="fa-light fa-filter-list"></i>
-                            <span style="font-size: 14px;">Lọc</span>
-                        </button>
+                       
                     </form>
                 </div>
                 <div class="header-middle-right">
@@ -167,9 +162,11 @@ if ($username && !$customer_id) {
                                 </div>
 
                                 <div class="hoadon">
+                                    <a href="giohang.php" style="text-decoration: none; color: inherit;">
                                     <span class="ravao">
                                         <i class="fa-light fa-basket-shopping"></i> Giỏ hàng
                                     </span>
+                                    </a>
                                 </div>
 
                             </div>
@@ -380,116 +377,6 @@ if ($username && !$customer_id) {
             </div>
         </div>
     </div>
-
-
-
-
-
-    <section class="cart">
-        <button class="dong"><i class="fa-regular fa-xmark"></i></button>
-        <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
-        <form action="" method="POST">
-            <?php
-            if (isset($_POST['add_to_cart'])) {
-                if (!isset($_SESSION['customer_id'])) {
-                    $_SESSION['error'] = "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!";
-                    header("Location: index.php");
-                    exit();
-                }
-
-                $product_id = $_POST['product_id'];
-                $product_price = $_POST['product_price'];
-                $product_img = $_POST['product_img'];
-                $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
-
-                // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
-                $stmt = $conn->prepare("SELECT soluong FROM giohang WHERE product_id = ? AND customer_id = ?");
-                $stmt->bind_param("ii", $product_id, $customer_id);
-                $stmt->execute();
-                $stmt->store_result();
-
-                if ($stmt->num_rows > 0) {
-                    $stmt->close();
-                } else {
-                    $stmt = $conn->prepare("INSERT INTO giohang (customer_id, product_id, soluong, price, img) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->bind_param("iiiss", $customer_id, $product_id, $quantity, $product_price, $product_img);
-                    $stmt->execute();
-                    $stmt->close();
-                }
-            }
-
-
-            ?>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>
-                            Sản phẩm
-                        </th>
-                        <th>Tên</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>Chọn</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    // Kiểm tra xem người dùng đã đăng nhập chưa
-                    if (!isset($_SESSION['customer_id'])) {
-                        echo "<tr><td colspan='4'>Bạn cần đăng nhập để xem giỏ hàng!</td></tr>";
-                    } else {
-                        $customer_id = $_SESSION['customer_id'];
-
-                        // Truy vấn lấy sản phẩm từ bảng giỏ hàng
-                        $sql = "SELECT g.id, g.product_id, g.soluong, g.price, g.img, p.tensp 
-                                FROM giohang g
-                                JOIN products p ON g.product_id = p.id
-                                WHERE g.customer_id = ?";
-
-                        $stmt = $conn->prepare($sql);
-                        $stmt->bind_param("i", $customer_id);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-
-                        $total_price = 0;
-
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                $subtotal = $row["soluong"] * $row["price"];
-                                $total_price += $subtotal;
-                                echo '
-                                <tr>
-                                    <td style="display: flex; align-items: center;">
-                                        <img style="width: 90px;" src="sanpham/' . $row["img"] . '" alt="' . htmlspecialchars($row["tensp"]) . '">
-                                    </td>
-                                    <td><span>' . htmlspecialchars($row["tensp"]) . '</span></td>
-                                    <td>
-                                        <p><span>' . number_format($row["price"], 0, ',', '.') . '</span><sup>đ</sup></p>
-                                    </td>
-                                    <td>
-                                        <input style="width: 40px; outline: none;" type="number" value="' . $row["soluong"] . '" min="1" class="cart-quantity" data-cart-id="' . $row["id"] . '">
-                                    </td>
-                                    <td style="cursor: pointer;" class="delete-item" data-cart-id="' . $row["id"] . '">Xóa</td>
-                                </tr>';
-                            }
-                        } else {
-                            echo "<tr><td colspan='4'>Giỏ hàng của bạn đang trống!</td></tr>";
-                        }
-                    }
-                    ?>
-                </tbody>
-
-            </table>
-            <div style="text-align: center;" class="price-total">
-                <p style="font-weight: bold; margin-top: 10px; margin-bottom: 20px;">
-                    Tổng tiền: <span><?php echo number_format($total_price, 0, ',', '.'); ?></span>đ
-                </p>
-            </div>
-            <a class="thanhtoan" href="thanhtoan.php">Thanh toán</a>
-        </form>
-    </section>
-
     <?php include 'footer.php' ?>
     <script src="js/hoadon.js"></script>
     <script src="js/giohang.js"></script>
