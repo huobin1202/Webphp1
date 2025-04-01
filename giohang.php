@@ -594,59 +594,6 @@ if (isset($_POST['add_to_cart'])) {
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
     <script src="js/filter.js"></script>
-
-    <script>
-        function updateQuantity(btn, change) {
-            const input = btn.parentElement.querySelector('.quantity-input');
-            const currentValue = parseInt(input.value);
-            let newValue = currentValue + change;
-
-            // Giới hạn giá trị từ 1 đến 10
-            newValue = Math.max(1, Math.min(10, newValue));
-
-            // Cập nhật giá trị cho input
-            input.value = newValue;
-
-            // Cập nhật giá trị cho hidden input trong form
-            const form = btn.closest('.button-container').querySelector('form');
-            const hiddenInput = form.querySelector('.quantity-hidden');
-            hiddenInput.value = newValue;
-
-            // Cập nhật hiển thị giá tiền
-            const unitPrice = parseInt(input.getAttribute('data-price'));
-            const newTotal = unitPrice * newValue;
-            const priceElement = btn.closest('.button-container').querySelector('.product-price');
-            priceElement.textContent = new Intl.NumberFormat('vi-VN').format(newTotal) + 'đ';
-        }
-
-        function prepareUpdate(btn) {
-            const form = btn.closest('form');
-            const quantityInput = form.previousElementSibling.querySelector('.quantity-input');
-            const hiddenInput = form.querySelector('.quantity-hidden');
-            hiddenInput.value = quantityInput.value;
-            return true;
-        }
-
-        // Vô hiệu hóa việc nhập trực tiếp vào input số lượng
-        document.querySelectorAll('.quantity-input').forEach(input => {
-            input.addEventListener('keydown', (e) => {
-                e.preventDefault();
-                return false;
-            });
-        });
-
-        // Hiển thị thông báo nếu có
-        <?php if (isset($_SESSION['success'])): ?>
-            alert("<?php echo $_SESSION['success']; ?>");
-            <?php unset($_SESSION['success']); ?>
-        <?php endif; ?>
-
-        <?php if (isset($_SESSION['error'])): ?>
-            alert("<?php echo $_SESSION['error']; ?>");
-            <?php unset($_SESSION['error']); ?>
-        <?php endif; ?>
-    </script>
-
 </body>
 <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "<script>if(window.history.replaceState){window.history.replaceState(null, null, window.location.href);}</script>";

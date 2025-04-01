@@ -1,6 +1,7 @@
 <?php
 session_start();
 include('database.php');
+include('toast.php');
 
 // Xử lý đăng xuất
 if (isset($_GET['logout'])) {
@@ -14,14 +15,16 @@ $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null
 
 // Nếu có username, lấy ID từ bảng customer
 if ($username && !$customer_id) {
-    $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ?");
+    $stmt = $conn->prepare("SELECT id, role FROM customer WHERE name = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $stmt->bind_result($customer_id);
+    $stmt->bind_result($customer_id, $role);
     if ($stmt->fetch()) {
         $_SESSION["customer_id"] = $customer_id;
+        $_SESSION["role"] = $role;
     }
-    $stmt->close();
+} else {
+    $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
 }
 // Lấy ID sản phẩm từ URL
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;

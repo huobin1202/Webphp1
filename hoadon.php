@@ -11,6 +11,7 @@ if (isset($_GET['logout'])) {
     header("Location: index.php");
     exit;
 }
+
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
 $role = null;
@@ -25,7 +26,6 @@ if ($username && !$customer_id) {
         $_SESSION["customer_id"] = $customer_id;
         $_SESSION["role"] = $role;
     }
-    $stmt->close();
 } else {
     $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
 }
@@ -34,17 +34,7 @@ if (!isset($_SESSION['customer_id'])) {
     header("Location: dn.php");
     exit();
 }
-// Nếu có username, lấy ID từ bảng customer
-if ($username && !$customer_id) {
-    $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->bind_result($customer_id);
-    if ($stmt->fetch()) {
-        $_SESSION["customer_id"] = $customer_id;
-    }
-    $stmt->close();
-}
+
 
 ?>
 <!DOCTYPE html>
@@ -176,35 +166,7 @@ if ($username && !$customer_id) {
             </div>
         </div>
     </header>
-    <div class="advanced-search">
-        <div class="container">
-            <div class="advanced-search-category">
-                <span>Phân loại </span>
-                <select name="" id="advanced-search-category-select" onchange="searchProducts()">
-                    <option>Tất cả</option>
-                    <option>Dòng Ninja</option>
-                    <option>Dòng Z</option>
-                    <option>Dòng KLX</option>
-                </select>
-            </div>
-            <div class="advanced-search-price">
-                <span>Giá từ</span>
-                <input type="number" placeholder="tối thiểu" id="min-price" onchange="searchProducts()">
-                <span>đến</span>
-                <input type="number" placeholder="tối đa" id="max-price" onchange="searchProducts()">
-                <button id="advanced-search-price-btn"><a href=""><i class="fa-light fa-magnifying-glass-dollar"></i></a></button>
-            </div>
-            <div class="advanced-search-control">
-                <button id="sort-ascending" onclick="searchProducts(1)"><i
-                        class="fa-regular fa-arrow-up-short-wide"></i></button>
-                <button id="sort-descending" onclick="searchProducts(2)"><i
-                        class="fa-regular fa-arrow-down-wide-short"></i></button>
-                <button id="reset-search" onclick="searchProducts(0)"><i
-                        class="fa-light fa-arrow-rotate-right"></i></button>
-                <button onclick="closeSearchAdvanced()"><i class="fa-light fa-xmark"></i></button>
-            </div>
-        </div>
-    </div>
+ 
     <div class="green-line-header"></div>
 
     <nav class="header-bottom">
