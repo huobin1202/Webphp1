@@ -256,7 +256,7 @@ $result = $stmt->get_result();
                                     echo "<td>" . $row["id"] . "</td>";
                                     echo "<td>" . htmlspecialchars($row["name"]) . "</td>";
                                     echo "<td>" . htmlspecialchars($row["contact"]) . "</td>";
-                                    echo "<td>" . $row["joindate"] . "</td>";
+                                    echo "<td>" . date('d/m/Y', strtotime($row["joindate"])) . "</td>";
                                     echo "<td><span class='status-" . ($row["status"] == 1 ? "complete" : "no-complete") . "'>" .
                                         ($row["status"] == 1 ? "Hoạt động" : "Bị khóa") . "</span></td>";
                                     echo "<td class='control control-table'>";

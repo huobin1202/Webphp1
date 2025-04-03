@@ -481,7 +481,11 @@ if (isset($_POST['add_to_cart'])) {
 
     <main class="main-wrapper">
         <div class="container" style="margin: 30px auto;">
-            <h2 style="font-size: 28px; margin-bottom: 30px; text-transform: uppercase;">GIỎ HÀNG</h2>
+            <div class="home-title-block" id="home-title">
+                <h2 class="home-title">GIỎ HÀNG</h2>
+                <div class="border-line"></div>
+            </div>
+
 
             <div style="display: flex; gap: 30px;">
                 <!-- Phần danh sách sản phẩm -->
@@ -572,7 +576,6 @@ if (isset($_POST['add_to_cart'])) {
                                 <span>Tổng cộng (<?php echo $result->num_rows; ?> Sản phẩm)</span>
                                 <span><?php echo number_format($total, 0, ',', '.'); ?>đ</span>
                             </div>
-                            <p style="font-size: 12px; color: #666;">Excluding tax and shipping</p>
 
                             <a href="thanhtoan.php" class="mua" style="width: 100%; margin-top: 20px; display: block; text-align: center; text-decoration: none; color: white;">Thanh toán</a>
 

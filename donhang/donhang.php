@@ -325,7 +325,7 @@ $conn->close();
                                     </li>
                                     <li class="detail-order-item tb">
                                         <span class="detail-order-item-left"><i class="fa-light fa-clock"></i> Thời gian giao</span>
-                                        <p class="detail-order-item-b"></p>
+                                        <p class="detail-order-item-b"><?php echo date('d/m/Y', strtotime($current_order['created_at'])); ?></p>
                                     </li>
                                     <li class="detail-order-item tb">
                                         <span class="detail-order-item-t"><i class="fa-light fa-location-dot"></i> Địa chỉ</span>

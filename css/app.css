@@ -824,8 +824,6 @@ li {
 
 .border-line {
     border-bottom: 1px solid #139b3a;
-
-    margin-left: 330px;
 }
 
 .visible {
@@ -2527,4 +2525,24 @@ input[type=number] {
     margin-top: 20px;
     margin-bottom: 15px;
     font-weight: 600;
+}
+
+.order-history-cancel-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 15px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 939px;
+    transition: background-color 0.3s;
+}
+
+.order-history-cancel-btn:hover {
+    background-color: #d32f2f;
+}
+
+.order-history-cancel-btn i {
+    margin-right: 5px;
 }

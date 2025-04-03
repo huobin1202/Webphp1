@@ -257,6 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <nav class="header-bottom">
         <div class="container">
+            
             <ul class="menu-list">
                 <li class="menu-list-item"><a href="index.php" class="menu-link">Trang chủ</a></li>
 
@@ -287,13 +288,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </nav>
     <div class="container" id="account-user">
+        
         <div class="main-account">
             <div class="main-account-header">
                 <h3>Thông tin tài khoản của bạn</h3>
                 <p>Quản lý thông tin để bảo mật tài khoản</p>
             </div>
             <form class="main-account-body" method="POST">
-
                 <div class="main-account-body-col">
                     <div class="form-group">
                         <label for="infoname" class="form-label">Tên tài khoản</label>

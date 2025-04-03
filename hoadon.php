@@ -35,6 +35,14 @@ if (!isset($_SESSION['customer_id'])) {
     exit();
 }
 
+if (isset($_POST['cancel_order'])) {
+    $order_id = intval($_POST['order_id']);
+    $stmt = $conn->prepare("UPDATE orders SET status = 'dahuy' WHERE id = ? AND customer_id = ? AND status = 'chuaxuly'");
+    $stmt->bind_param("ii", $order_id, $customer_id);
+    $stmt->execute();
+    header("Location: hoadon.php");
+    exit();
+}
 
 ?>
 <!DOCTYPE html>
@@ -288,6 +296,14 @@ if (!isset($_SESSION['customer_id'])) {
                                                 data-recipient-name="<?= htmlspecialchars($order['recipient_name']) ?>"
                                                 data-recipient-phone="<?= htmlspecialchars($order['recipient_phone']) ?>"><i class="fa-regular fa-eye"></i> Xem chi tiết
                                             </button>
+                                            <?php if ($order['status'] === 'chuaxuly'): ?>
+                                            <form method="POST" action="" style="display: inline;" onsubmit="return confirmCancelOrder()">
+                                                <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                                                <button type="submit" name="cancel_order" class="order-history-cancel-btn">
+                                                    <i class="fa-regular fa-xmark"></i> Hủy đơn
+                                                </button>
+                                            </form>
+                                            <?php endif; ?>
                                         </div>
 
                                     </div>
@@ -321,7 +337,7 @@ if (!isset($_SESSION['customer_id'])) {
                     </li>
                     <li class="detail-order-item">
                         <span class="detail-order-item-left"><i class="fa-light fa-clock"></i> Ngày nhận hàng</span>
-                        <span class="detail-order-item-right">01/04/2025</span>
+                        <span class="detail-order-item-right" id="modal-delivery-date"></span>
                     </li>
                     <li class="detail-order-item">
                         <span class="detail-order-item-left"><i class="fa-light fa-location-dot"></i> Địa điểm nhận</span>
@@ -344,10 +360,6 @@ if (!isset($_SESSION['customer_id'])) {
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
-
-
-
-
 </body>
 <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "<script>if(window.history.replaceState){window.history.replaceState(null, null, window.location.href);}</script>";
