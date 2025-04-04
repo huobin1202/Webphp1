@@ -2,11 +2,6 @@
 session_start();
 include('database.php');
 
-if (!isset($_SESSION['customer_id'])) {
-    echo "<script>alert('Bạn cần đăng nhập để xem hóa đơn!'); window.location.href='dn.php';</script>";
-    exit();
-}
-
 $customer_id = $_SESSION['customer_id'];
 
 // Lấy đơn hàng mới nhất của khách hàng
@@ -19,7 +14,7 @@ $order_query->bind_param("i", $customer_id);
 $order_query->execute();
 $order_result = $order_query->get_result();
 $order = $order_result->fetch_assoc();
-var_dump($order);
+
 if (!$order) {
     echo "<script>alert('Không tìm thấy hóa đơn!'); window.location.href='index.php';</script>";
     exit();
@@ -46,6 +41,7 @@ $details_result = $details_query->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Hóa Đơn Mua Hàng</title>
     <style>
     body {
@@ -123,12 +119,14 @@ $details_result = $details_query->get_result();
     <div class="container">
         <h2 class="title">Hóa Đơn Mua Hàng</h2>
         <div class="info">
-            <p><b>Tên người nhận:</b> <?php echo htmlspecialchars($order['recipient_name']); ?></p>
+            <h2>Thông tin người đặt</h2>
+            <p><b>Tên người nhận:</b> <?php echo htmlspecialchars($order['recipient_name']); ?></p> 
             <p><b>Số điện thoại:</b> <?php echo htmlspecialchars($order['recipient_phone']); ?></p>
             <p><b>Địa chỉ:</b> <?php echo htmlspecialchars($order['address']); ?></p>
+            <h2>Thông tin thanh toán</h2>
             <p><b>Hình thức giao hàng:</b> <?php echo htmlspecialchars($order['delivery_type']); ?></p>
             <p><b>Phương thức thanh toán:</b> <?php echo htmlspecialchars($order['payment_method']); ?></p>
-
+            <h2>Danh sách đơn mua</h2>
         </div>
 
         <table class="table">
