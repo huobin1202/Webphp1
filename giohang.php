@@ -36,14 +36,6 @@ if ($username && !$customer_id) {
     $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
 }
 
-// Khởi tạo biến category
-$selected_category = isset($_GET['category']) ? $_GET['category'] : '';
-
-// Xây dựng câu truy vấn SQL dựa trên category được chọn
-$sql = "SELECT id, tensp, giaban, hinhanh, dongsp FROM products WHERE status = 1";
-if ($selected_category != '') {
-    $sql .= " AND dongsp = '" . mysqli_real_escape_string($conn, $selected_category) . "'";
-}
 
 // Kiểm tra đăng nhập
 if (!isset($_SESSION['customer_id'])) {
@@ -454,17 +446,17 @@ if (isset($_POST['add_to_cart'])) {
 
                         </li>
                         <li class="menu-list-item">
-                            <a href="?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                            <a href="index.php?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
                                 Dòng Ninja
                             </a>
                         </li>
                         <li class="menu-list-item">
-                            <a href="?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Z' ? 'active' : ''; ?>">
+                            <a href="index.php?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Z' ? 'active' : ''; ?>">
                                 Dòng Z
                             </a>
                         </li>
                         <li class="menu-list-item">
-                            <a href="?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
+                            <a href="index.php?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
                                 Dòng KLX
                             </a>
                         </li>

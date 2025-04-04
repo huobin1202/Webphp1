@@ -514,9 +514,15 @@ if ($result->num_rows > 0) {
                 <div class="dropdown">
                     <span>Sản phẩm</span>
                     <div class="dropdown-content">
-                        <li class="menu-list-item"><a href="NINJA.php" class="menu-link">Dòng Ninja</a></li>
-                        <li class="menu-list-item"><a href="Z.php" class="menu-link">Dòng Z</a></li>
-                        <li class="menu-list-item"><a href="KLX.php" class="menu-link">Dòng KLX</a></li>
+                        <li class="menu-list-item"> <a href="index.php?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                                Dòng Ninja
+                            </a></li>
+                        <li class="menu-list-item"> <a href="index.php?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                                Dòng Z
+                            </a></li>
+                        <li class="menu-list-item"><a href="index.php?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
+                                Dòng KLX
+                            </a></li>
                     </div>
                 </div>
                 <li class="menu-list-item"><a href="index.php" class="menu-link">Tin tức </a></li>
@@ -582,7 +588,6 @@ if ($result->num_rows > 0) {
         </div>
     </main>
 
-    <div class="green-line-header"></div>
     <?php include 'footer.php' ?>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>

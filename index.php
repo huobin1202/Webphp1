@@ -2,10 +2,7 @@
 session_start();
 include('database.php');
 include('toast.php');
-if (isset($_SESSION['success'])) {
-    echo '<script>alert("' . $_SESSION['success'] . '");</script>';
-    unset($_SESSION['success']); // Xóa thông báo sau khi hiển thị
-}
+
 
 // Xử lý đăng xuất
 if (isset($_GET['logout'])) {
@@ -18,31 +15,9 @@ if (isset($_GET['logout'])) {
 }
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
-$total_price=0;
+$total_price = 0;
 $role = null;
-// Xử lý cập nhật số lượng
-if (isset($_POST['update_quantity'])) {
-    $product_id = $_POST['product_id'];
-    $quantity = $_POST['quantity'];
-    
-    if ($quantity > 0) {
-        $stmt = $conn->prepare("UPDATE giohang SET soluong = ? WHERE product_id = ? AND customer_id = ?");
-        $stmt->bind_param("iii", $quantity, $product_id, $customer_id);
-        $stmt->execute();
-    }
-    header("Location: giohang.php");
-    exit;
-}
 
-// Xử lý xóa sản phẩm
-if (isset($_GET['remove'])) {
-    $product_id = $_GET['remove'];
-    $stmt = $conn->prepare("DELETE FROM giohang WHERE product_id = ? AND customer_id = ?");
-    $stmt->bind_param("ii", $product_id, $customer_id);
-    $stmt->execute();
-    header("Location: giohang.php");
-    exit;
-}
 
 if ($username && !$customer_id) {
     $stmt = $conn->prepare("SELECT id, role FROM customer WHERE name = ?");
@@ -80,12 +55,12 @@ if ($selected_category != '') {
     <link rel="stylesheet" href="./assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css">
     <script src="https://fontawesome.com/v6/search" crossorigin="anonymous"></script>
     <style>
-    
         .display {
             display: flex;
             gap: 10px;
             margin-top: 10px;
         }
+
         .menu-link.active {
             color: #139b3a !important;
             font-weight: bold;
@@ -113,9 +88,10 @@ if ($selected_category != '') {
         }
 
         .mua.in-cart {
-            background-color: #dc3545 !important; /* Màu đỏ */
+            background-color: #dc3545 !important;
+            /* Màu đỏ */
         }
-        
+
         .cart-button {
             transition: all 0.3s ease;
         }
@@ -136,12 +112,12 @@ if ($selected_category != '') {
                 </div>
                 <div class="header-middle-center">
                     <form action="" class="form-search">
-                    <button class="filter-btn">
-                                <i class="fa-light fa-magnifying-glass"></i>
+                        <button class="filter-btn">
+                            <i class="fa-light fa-magnifying-glass"></i>
                         </button>
                         <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
-                       
+
                     </form>
                 </div>
                 <div class="header-middle-right">
@@ -225,9 +201,9 @@ if ($selected_category != '') {
 
                                 <div class="hoadon">
                                     <a href="giohang.php" style="text-decoration: none; color: inherit;">
-                                    <span class="ravao">
-                                        <i class="fa-light fa-basket-shopping"></i> Giỏ hàng
-                                    </span>
+                                        <span class="ravao">
+                                            <i class="fa-light fa-basket-shopping"></i> Giỏ hàng
+                                        </span>
                                     </a>
                                 </div>
 
@@ -240,7 +216,7 @@ if ($selected_category != '') {
             </div>
         </div>
     </header>
-   
+
     <div class="green-line-header"></div>
 
     <nav class="header-bottom">
@@ -251,7 +227,7 @@ if ($selected_category != '') {
                 <div class="dropdown">
                     <span>Sản phẩm</span>
                     <div class="dropdown-content">
-        
+
                         </li>
                         <li class="menu-list-item">
                             <a href="?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
@@ -296,8 +272,8 @@ if ($selected_category != '') {
 
             <a class="prev" onclick="prevSlide()">&#10094;</a>
             <a class="next" onclick="nextSlide()">&#10095;</a>
-            </div>
-            <div class="dot-wrapper">
+        </div>
+        <div class="dot-wrapper">
             <span class="dot" onclick="currentSlide(0)"></span>
             <span class="dot" onclick="currentSlide(1)"></span>
             <span class="dot" onclick="currentSlide(2)"></span>
@@ -424,4 +400,3 @@ if ($selected_category != '') {
 <?php $conn->close(); ?>
 
 </html>
-

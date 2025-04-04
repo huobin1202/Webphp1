@@ -166,8 +166,6 @@ $conn->close();
         <form method="post">
             <input type="text" id="newUsername" placeholder="Tên đăng nhập" name="name" maxlength="20" required>
             <input type="text" id="newContact" placeholder="Số điện thoại" name="contact" maxlength="11" required>
-            <input type="email" id="newEmail" placeholder="Email" name="email" maxlength="40" >
-            <input type="text" id="newAddress" placeholder="Địa chỉ" name="address" maxlength="40" >
 
             <input type="password" id="newPassword" placeholder="Mật khẩu" name="password" maxlength="20" required>
             <input type="password" id="confirmPassword" placeholder="Xác nhận mật khẩu" name="password_confirm" maxlength="20" required>
