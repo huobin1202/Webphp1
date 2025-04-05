@@ -9,7 +9,7 @@
 + Yêu cầu phải đăng nhập vào hệ thống thì người dùng mới thấy được thông tin ✅
 + Cho phép chọn địa chỉ của tài khoản mua hoặc nhập địa chỉ mới (0.25) ✅
 + Cho phép chọn hình thức chi trả (Trực tuyến hoặc Tiền mặt) (0.25) ✅
-- Hiển thị và lưu hóa đơn khi kết thúc giao dịch (0.5) ❌
+- Hiển thị và lưu hóa đơn khi kết thúc giao dịch (0.5) ✅
 - Cho phép xem lại lịch sử mua hàng của người mua (được nhóm theo hóa đơn) (0.5) ✅
   
 **2. Các chức năng cho người quản trị web (web-admin) - 5.0 điểm**
