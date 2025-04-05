@@ -66,7 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $order_address = $_POST['diachinhan_new'] ?? '';
             }
         } else {
-            $order_address = $delivery_mode; // For "Mua trực tiếp" mode
+            // Khi chọn "Tự đến lấy", sử dụng địa chỉ cửa hàng
+            $order_address = "Cửa hàng BMT - 123 Đường ABC, Quận XYZ, TP.HCM";
         }
     }
     

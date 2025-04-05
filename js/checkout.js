@@ -138,7 +138,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     finalAddress = newAddress;
                 }
             } else {
-                finalAddress = deliveryMode; // For "Mua trực tiếp" mode
+                // Khi chọn "Tự đến lấy", lấy địa chỉ chi nhánh được chọn
+                const selectedBranch = document.querySelector('input[name="delivery_type"]:checked');
+                if (selectedBranch) {
+                    finalAddress = selectedBranch.value;
+                } else {
+                    finalAddress = "273 An Dương Vương, Phường 3, Quận 5"; // Địa chỉ mặc định
+                }
             }
             
             // Set the final address in the hidden input
