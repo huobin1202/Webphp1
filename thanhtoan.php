@@ -46,24 +46,46 @@ if (empty($cart)) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tennguoinhan = $_POST['tennguoinhan'];
     $sdt = $_POST['sdtnhan'];
-    $diachi = $_POST['diachinhan'];
     $ghichu = $_POST['ghichu'] ?? '';
     $payment = $_POST['payment_method'] ?? 'Tiền mặt';
     $delivery = $_POST['delivery_type'] ?? 'Giao tận nơi';
-
-    // Xác định địa chỉ lưu vào orders
-    if ($delivery === 'Giao tận nơi') {
-        $order_address = $diachi;
-    } else {
-        $order_address = $delivery; // chi nhánh
-    }
-
     $delivery_mode = $_POST['delivery_mode']; // "Mua trực tiếp" hoặc "Giao tận nơi"
 
-    if ($delivery_mode === 'Giao tận nơi') {
-        $order_address = $_POST['diachinhan'];
-    } else {
-        $order_address = $_POST['delivery_type']; // Chi nhánh (radio)
+    // Debug all POST data
+    error_log("POST data received: " . print_r($_POST, true));
+
+    // Get the final address from the form
+    $order_address = $_POST['final_address'] ?? '';
+    
+    // If final_address is empty, try to get it from the old fields
+    if (empty($order_address)) {
+        if ($delivery_mode === 'Giao tận nơi') {
+            if (isset($_POST['address_type']) && $_POST['address_type'] === 'saved') {
+                $order_address = $_POST['diachinhan'] ?? '';
+            } else {
+                $order_address = $_POST['diachinhan_new'] ?? '';
+            }
+        } else {
+            $order_address = $delivery_mode; // For "Mua trực tiếp" mode
+        }
+    }
+    
+    // Log the final address that will be saved
+    error_log("Final order address: " . $order_address);
+    
+    // Check if address is empty and log a warning
+    if (empty($order_address)) {
+        error_log("WARNING: Order address is empty!");
+        $order_address = "Không có địa chỉ";
+    }
+    
+    // Check if the address field exists in the database
+    $check_address_field = $conn->query("SHOW COLUMNS FROM orders LIKE 'address'");
+    if ($check_address_field->num_rows == 0) {
+        error_log("WARNING: 'address' column does not exist in the orders table!");
+        // Add the address column if it doesn't exist
+        $conn->query("ALTER TABLE orders ADD COLUMN address VARCHAR(255)");
+        error_log("Added 'address' column to orders table");
     }
     
     // Lưu đơn hàng
@@ -73,8 +95,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ");
     $order_stmt->bind_param("idssssss", $customer_id, $total, $ghichu, $payment, $delivery_mode, $tennguoinhan, $sdt, $order_address);
     
+    // Log the SQL query and parameters for debugging
+    error_log("SQL Query: INSERT INTO orders (customer_id, total, note, payment_method, delivery_type, status, recipient_name, recipient_phone, address) VALUES ($customer_id, $total, '$ghichu', '$payment', '$delivery_mode', 'chuaxuly', '$tennguoinhan', '$sdt', '$order_address')");
+    
     $order_stmt->execute();
     $order_id = $conn->insert_id;
+    
+    // Log the order ID for debugging
+    error_log("Order ID: $order_id");
 
     // Lưu chi tiết đơn hàng
     foreach ($cart as $item) {
@@ -88,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $delete_cart->bind_param("i", $customer_id);
     $delete_cart->execute();
 
-    header('Location: index.php');
+    header('Location: mua_thanhcong.php');
     exit();
 }
 ?>
@@ -140,12 +168,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </label>
                                 </div>
                                 <div id="saved-address" class="form-group">
-                                    <input type="text" value="<?php echo htmlspecialchars($customer_address); ?>" readonly class="form-control">
+                                    <input type="text" name="diachinhan" value="<?php echo htmlspecialchars($customer_address); ?>" readonly class="form-control">
                                 </div>
                                 <div id="new-address" class="form-group" style="display: none;">
-                                    <input id="diachinhan" name="diachinhan" type="text" value=""
+                                    <input type="text" name="diachinhan_new" id="diachinhan_new" value=""
                                         placeholder="Địa chỉ nhận hàng" class="form-control chk-ship">
                                 </div>
+                                <input type="hidden" name="final_address" id="final_address" value="">
                             </div>
                         </div>
                     </div>
@@ -168,24 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
 
-                    <div class="content-group" id="address-selection" style="display: none;">
-                        <div class="address-options">
-                            <label>
-                                <input type="radio" name="address_type" value="saved" checked> Sử dụng địa chỉ đã lưu
-                            </label>
-                            <label>
-                                <input type="radio" name="address_type" value="new"> Nhập địa chỉ mới
-                            </label>
-                        </div>
-                        <div id="saved-address" class="form-group">
-                            <input type="text" value="<?php echo htmlspecialchars($customer_address); ?>" readonly class="form-control">
-                        </div>
-                        <div id="new-address" class="form-group" style="display: none;">
-                            <input id="diachinhan" name="diachinhan" type="text" placeholder="Địa chỉ nhận hàng" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="content-group chk-ship" id="giaotannoi-group" style="display: none;">
+                    <div class="content-group" id="giaotannoi-group" style="display: none;">
                         <p class="checkout-content-label">Phương thức thanh toán</p>
                         <div class="delivery-time">
                             <input type="radio" name="payment_method" value="Tiền mặt" id="giaongay" class="radio" checked>
@@ -217,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p class="checkout-content-label">Phương thức thanh toán</p>
                         <div class="delivery-time">
                             <input type="radio" name="payment_method_store" value="Tiền mặt" id="tienmat_store" class="radio" checked>
-                            <label for="tienmat_store">Thanh toán bằng tiền mặt khi nhận hàng</label>
+                            <label for="tienmat_store">Thanh toán bằng tiền mặt</label>
                         </div>
                         <div class="delivery-time">
                             <input type="radio" name="payment_method_store" value="Chuyển khoản" id="chuyenkhoan_store" class="radio">
@@ -282,7 +294,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="price-final" id="checkout-cart-price-final"><?php echo number_format($total); ?>₫</div>
                 </div>
             </div>
-            <button type="submit" class="complete-checkout-btn">Đặt hàng</button>
+            <a href="mua_thanhcong.php"><button type="submit" class="complete-checkout-btn">Đặt hàng</button></a>
         </div>
         </form>
     </main>
@@ -293,3 +305,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
+
+
