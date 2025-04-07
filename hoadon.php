@@ -1,6 +1,8 @@
 <?php
 session_start();
 include('database.php');
+include('toast.php');
+
 
 // Xử lý đăng xuất
 if (isset($_GET['logout'])) {
@@ -9,19 +11,37 @@ if (isset($_GET['logout'])) {
     header("Location: index.php");
     exit;
 }
+
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
+$role = null;
+$total_price = 0;
 
-// Nếu có username, lấy ID từ bảng customer
 if ($username && !$customer_id) {
-    $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ?");
+    $stmt = $conn->prepare("SELECT id, role FROM customer WHERE name = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $stmt->bind_result($customer_id);
+    $stmt->bind_result($customer_id, $role);
     if ($stmt->fetch()) {
         $_SESSION["customer_id"] = $customer_id;
+        $_SESSION["role"] = $role;
     }
-    $stmt->close();
+} else {
+    $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
+}
+if (!isset($_SESSION['customer_id'])) {
+    $_SESSION['error'] = "Bạn cần đăng nhập để thực hiện thao tác này!";
+    header("Location: dn.php");
+    exit();
+}
+
+if (isset($_POST['cancel_order'])) {
+    $order_id = intval($_POST['order_id']);
+    $stmt = $conn->prepare("UPDATE orders SET status = 'dahuy' WHERE id = ? AND customer_id = ? AND status = 'chuaxuly'");
+    $stmt->bind_param("ii", $order_id, $customer_id);
+    $stmt->execute();
+    header("Location: hoadon.php");
+    exit();
 }
 
 ?>
@@ -53,17 +73,12 @@ if ($username && !$customer_id) {
                 </div>
                 <div class="header-middle-center">
                     <form action="" class="form-search">
-                        <span class="search-btn">
-                            <a href="">
+                    <button class="filter-btn">
                                 <i class="fa-light fa-magnifying-glass"></i>
-                            </a>
-                        </span>
+                        </button>
                         <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
-                        <button class="filter-btn">
-                            <i class="fa-light fa-filter-list"></i>
-                            <span style="font-size: 14px;">Lọc</span>
-                        </button>
+                       
                     </form>
                 </div>
                 <div class="header-middle-right">
@@ -118,20 +133,20 @@ if ($username && !$customer_id) {
                                         <!-- Dropdown -->
                                         <div class="dropdownb-menu">
                                             <?php if (isset($_SESSION['customer_id'])): ?>
-                                               
                                                 <a href="thongtintk.php">
                                                     <div class="hd"><i class="fa-light fa-circle-user" style="font-size:20px"></i> Tài khoản của tôi</div>
                                                 </a>
                                                 <a href="hoadon.php">
-                                                    <div class="hd"><i class="fa-regular fa-bags-shopping" style="font-size:20px"> </i> Đơn hàng đã mua</div>
+                                                    <div class="hd"><i class="fa-regular fa-bags-shopping" style="font-size:20px"></i> Đơn hàng đã mua</div>
                                                 </a>
-                                               
                                                 <a href="index.php?logout=1" onclick="return confirm('Bạn có muốn đăng xuất?')">
                                                     <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i> Đăng xuất</div>
                                                 </a>
-                                                <a href="dnurl.php">
-                                                    <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i> Quản lý</div>
-                                                </a>
+                                                <?php if ($role === 'admin'): ?>
+                                                    <a href="dnurl.php">
+                                                        <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i> Quản lý</div>
+                                                    </a>
+                                                <?php endif; ?>
                                             <?php else: ?>
                                                 <a href="dn.php">
                                                     <div class="hd"><i class="fa-light fa-right-to-bracket" style="font-size:20px;color:green"></i> Đăng nhập</div>
@@ -145,9 +160,11 @@ if ($username && !$customer_id) {
                                 </div>
 
                                 <div class="hoadon">
+                                    <a href="giohang.php" style="text-decoration: none; color: inherit;">
                                     <span class="ravao">
                                         <i class="fa-light fa-basket-shopping"></i> Giỏ hàng
                                     </span>
+                                    </a>
                                 </div>
 
                             </div>
@@ -157,35 +174,7 @@ if ($username && !$customer_id) {
             </div>
         </div>
     </header>
-    <div class="advanced-search">
-        <div class="container">
-            <div class="advanced-search-category">
-                <span>Phân loại </span>
-                <select name="" id="advanced-search-category-select" onchange="searchProducts()">
-                    <option>Tất cả</option>
-                    <option>Dòng Ninja</option>
-                    <option>Dòng Z</option>
-                    <option>Dòng KLX</option>
-                </select>
-            </div>
-            <div class="advanced-search-price">
-                <span>Giá từ</span>
-                <input type="number" placeholder="tối thiểu" id="min-price" onchange="searchProducts()">
-                <span>đến</span>
-                <input type="number" placeholder="tối đa" id="max-price" onchange="searchProducts()">
-                <button id="advanced-search-price-btn"><a href=""><i class="fa-light fa-magnifying-glass-dollar"></i></a></button>
-            </div>
-            <div class="advanced-search-control">
-                <button id="sort-ascending" onclick="searchProducts(1)"><i
-                        class="fa-regular fa-arrow-up-short-wide"></i></button>
-                <button id="sort-descending" onclick="searchProducts(2)"><i
-                        class="fa-regular fa-arrow-down-wide-short"></i></button>
-                <button id="reset-search" onclick="searchProducts(0)"><i
-                        class="fa-light fa-arrow-rotate-right"></i></button>
-                <button onclick="closeSearchAdvanced()"><i class="fa-light fa-xmark"></i></button>
-            </div>
-        </div>
-    </div>
+ 
     <div class="green-line-header"></div>
 
     <nav class="header-bottom">
@@ -196,9 +185,23 @@ if ($username && !$customer_id) {
                 <div class="dropdown">
                     <span>Sản phẩm</span>
                     <div class="dropdown-content">
-                        <li class="menu-list-item"><a href="NINJA.php" class="menu-link">Dòng Ninja</a></li>
-                        <li class="menu-list-item"><a href="Z.php" class="menu-link">Dòng Z</a></li>
-                        <li class="menu-list-item"><a href="KLX.php" class="menu-link">Dòng KLX</a></li>
+
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="index.php?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                                Dòng Ninja
+                            </a>
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="index.php?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Z' ? 'active' : ''; ?>">
+                                Dòng Z
+                            </a>
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="index.php?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
+                                Dòng KLX
+                            </a>
+                        </li>
                     </div>
                 </div>
                 <li class="menu-list-item"><a href="index.php" class="menu-link">Tin tức </a></li>
@@ -230,7 +233,7 @@ if ($username && !$customer_id) {
                                 $order_id = $order['id'];
                     ?>
                                 <div class="order-history-group">
-                                    
+
                                     <?php
                                     // Chi tiết đơn hàng
                                     $sql_details = "SELECT od.*, p.tensp, p.hinhanh
@@ -262,8 +265,26 @@ if ($username && !$customer_id) {
                                     <div class="order-history-control">
                                         <div class="order-history-status">
                                             <?php
-                                            $status_class = ($order['status'] === '1') ? 'complete' : 'no-complete';
-                                            $status_text = ($order['status'] === '1') ? 'Đã xử lý' : 'Đang xử lý';
+                                            $status_class = '';
+                                            $status_text = '';
+                                            switch ($order['status']) {
+                                                case 'chuaxuly':
+                                                    $status_class = 'pending';
+                                                    $status_text = 'Chưa xử lý';
+                                                    break;
+                                                case 'daxuly':
+                                                    $status_class = 'processing';
+                                                    $status_text = 'Đã xử lý';
+                                                    break;
+                                                case 'dahuy':
+                                                    $status_class = 'no-complete';
+                                                    $status_text = 'Đã hủy';
+                                                    break;
+                                                case 'dagiao':
+                                                    $status_class = 'complete';
+                                                    $status_text = 'Đã giao';
+                                                    break;
+                                            }
                                             ?>
                                             <span class="order-history-status-sp <?= $status_class ?>"><?= $status_text ?></span>
 
@@ -275,6 +296,14 @@ if ($username && !$customer_id) {
                                                 data-recipient-name="<?= htmlspecialchars($order['recipient_name']) ?>"
                                                 data-recipient-phone="<?= htmlspecialchars($order['recipient_phone']) ?>"><i class="fa-regular fa-eye"></i> Xem chi tiết
                                             </button>
+                                            <?php if ($order['status'] === 'chuaxuly'): ?>
+                                            <form method="POST" action="" style="display: inline;" onsubmit="return confirmCancelOrder()">
+                                                <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                                                <button type="submit" name="cancel_order" class="order-history-cancel-btn">
+                                                    <i class="fa-regular fa-xmark"></i> Hủy đơn
+                                                </button>
+                                            </form>
+                                            <?php endif; ?>
                                         </div>
 
                                     </div>
@@ -307,6 +336,10 @@ if ($username && !$customer_id) {
                         <span class="detail-order-item-right" id="modal-delivery-type"></span>
                     </li>
                     <li class="detail-order-item">
+                        <span class="detail-order-item-left"><i class="fa-light fa-clock"></i> Ngày nhận hàng</span>
+                        <span class="detail-order-item-right" id="modal-delivery-date"></span>
+                    </li>
+                    <li class="detail-order-item">
                         <span class="detail-order-item-left"><i class="fa-light fa-location-dot"></i> Địa điểm nhận</span>
                         <span class="detail-order-item-right" id="modal-address"></span>
                     </li>
@@ -322,126 +355,11 @@ if ($username && !$customer_id) {
             </div>
         </div>
     </div>
-
-
-
-
-
-    <section class="cart">
-        <button class="dong"><i class="fa-regular fa-xmark"></i></button>
-        <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
-        <form action="" method="POST">
-            <?php
-            if (isset($_POST['add_to_cart'])) {
-                if (!isset($_SESSION['customer_id'])) {
-                    $_SESSION['error'] = "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!";
-                    header("Location: index.php");
-                    exit();
-                }
-
-                $product_id = $_POST['product_id'];
-                $product_price = $_POST['product_price'];
-                $product_img = $_POST['product_img'];
-                $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
-
-                // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
-                $stmt = $conn->prepare("SELECT soluong FROM giohang WHERE product_id = ? AND customer_id = ?");
-                $stmt->bind_param("ii", $product_id, $customer_id);
-                $stmt->execute();
-                $stmt->store_result();
-
-                if ($stmt->num_rows > 0) {
-                    $stmt->close();
-                } else {
-                    $stmt = $conn->prepare("INSERT INTO giohang (customer_id, product_id, soluong, price, img) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->bind_param("iiiss", $customer_id, $product_id, $quantity, $product_price, $product_img);
-                    $stmt->execute();
-                    $stmt->close();
-                }
-            }
-
-
-            ?>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>
-                            Sản phẩm
-                        </th>
-                        <th>Tên</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>Chọn</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    // Kiểm tra xem người dùng đã đăng nhập chưa
-                    if (!isset($_SESSION['customer_id'])) {
-                        echo "<tr><td colspan='4'>Bạn cần đăng nhập để xem giỏ hàng!</td></tr>";
-                    } else {
-                        $customer_id = $_SESSION['customer_id'];
-
-                        // Truy vấn lấy sản phẩm từ bảng giỏ hàng
-                        $sql = "SELECT g.id, g.product_id, g.soluong, g.price, g.img, p.tensp 
-                                FROM giohang g
-                                JOIN products p ON g.product_id = p.id
-                                WHERE g.customer_id = ?";
-
-                        $stmt = $conn->prepare($sql);
-                        $stmt->bind_param("i", $customer_id);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-
-                        $total_price = 0;
-
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                $subtotal = $row["soluong"] * $row["price"];
-                                $total_price += $subtotal;
-                                echo '
-                                <tr>
-                                    <td style="display: flex; align-items: center;">
-                                        <img style="width: 90px;" src="sanpham/' . $row["img"] . '" alt="' . htmlspecialchars($row["tensp"]) . '">
-                                    </td>
-                                    <td><span>' . htmlspecialchars($row["tensp"]) . '</span></td>
-                                    <td>
-                                        <p><span>' . number_format($row["price"], 0, ',', '.') . '</span><sup>đ</sup></p>
-                                    </td>
-                                    <td>
-                                        <input style="width: 40px; outline: none;" type="number" value="' . $row["soluong"] . '" min="1" class="cart-quantity" data-cart-id="' . $row["id"] . '">
-                                    </td>
-                                    <td style="cursor: pointer;" class="delete-item" data-cart-id="' . $row["id"] . '">Xóa</td>
-                                </tr>';
-                            }
-                        } else {
-                            echo "<tr><td colspan='4'>Giỏ hàng của bạn đang trống!</td></tr>";
-                        }
-                    }
-                    ?>
-                </tbody>
-
-            </table>
-            <div style="text-align: center;" class="price-total">
-                <p style="font-weight: bold; margin-top: 10px; margin-bottom: 20px;">
-                    Tổng tiền: <span><?php echo number_format($total_price, 0, ',', '.'); ?></span>đ
-                </p>
-            </div>
-            <a class="thanhtoan" href="thanhtoan.php">Thanh toán</a>
-        </form>
-    </section>
-
-    <div class="green-line-header"></div>
     <?php include 'footer.php' ?>
     <script src="js/hoadon.js"></script>
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
-
-
-
-
 </body>
 <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "<script>if(window.history.replaceState){window.history.replaceState(null, null, window.location.href);}</script>";

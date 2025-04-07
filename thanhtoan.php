@@ -4,7 +4,8 @@ include('database.php');
 include('toast.php');
 
 if (!isset($_SESSION['customer_id'])) {
-    echo "<script>alert('Bạn cần đăng nhập để thanh toán!'); window.location.href='dn.php';</script>";
+    $_SESSION['error'] = "Đăng nhập để thanh toán!";
+    header("Location: index.php");
     exit();
 }
 
@@ -45,35 +46,64 @@ if (empty($cart)) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tennguoinhan = $_POST['tennguoinhan'];
     $sdt = $_POST['sdtnhan'];
-    $diachi = $_POST['diachinhan'];
     $ghichu = $_POST['ghichu'] ?? '';
     $payment = $_POST['payment_method'] ?? 'Tiền mặt';
     $delivery = $_POST['delivery_type'] ?? 'Giao tận nơi';
-
-    // Xác định địa chỉ lưu vào orders
-    if ($delivery === 'Giao tận nơi') {
-        $order_address = $diachi;
-    } else {
-        $order_address = $delivery; // chi nhánh
-    }
-
     $delivery_mode = $_POST['delivery_mode']; // "Mua trực tiếp" hoặc "Giao tận nơi"
 
-    if ($delivery_mode === 'Giao tận nơi') {
-        $order_address = $_POST['diachinhan'];
-    } else {
-        $order_address = $_POST['delivery_type']; // Chi nhánh (radio)
+    // Debug all POST data
+    error_log("POST data received: " . print_r($_POST, true));
+
+    // Get the final address from the form
+    $order_address = $_POST['final_address'] ?? '';
+    
+    // If final_address is empty, try to get it from the old fields
+    if (empty($order_address)) {
+        if ($delivery_mode === 'Giao tận nơi') {
+            if (isset($_POST['address_type']) && $_POST['address_type'] === 'saved') {
+                $order_address = $_POST['diachinhan'] ?? '';
+            } else {
+                $order_address = $_POST['diachinhan_new'] ?? '';
+            }
+        } else {
+            // Khi chọn "Tự đến lấy", sử dụng địa chỉ cửa hàng
+            $order_address = "Cửa hàng BMT - 123 Đường ABC, Quận XYZ, TP.HCM";
+        }
+    }
+    
+    // Log the final address that will be saved
+    error_log("Final order address: " . $order_address);
+    
+    // Check if address is empty and log a warning
+    if (empty($order_address)) {
+        error_log("WARNING: Order address is empty!");
+        $order_address = "Không có địa chỉ";
+    }
+    
+    // Check if the address field exists in the database
+    $check_address_field = $conn->query("SHOW COLUMNS FROM orders LIKE 'address'");
+    if ($check_address_field->num_rows == 0) {
+        error_log("WARNING: 'address' column does not exist in the orders table!");
+        // Add the address column if it doesn't exist
+        $conn->query("ALTER TABLE orders ADD COLUMN address VARCHAR(255)");
+        error_log("Added 'address' column to orders table");
     }
     
     // Lưu đơn hàng
     $order_stmt = $conn->prepare("
         INSERT INTO orders (customer_id, total, note, payment_method, delivery_type, status, recipient_name, recipient_phone, address) 
-        VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, 'chuaxuly', ?, ?, ?)
     ");
     $order_stmt->bind_param("idssssss", $customer_id, $total, $ghichu, $payment, $delivery_mode, $tennguoinhan, $sdt, $order_address);
     
+    // Log the SQL query and parameters for debugging
+    error_log("SQL Query: INSERT INTO orders (customer_id, total, note, payment_method, delivery_type, status, recipient_name, recipient_phone, address) VALUES ($customer_id, $total, '$ghichu', '$payment', '$delivery_mode', 'chuaxuly', '$tennguoinhan', '$sdt', '$order_address')");
+    
     $order_stmt->execute();
     $order_id = $conn->insert_id;
+    
+    // Log the order ID for debugging
+    error_log("Order ID: $order_id");
 
     // Lưu chi tiết đơn hàng
     foreach ($cart as $item) {
@@ -87,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $delete_cart->bind_param("i", $customer_id);
     $delete_cart->execute();
 
-    header('Location: index.php');
+    header('Location: mua_thanhcong.php');
     exit();
 }
 ?>
@@ -139,12 +169,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </label>
                                 </div>
                                 <div id="saved-address" class="form-group">
-                                    <input type="text" value="<?php echo htmlspecialchars($customer_address); ?>" readonly class="form-control">
+                                    <input type="text" name="diachinhan" value="<?php echo htmlspecialchars($customer_address); ?>" readonly class="form-control">
                                 </div>
                                 <div id="new-address" class="form-group" style="display: none;">
-                                    <input id="diachinhan" name="diachinhan" type="text" value=""
+                                    <input type="text" name="diachinhan_new" id="diachinhan_new" value=""
                                         placeholder="Địa chỉ nhận hàng" class="form-control chk-ship">
                                 </div>
+                                <input type="hidden" name="final_address" id="final_address" value="">
                             </div>
                         </div>
                     </div>
@@ -154,17 +185,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="checkout-row">
                 <div class="checkout-col-title">Thông tin đơn hàng</div>
                 <div class="checkout-col-content">
-                    <div class="content-group  ">
+                    <div class="content-group">
                         <p class="checkout-content-label">Hình thức giao nhận</p>
                         <div class="checkout-type-order">
-                        <input type="button" class="type-order-btn active " id="tudenlay" value="Tự đến lấy"  ></input>
-                        <input type="button" class="type-order-btn " id="giaotannoi" value="Giao tận nơi"></input>
-                        <input type="hidden" name="delivery_mode" id="delivery_mode" value="Mua trực tiếp">
-                        <input type="hidden" name="delivery_mode" id="delivery_mode" value="Giao tận nơi">
+                            <button type="button" class="type-order-btn active" id="tudenlay" onclick="switchDeliveryMode('tudenlay')">
+                                <i class="fa-regular fa-shop"></i>Tự đến lấy
+                            </button>
+                            <button type="button" class="type-order-btn" id="giaotannoi" onclick="switchDeliveryMode('giaotannoi')">
+                                <i class="fa-regular fa-truck"></i>Giao tận nơi
+                            </button>
+                            <input type="hidden" name="delivery_mode" id="delivery_mode" value="Mua trực tiếp">
                         </div>
                     </div>
 
-                    <div class="content-group chk-ship" id="giaotannoi-group">
+                    <div class="content-group" id="giaotannoi-group" style="display: none;">
                         <p class="checkout-content-label">Phương thức thanh toán</p>
                         <div class="delivery-time">
                             <input type="radio" name="payment_method" value="Tiền mặt" id="giaongay" class="radio" checked>
@@ -174,9 +208,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="radio" name="payment_method" value="Chuyển khoản" id="deliverytime" class="radio">
                             <label for="deliverytime">Thanh toán bằng chuyển khoản</label>
                         </div>
+                        
+                        <div id="bank-info" style="display: none; margin-top: 15px; padding: 15px; background: #f8f8f8; border-radius: 5px; border: 1px solid #e0e0e0;">
+                            <p style="font-weight: 600; color: #139b3a; margin-bottom: 10px;">Thông tin chuyển khoản:</p>
+                            <div style="margin-bottom: 15px;">
+                                <p style="margin: 5px 0;"><strong>Ngân hàng:</strong> Vietcombank</p>
+                                <p style="margin: 5px 0;"><strong>Số tài khoản:</strong> 1234567890</p>
+                                <p style="margin: 5px 0;"><strong>Chủ tài khoản:</strong> CÔNG TY TNHH BMT</p>
+                                <p style="margin: 5px 0;"><strong>Chi nhánh:</strong> TP.HCM</p>
+                            </div>
+                            <div style="background: #fff3cd; padding: 10px; border-radius: 4px; border: 1px solid #ffeeba;">
+                                <p style="color: #856404; margin: 0;">
+                                    <i class="fa-light fa-triangle-exclamation" style="margin-right: 5px;"></i>
+                                    Vui lòng ghi rõ nội dung chuyển khoản: "Tên người mua + Số điện thoại"
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="content-group" id="tudenlay-group">
+                        <p class="checkout-content-label">Phương thức thanh toán</p>
+                        <div class="delivery-time">
+                            <input type="radio" name="payment_method_store" value="Tiền mặt" id="tienmat_store" class="radio" checked>
+                            <label for="tienmat_store">Thanh toán bằng tiền mặt</label>
+                        </div>
+                        <div class="delivery-time">
+                            <input type="radio" name="payment_method_store" value="Chuyển khoản" id="chuyenkhoan_store" class="radio">
+                            <label for="chuyenkhoan_store">Thanh toán bằng chuyển khoản</label>
+                        </div>
+
+                        <div id="bank-info-store" style="display: none; margin: 15px 0 25px; padding: 15px; background: #f8f8f8; border-radius: 5px; border: 1px solid #e0e0e0;">
+                            <p style="font-weight: 600; color: #139b3a; margin-bottom: 10px;">Thông tin chuyển khoản:</p>
+                            <div style="margin-bottom: 15px;">
+                                <p style="margin: 5px 0;"><strong>Ngân hàng:</strong> Vietcombank</p>
+                                <p style="margin: 5px 0;"><strong>Số tài khoản:</strong> 1234567890</p>
+                                <p style="margin: 5px 0;"><strong>Chủ tài khoản:</strong> CÔNG TY TNHH BMT</p>
+                                <p style="margin: 5px 0;"><strong>Chi nhánh:</strong> TP.HCM</p>
+                            </div>
+                            <div style="background: #fff3cd; padding: 10px; border-radius: 4px; border: 1px solid #ffeeba;">
+                                <p style="color: #856404; margin: 0;">
+                                    <i class="fa-light fa-triangle-exclamation" style="margin-right: 5px;"></i>
+                                    Vui lòng ghi rõ nội dung chuyển khoản: "Tên người mua + Số điện thoại"
+                                </p>
+                            </div>
+                        </div>
+
                         <p class="checkout-content-label">Lấy hàng tại chi nhánh</p>
                         <div class="delivery-time">
                             <input type="radio" name="delivery_type" value="273 An Dương Vương" id="chinhanh-1" class="radio" checked>
@@ -219,12 +295,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="price-final" id="checkout-cart-price-final"><?php echo number_format($total); ?>₫</div>
                 </div>
             </div>
-            <button type="submit" class="complete-checkout-btn">Đặt hàng</button>
+            <a href="mua_thanhcong.php"><button type="submit" class="complete-checkout-btn">Đặt hàng</button></a>
         </div>
         </form>
     </main>
 </div>
 
 <script src="js/checkout.js"></script>
+
+
 </body>
 </html>
+
+

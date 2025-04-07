@@ -1,6 +1,7 @@
 <?php
 session_start();
 include('database.php');
+include('toast.php');
 
 // Xử lý đăng xuất
 if (isset($_GET['logout'])) {
@@ -14,14 +15,16 @@ $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null
 
 // Nếu có username, lấy ID từ bảng customer
 if ($username && !$customer_id) {
-    $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ?");
+    $stmt = $conn->prepare("SELECT id, role FROM customer WHERE name = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $stmt->bind_result($customer_id);
+    $stmt->bind_result($customer_id, $role);
     if ($stmt->fetch()) {
         $_SESSION["customer_id"] = $customer_id;
+        $_SESSION["role"] = $role;
     }
-    $stmt->close();
+} else {
+    $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
 }
 // Lấy ID sản phẩm từ URL
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -67,7 +70,13 @@ if ($result->num_rows > 0) {
         border: 1px solid #ccc;
     }
 
+    .mua.in-cart {
+        background-color: #dc3545 !important; /* Màu đỏ */
+    }
 
+    .cart-button {
+        transition: all 0.3s ease;
+    }
 
     .card2 {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -86,12 +95,111 @@ if ($result->num_rows > 0) {
     .preview {
         flex: 1;
         padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
-    .preview img {
-        width: 50%;
+    .main-image {
+        width: 100%;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .zoom-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        z-index: 10;
+    }
+
+    .zoom-btn {
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        transition: all 0.3s ease;
+    }
+
+    .zoom-btn:hover {
+        background: #139b3a;
+        color: white;
+        border-color: #139b3a;
+    }
+
+    .main-image img {
+        width: 100%;
+        max-height: 400px;
+        object-fit: contain;
         border-radius: 8px;
+        transition: transform 0.3s ease;
+        transform-origin: center center;
+    }
+
+    .thumbnail-section {
+        width: 100%;
+        margin-top: 20px;
+        border-top: 1px dashed #ccc;
+        padding-top: 20px;
+    }
+
+    .thumbnail-title {
+        text-align: center;
+        font-size: 14px;
+        color: #76767c;
+        margin-bottom: 15px;
+        font-weight: 500;
+        position: relative;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .thumbnail-title:before,
+    .thumbnail-title:after {
+        content: "―";
+        display: inline-block;
+        position: relative;
+        top: -3px;
+        padding: 0 10px;
+        color: #76767c;
+    }
+
+    .thumbnail-images {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .thumb {
+        width: 120px;
+        height: 80px;
         object-fit: cover;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        padding: 3px;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .thumb:hover {
+        border-color: #139b3a;
+    }
+
+    .thumb.active {
+        border-color: #139b3a;
+        border-width: 2px;
     }
 
     .details {
@@ -208,8 +316,6 @@ if ($result->num_rows > 0) {
         color: #e74c3c;
     }
 
-
-
     .float-right a {
         color: white;
         font-size: 1em;
@@ -238,9 +344,6 @@ if ($result->num_rows > 0) {
         background-color: #218838;
         /* Màu xanh lá cây đậm hơn khi hover */
     }
-
-
-
 
     @media (max-width: 768px) {
         .wrapper {
@@ -276,6 +379,14 @@ if ($result->num_rows > 0) {
             width: 100%;
         }
 
+        .main-image img {
+            max-height: 300px;
+        }
+        
+        .thumb {
+            width: 80px;
+            height: 60px;
+        }
     }
 </style>
 
@@ -292,17 +403,12 @@ if ($result->num_rows > 0) {
                 </div>
                 <div class="header-middle-center">
                     <form action="" class="form-search">
-                        <span class="search-btn">
-                            <a href="">
+                    <button class="filter-btn">
                                 <i class="fa-light fa-magnifying-glass"></i>
-                            </a>
-                        </span>
+                        </button>
                         <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
-                        <button class="filter-btn">
-                            <i class="fa-light fa-filter-list"></i>
-                            <span style="font-size: 14px;">Lọc</span>
-                        </button>
+                       
                     </form>
                 </div>
                 <div class="header-middle-right">
@@ -366,7 +472,7 @@ if ($result->num_rows > 0) {
                                                 <a href="hoadon.php">
                                                     <div class="hd"><i class="fa-regular fa-bags-shopping" style="font-size:20px"> </i> Đơn hàng đã mua</div>
                                                 </a>
-                                               
+
                                                 <a href="index.php?logout=1" onclick="return confirm('Bạn có muốn đăng xuất?')">
                                                     <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i> Đăng xuất</div>
                                                 </a>
@@ -381,11 +487,12 @@ if ($result->num_rows > 0) {
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="hoadon">
+                                    <a href="giohang.php" style="text-decoration: none; color: inherit;">
                                     <span class="ravao">
                                         <i class="fa-light fa-basket-shopping"></i> Giỏ hàng
                                     </span>
+                                    </a>
                                 </div>
 
                             </div>
@@ -408,9 +515,15 @@ if ($result->num_rows > 0) {
                 <div class="dropdown">
                     <span>Sản phẩm</span>
                     <div class="dropdown-content">
-                        <li class="menu-list-item"><a href="NINJA.php" class="menu-link">Dòng Ninja</a></li>
-                        <li class="menu-list-item"><a href="Z.php" class="menu-link">Dòng Z</a></li>
-                        <li class="menu-list-item"><a href="KLX.php" class="menu-link">Dòng KLX</a></li>
+                        <li class="menu-list-item"> <a href="index.php?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                                Dòng Ninja
+                            </a></li>
+                        <li class="menu-list-item"> <a href="index.php?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                                Dòng Z
+                            </a></li>
+                        <li class="menu-list-item"><a href="index.php?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
+                                Dòng KLX
+                            </a></li>
                     </div>
                 </div>
                 <li class="menu-list-item"><a href="index.php" class="menu-link">Tin tức </a></li>
@@ -430,21 +543,52 @@ if ($result->num_rows > 0) {
                     <form name="frmsanphamchitiet11" id="frmsanphamchitiet11" method="POST">
                         <div class="wrapper row">
                             <div class="preview col-md-6">
-                                <img src="sanpham/<?php echo $row['hinhanh']; ?>" alt="<?php echo $row['tensp']; ?>">
-                                <img src="sanpham/<?php echo $row['hinhanh2']; ?>" alt="<?php echo $row['tensp']; ?>">
-                                <img src="sanpham/<?php echo $row['hinhanh3']; ?>" alt="<?php echo $row['tensp']; ?>">
+                                <div class="main-image">
+                                    <div class="zoom-controls">
+                                        <button type="button" onclick="zoomIn()" class="zoom-btn">
+                                            <i class="fa-light fa-plus"></i>
+                                        </button>
+                                        <button type="button" onclick="zoomOut()" class="zoom-btn">
+                                            <i class="fa-light fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    <img id="mainImage" src="sanpham/<?php echo $row['hinhanh']; ?>" alt="<?php echo $row['tensp']; ?>">
+                                </div>
+                                <div class="thumbnail-section">
+                                    <p class="thumbnail-title">CHỌN GÓC NHÌN</p>
+                                    <div class="thumbnail-images">
+                                        <img class="thumb active" src="sanpham/<?php echo $row['hinhanh']; ?>" alt="<?php echo $row['tensp']; ?>" onclick="changeImage(this)">
+                                        <img class="thumb" src="sanpham/<?php echo $row['hinhanh2']; ?>" alt="<?php echo $row['tensp']; ?>" onclick="changeImage(this)">
+                                        <img class="thumb" src="sanpham/<?php echo $row['hinhanh3']; ?>" alt="<?php echo $row['tensp']; ?>" onclick="changeImage(this)">
+                                    </div>
+                                </div>
                             </div>
                             <div class="details col-md-6">
                                 <h3><?php echo $row["tensp"]; ?></h3>
                                 <div class="price"><?php echo number_format($row["giaban"], 0, ',', '.'); ?>đ</div>
 
-                                <form action="" method="POST">
-                                    <input type="hidden" name="product_id" value="<?php echo $row['id']; ?>">
-                                    <input type="hidden" name="product_price" value="<?php echo $row['giaban']; ?>">
-                                    <input type="hidden" name="product_img" value="<?php echo $row['hinhanh']; ?>">
-                                    <input type="hidden" name="quantity" value="1">
-                                    <button type="submit" name="add_to_cart" class="mua">Thêm vào giỏ hàng</button>
-                                </form>
+                                <?php
+                                // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+                                $in_cart = false;
+                                if (isset($_SESSION['customer_id'])) {
+                                    $check_cart = $conn->prepare("SELECT id FROM giohang WHERE customer_id = ? AND product_id = ?");
+                                    $check_cart->bind_param("ii", $_SESSION['customer_id'], $row["id"]);
+                                    $check_cart->execute();
+                                    $check_result = $check_cart->get_result();
+                                    $in_cart = $check_result->num_rows > 0;
+                                    $check_cart->close();
+                                }
+                                ?>
+
+                                <div class="display" style="display:flex;">
+                                    <button type="button" 
+                                            class="mua cart-button <?php echo $in_cart ? 'in-cart' : ''; ?>" 
+                                            data-product-id="<?php echo $row["id"]; ?>"
+                                            data-product-price="<?php echo $row["giaban"]; ?>"
+                                            data-product-img="<?php echo $row["hinhanh"]; ?>">
+                                        <?php echo $in_cart ? '- Xóa khỏi giỏ hàng' : '+ Thêm vào giỏ hàng'; ?>
+                                    </button>
+                                </div>
 
                                 <p class="vote"><?php echo $row["thongtinsp"]; ?></p>
                                 <h4>Thông số kỹ thuật</h4>
@@ -453,120 +597,6 @@ if ($result->num_rows > 0) {
                                 </ul>
                             </div>
 
-
-                            <section class="cart">
-                                <button class="dong"><i class="fa-regular fa-xmark"></i></button>
-                                <!-- <div>Đóng</div> -->
-                                <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
-                                <form action="" method="POST">
-                                <?php
-if (isset($_POST['add_to_cart'])) {
-    if (!$customer_id) {
-        die("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
-    }
-
-    $product_id = $_POST['product_id'];
-    $product_price = $_POST['product_price'];
-    $product_img = $_POST['product_img'];
-    $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
-
-    // Kiểm tra sản phẩm đã tồn tại chưa
-    $stmt = $conn->prepare("SELECT soluong FROM giohang WHERE product_id = ? AND customer_id = ?");
-    $stmt->bind_param("ii", $product_id, $customer_id);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        // Sản phẩm đã tồn tại, cập nhật số lượng
-        $stmt->bind_result($current_quantity);
-        $stmt->fetch();
-        $new_quantity = $current_quantity + $quantity;
-        $stmt->close();
-
-        $update_stmt = $conn->prepare("UPDATE giohang SET soluong = ? WHERE product_id = ? AND customer_id = ?");
-        $update_stmt->bind_param("iii", $new_quantity, $product_id, $customer_id);
-        $update_stmt->execute();
-        $update_stmt->close();
-    } else {
-        // Sản phẩm chưa có, thêm mới
-        $stmt->close();
-        $stmt = $conn->prepare("INSERT INTO giohang (customer_id, product_id, soluong, price, img) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("iiiss", $customer_id, $product_id, $quantity, $product_price, $product_img);
-        $stmt->execute();
-        $stmt->close();
-    }
-}
-?>
-
-
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    Sản phẩm
-                                                </th>
-                                                <th>Tên</th>
-                                                <th>Giá</th>
-                                                <th>Số lượng</th>
-                                                <th>Chọn</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            // Kiểm tra xem người dùng đã đăng nhập chưa
-                                            if (!isset($_SESSION['customer_id'])) {
-                                                echo "<tr><td colspan='4'>Bạn cần đăng nhập để xem giỏ hàng!</td></tr>";
-                                            } else {
-                                                $customer_id = $_SESSION['customer_id'];
-
-                                                // Truy vấn lấy sản phẩm từ bảng giỏ hàng
-                                                $sql = "SELECT g.id, g.product_id, g.soluong, g.price, g.img, p.tensp 
-                                FROM giohang g
-                                JOIN products p ON g.product_id = p.id
-                                WHERE g.customer_id = ?";
-
-                                                $stmt = $conn->prepare($sql);
-                                                $stmt->bind_param("i", $customer_id);
-                                                $stmt->execute();
-                                                $result = $stmt->get_result();
-
-                                                $total_price = 0;
-
-                                                if ($result->num_rows > 0) {
-                                                    while ($row = $result->fetch_assoc()) {
-                                                        $subtotal = $row["soluong"] * $row["price"];
-                                                        $total_price += $subtotal;
-                                                        echo '
-                                <tr>
-                                    <td style="display: flex; align-items: center;">
-                                        <img style="width: 90px;" src="sanpham/' . $row["img"] . '" alt="' . htmlspecialchars($row["tensp"]) . '">
-                                    </td>
-                                    <td><span>' . htmlspecialchars($row["tensp"]) . '</span></td>
-                                    <td>
-                                        <p><span>' . number_format($row["price"], 0, ',', '.') . '</span><sup>đ</sup></p>
-                                    </td>
-                                    <td>
-                                        <input style="width: 40px; outline: none;" type="number" value="' . $row["soluong"] . '" min="1" class="cart-quantity" data-cart-id="' . $row["id"] . '">
-                                    </td>
-                                    <td style="cursor: pointer;" class="delete-item" data-cart-id="' . $row["id"] . '">Xóa</td>
-                                </tr>';
-                                                    }
-                                                } else {
-                                                    echo "<tr><td colspan='4'>Giỏ hàng của bạn đang trống!</td></tr>";
-                                                }
-                                            }
-                                            ?>
-                                        </tbody>
-
-                                    </table>
-                                    <div style="text-align: center;" class="price-total">
-                                        <p style="font-weight: bold; margin-top: 10px; margin-bottom: 20px;">
-                                            Tổng tiền: <span><?php echo number_format($total_price, 0, ',', '.'); ?></span>đ
-                                        </p>
-                                    </div>
-                                    <a class="thanhtoan" href="thanhtoan.php">Thanh toán</a>
-                                </form>
-                            </section>
                         </div>
                     </form>
                 </div>
@@ -574,15 +604,55 @@ if (isset($_POST['add_to_cart'])) {
         </div>
     </main>
 
-    <div class="green-line-header"></div>
     <?php include 'footer.php' ?>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
+    <script>
+    function changeImage(element) {
+        // Cập nhật ảnh chính
+        document.getElementById('mainImage').src = element.src;
+        
+        // Xóa class active từ tất cả thumbnails
+        document.querySelectorAll('.thumb').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        
+        // Thêm class active vào thumbnail được chọn
+        element.classList.add('active');
+    }
+    </script>
 
+    <script>
+    let currentZoom = 1;
+    const ZOOM_STEP = 0.1;
+    const MAX_ZOOM = 1.5;
+    const MIN_ZOOM = 1;
 
+    function zoomIn() {
+        if (currentZoom < MAX_ZOOM) {
+            currentZoom = Math.min(currentZoom + ZOOM_STEP, MAX_ZOOM);
+            updateZoom();
+        }
+    }
 
+    function zoomOut() {
+        if (currentZoom > MIN_ZOOM) {
+            currentZoom = Math.max(currentZoom - ZOOM_STEP, MIN_ZOOM);
+            updateZoom();
+        }
+    }
+
+    function updateZoom() {
+        const mainImage = document.getElementById('mainImage');
+        mainImage.style.transform = `scale(${currentZoom})`;
+    }
+    </script>
+
+    <script>
+        const isLoggedIn = <?php echo isset($_SESSION['customer_id']) ? 'true' : 'false'; ?>;
+    </script>
 
 </body>
 <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
