@@ -70,7 +70,13 @@ if ($result->num_rows > 0) {
         border: 1px solid #ccc;
     }
 
+    .mua.in-cart {
+        background-color: #dc3545 !important; /* Màu đỏ */
+    }
 
+    .cart-button {
+        transition: all 0.3s ease;
+    }
 
     .card2 {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -310,8 +316,6 @@ if ($result->num_rows > 0) {
         color: #e74c3c;
     }
 
-
-
     .float-right a {
         color: white;
         font-size: 1em;
@@ -340,9 +344,6 @@ if ($result->num_rows > 0) {
         background-color: #218838;
         /* Màu xanh lá cây đậm hơn khi hover */
     }
-
-
-
 
     @media (max-width: 768px) {
         .wrapper {
@@ -566,13 +567,28 @@ if ($result->num_rows > 0) {
                                 <h3><?php echo $row["tensp"]; ?></h3>
                                 <div class="price"><?php echo number_format($row["giaban"], 0, ',', '.'); ?>đ</div>
 
-                                <form action="" method="POST">
-                                    <input type="hidden" name="product_id" value="<?php echo $row['id']; ?>">
-                                    <input type="hidden" name="product_price" value="<?php echo $row['giaban']; ?>">
-                                    <input type="hidden" name="product_img" value="<?php echo $row['hinhanh']; ?>">
-                                    <input type="hidden" name="quantity" value="1">
-                                    <button type="submit" name="add_to_cart" class="mua">Thêm vào giỏ hàng</button>
-                                </form>
+                                <?php
+                                // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+                                $in_cart = false;
+                                if (isset($_SESSION['customer_id'])) {
+                                    $check_cart = $conn->prepare("SELECT id FROM giohang WHERE customer_id = ? AND product_id = ?");
+                                    $check_cart->bind_param("ii", $_SESSION['customer_id'], $row["id"]);
+                                    $check_cart->execute();
+                                    $check_result = $check_cart->get_result();
+                                    $in_cart = $check_result->num_rows > 0;
+                                    $check_cart->close();
+                                }
+                                ?>
+
+                                <div class="display" style="display:flex;">
+                                    <button type="button" 
+                                            class="mua cart-button <?php echo $in_cart ? 'in-cart' : ''; ?>" 
+                                            data-product-id="<?php echo $row["id"]; ?>"
+                                            data-product-price="<?php echo $row["giaban"]; ?>"
+                                            data-product-img="<?php echo $row["hinhanh"]; ?>">
+                                        <?php echo $in_cart ? '- Xóa khỏi giỏ hàng' : '+ Thêm vào giỏ hàng'; ?>
+                                    </button>
+                                </div>
 
                                 <p class="vote"><?php echo $row["thongtinsp"]; ?></p>
                                 <h4>Thông số kỹ thuật</h4>
@@ -634,8 +650,9 @@ if ($result->num_rows > 0) {
     }
     </script>
 
-
-
+    <script>
+        const isLoggedIn = <?php echo isset($_SESSION['customer_id']) ? 'true' : 'false'; ?>;
+    </script>
 
 </body>
 <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
