@@ -100,14 +100,10 @@ if ($username && !$customer_id) {
                     </div>
                 </div>
                 <div class="header-middle-center">
-    <!--tìm kiếm-->
-                
                     <form action="timkiem.php" method="GET" class="form-search">
-                        <span class="search-btn">
-                            <button type="submit">
+                            <button type="submit" class="search-btn">
                                 <i class="fa-light fa-magnifying-glass"></i>
                             </button>
-                        </span>
                         <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
                     </form>
