@@ -95,6 +95,15 @@ if ($selected_category != '') {
         .cart-button {
             transition: all 0.3s ease;
         }
+
+        .product-pag {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+   
     </style>
     <title>BMT </title>
 </head>
@@ -301,7 +310,7 @@ if ($selected_category != '') {
                 <button type="submit" class="search-btn">
                     <i class="fa-light fa-magnifying-glass"></i>
                 </button>
-                <input type="text" name="tukhoa" class="form-search-input" id="searchBox" 
+                <input type="text" name="tukhoa" class="form-search-input" id="searchBox"
                     value="<?php echo isset($_GET['tukhoa']) ? htmlspecialchars($_GET['tukhoa']) : ''; ?>"
                     placeholder="Tìm kiếm xe..."
                     onkeyup="searchProducts()">
@@ -324,7 +333,7 @@ if ($selected_category != '') {
 
                                             <div class="advanced-search-category">
                                                 <?php
-                                    
+
                                                 // Truy vấn danh mục sản phẩm
                                                 $brand_query = "SELECT DISTINCT dongsp FROM products";
                                                 $brand_query_run = mysqli_query($conn, $brand_query);
@@ -384,24 +393,25 @@ if ($selected_category != '') {
                                 </div>
                             </div>
                         </div>
-                        <div class="grid-container" id="product-list">
+                        <div class="product-pag">
+                            <div class="grid-container" id="product-list">
 
-                            <?php
-                            $result = $conn->query($sql);
-                            if ($result->num_rows > 0) {
-                                while ($row = $result->fetch_assoc()) {
-                                    // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
-                                    $in_cart = false;
-                                    if (isset($_SESSION['customer_id'])) {
-                                        $check_cart = $conn->prepare("SELECT id FROM giohang WHERE customer_id = ? AND product_id = ?");
-                                        $check_cart->bind_param("ii", $_SESSION['customer_id'], $row["id"]);
-                                        $check_cart->execute();
-                                        $check_result = $check_cart->get_result();
-                                        $in_cart = $check_result->num_rows > 0;
-                                        $check_cart->close();
-                                    }
+                                <?php
+                                $result = $conn->query($sql);
+                                if ($result->num_rows > 0) {
+                                    while ($row = $result->fetch_assoc()) {
+                                        // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+                                        $in_cart = false;
+                                        if (isset($_SESSION['customer_id'])) {
+                                            $check_cart = $conn->prepare("SELECT id FROM giohang WHERE customer_id = ? AND product_id = ?");
+                                            $check_cart->bind_param("ii", $_SESSION['customer_id'], $row["id"]);
+                                            $check_cart->execute();
+                                            $check_result = $check_cart->get_result();
+                                            $in_cart = $check_result->num_rows > 0;
+                                            $check_cart->close();
+                                        }
 
-                                    echo '
+                                        echo '
                                 <div class="card page-1">
                                         <a href="thongtinsp.php?id=' . $row["id"] . '">
                                             <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
@@ -421,18 +431,19 @@ if ($selected_category != '') {
                                         <a href="thongtinsp.php?id=' . $row['id'] . '" class="mua" style="text-decoration: none; text-align: center; display: inline-block;color:white;">Xem chi tiết</a>
                                         </div>
                                 </div>';
+                                    }
+                                } else {
+                                    echo '<p class="no-products">Không có sản phẩm nào trong danh mục này</p>';
                                 }
-                            } else {
-                                echo '<p class="no-products">Không có sản phẩm nào trong danh mục này</p>';
-                            }
-                            ?>
-                            <div class="pagination">
-                                <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
-                                <div id="pageNumbers" class="page-numbers"></div>
-                                <button id="nextBtn" onclick="changePage(1)">&#10095;</button>
+                                ?>
+                              
                             </div>
+                            <div class="pagination">
+                                    <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
+                                    <div id="pageNumbers" class="page-numbers"></div>
+                                    <button id="nextBtn" onclick="changePage(1)">&#10095;</button>
+                                </div>
                         </div>
-
                     </div>
 
                 </ul>
