@@ -112,10 +112,10 @@ if ($selected_category != '') {
                 </div>
                 <div class="header-middle-center">
                     <form action="timkiem.php" method="GET" class="form-search">
-                      
-                            <button type="submit" class="search-btn">
-                                <i class="fa-light fa-magnifying-glass"></i>
-                            </button>
+
+                        <button type="submit" class="search-btn">
+                            <i class="fa-light fa-magnifying-glass"></i>
+                        </button>
                         <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
                     </form>
@@ -301,7 +301,9 @@ if ($selected_category != '') {
                 <button type="submit" class="search-btn">
                     <i class="fa-light fa-magnifying-glass"></i>
                 </button>
-                <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
+                <input type="text" name="tukhoa" class="form-search-input" id="searchBox" 
+                    value="<?php echo isset($_GET['tukhoa']) ? htmlspecialchars($_GET['tukhoa']) : ''; ?>"
+                    placeholder="Tìm kiếm xe..."
                     onkeyup="searchProducts()">
             </form>
 
@@ -322,14 +324,7 @@ if ($selected_category != '') {
 
                                             <div class="advanced-search-category">
                                                 <?php
-                                                // Kết nối CSDL
-                                                $conn = mysqli_connect("localhost", "root", "", "admindoan");
-
-                                                // Kiểm tra kết nối
-                                                if (!$conn) {
-                                                    die("Kết nối thất bại: " . mysqli_connect_error());
-                                                }
-
+                                    
                                                 // Truy vấn danh mục sản phẩm
                                                 $brand_query = "SELECT DISTINCT dongsp FROM products";
                                                 $brand_query_run = mysqli_query($conn, $brand_query);
@@ -431,15 +426,15 @@ if ($selected_category != '') {
                                 echo '<p class="no-products">Không có sản phẩm nào trong danh mục này</p>';
                             }
                             ?>
-  <div class="pagination">
-                            <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
-                            <div id="pageNumbers" class="page-numbers"></div>
-                            <button id="nextBtn" onclick="changePage(1)">&#10095;</button>
+                            <div class="pagination">
+                                <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
+                                <div id="pageNumbers" class="page-numbers"></div>
+                                <button id="nextBtn" onclick="changePage(1)">&#10095;</button>
+                            </div>
                         </div>
-                        </div>
-                  
+
                     </div>
-                  
+
                 </ul>
             </div>
         </div>
