@@ -112,15 +112,10 @@ if ($selected_category != '') {
                 </div>
                 <div class="header-middle-center">
                     <form action="timkiem.php" method="GET" class="form-search">
-<<<<<<< HEAD
-                        <button type="submit" class="search-btn">
-                            <i class="fa-light fa-magnifying-glass"></i>
-                        </button>
-=======
+                      
                             <button type="submit" class="search-btn">
                                 <i class="fa-light fa-magnifying-glass"></i>
                             </button>
->>>>>>> cb59b77b9d91eaa5e25d4ea0a7a34ead61b6ca37
                         <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
                     </form>
@@ -235,17 +230,17 @@ if ($selected_category != '') {
 
                         </li>
                         <li class="menu-list-item">
-                            <a href="?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                            <a href="index.php?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
                                 Dòng Ninja
                             </a>
                         </li>
                         <li class="menu-list-item">
-                            <a href="?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Z' ? 'active' : ''; ?>">
+                            <a href="index.php?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Z' ? 'active' : ''; ?>">
                                 Dòng Z
                             </a>
                         </li>
                         <li class="menu-list-item">
-                            <a href="?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
+                            <a href="index.php?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
                                 Dòng KLX
                             </a>
                         </li>
