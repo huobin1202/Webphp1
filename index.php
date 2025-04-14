@@ -111,13 +111,12 @@ if ($selected_category != '') {
                     </div>
                 </div>
                 <div class="header-middle-center">
-                    <form action="" class="form-search">
-                        <button class="filter-btn">
-                            <i class="fa-light fa-magnifying-glass"></i>
-                        </button>
-                        <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
+                    <form action="timkiem.php" method="GET" class="form-search">
+                            <button type="submit" class="search-btn">
+                                <i class="fa-light fa-magnifying-glass"></i>
+                            </button>
+                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
-
                     </form>
                 </div>
                 <div class="header-middle-right">
