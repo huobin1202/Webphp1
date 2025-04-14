@@ -363,7 +363,8 @@ if ($selected_category != '') {
                                         </button>
                                         <a href="thongtinsp.php?id=' . $row['id'] . '" class="mua" style="text-decoration: none; text-align: center; display: inline-block;color:white;">Xem chi tiết</a>
                                         </div>
-                                </div>';
+                                </div>
+                                ';
                             }
                         } else {
                             echo '<p class="no-products">Không có sản phẩm nào trong danh mục này</p>';

@@ -1,4 +1,4 @@
-<?php 
+<?php
 session_start();
 include('database.php');
 include('toast.php');
@@ -31,7 +31,17 @@ if ($username && !$customer_id) {
     $stmt->close();
 } else {
     $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
-}?>
+}
+
+// Khởi tạo biến category
+$selected_category = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Xây dựng câu truy vấn SQL dựa trên category được chọn
+$sql = "SELECT id, tensp, giaban, hinhanh, dongsp FROM products WHERE status = 1";
+if ($selected_category != '') {
+    $sql .= " AND dongsp = '" . mysqli_real_escape_string($conn, $selected_category) . "'";
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -44,9 +54,7 @@ if ($username && !$customer_id) {
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="./assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css">
     <script src="https://fontawesome.com/v6/search" crossorigin="anonymous"></script>
-    <title>BMT </title>
-</head>
-<style>
+    <style>
         .display {
             display: flex;
             gap: 10px;
@@ -88,8 +96,11 @@ if ($username && !$customer_id) {
             transition: all 0.3s ease;
         }
     </style>
+    <title>BMT </title>
+</head>
+
 <body>
-<header>
+    <header>
         <div class="header-middle">
             <div class="container">
                 <div class="header-middle-left">
@@ -100,14 +111,10 @@ if ($username && !$customer_id) {
                     </div>
                 </div>
                 <div class="header-middle-center">
-    <!--tìm kiếm-->
-                
                     <form action="timkiem.php" method="GET" class="form-search">
-                        <span class="search-btn">
-                            <button type="submit">
-                                <i class="fa-light fa-magnifying-glass"></i>
-                            </button>
-                        </span>
+                        <button type="submit" class="search-btn">
+                            <i class="fa-light fa-magnifying-glass"></i>
+                        </button>
                         <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
                     </form>
@@ -208,32 +215,47 @@ if ($username && !$customer_id) {
             </div>
         </div>
     </header>
-    <div class="advanced-search">
-        <div class="container">
 
-        </div>
-    </div>
     <div class="green-line-header"></div>
 
     <nav class="header-bottom">
         <div class="container">
+            <ul class="menu-list">
+                <li class="menu-list-item"><a href="index.php" class="menu-link">Trang chủ</a></li>
 
+                <div class="dropdown">
+                    <span>Sản phẩm</span>
+                    <div class="dropdown-content">
+
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                                Dòng Ninja
+                            </a>
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Z' ? 'active' : ''; ?>">
+                                Dòng Z
+                            </a>
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
+                                Dòng KLX
+                            </a>
+                        </li>
+                    </div>
+                </div>
+                <li class="menu-list-item"><a href="index.php" class="menu-link">Tin tức </a></li>
+                <li class="menu-list-item"><a href="index.php" class="menu-link">Điều khoản</a></li>
+
+            </ul>
         </div>
     </nav>
-
-
     <main class="main-wrapper">
-
         <div class="container" id="trangchu">
-
-
             <div class="home-service" id="home-service">
-
             </div>
-
             <?php
-
-
             // Nhận dữ liệu từ GET
             $tukhoa = isset($_GET['tukhoa']) ? trim($_GET['tukhoa']) : '';
             $brandchecked = isset($_GET['brands']) ? $_GET['brands'] : [];
@@ -274,21 +296,20 @@ if ($username && !$customer_id) {
             </div>
 
 
-            <form action="" class="form-search">
-                <span class="search-btn">
-                    <a href="">
-                        <i class="fa-light fa-magnifying-glass"></i>
-                    </a>
-                </span>
-                <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
+            <form action="" method="GET" class="form-search">
+                <button type="submit" class="search-btn">
+                    <i class="fa-light fa-magnifying-glass"></i>
+                </button>
+                <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                     onkeyup="searchProducts()">
-
             </form>
 
 
             <div class="page-nav">
+
                 <ul class="page-nav-list">
                     <div class="filter-row">
+
                         <div class="filter">
                             <div class="filter-box">
                                 <div class="container">
@@ -365,27 +386,26 @@ if ($username && !$customer_id) {
                                         </div>
                                     </form>
                                 </div>
-
                             </div>
                         </div>
                         <div class="grid-container" id="product-list">
 
-                        <?php
-                        $result = $conn->query($sql);
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
-                                $in_cart = false;
-                                if (isset($_SESSION['customer_id'])) {
-                                    $check_cart = $conn->prepare("SELECT id FROM giohang WHERE customer_id = ? AND product_id = ?");
-                                    $check_cart->bind_param("ii", $_SESSION['customer_id'], $row["id"]);
-                                    $check_cart->execute();
-                                    $check_result = $check_cart->get_result();
-                                    $in_cart = $check_result->num_rows > 0;
-                                    $check_cart->close();
-                                }
+                            <?php
+                            $result = $conn->query($sql);
+                            if ($result->num_rows > 0) {
+                                while ($row = $result->fetch_assoc()) {
+                                    // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+                                    $in_cart = false;
+                                    if (isset($_SESSION['customer_id'])) {
+                                        $check_cart = $conn->prepare("SELECT id FROM giohang WHERE customer_id = ? AND product_id = ?");
+                                        $check_cart->bind_param("ii", $_SESSION['customer_id'], $row["id"]);
+                                        $check_cart->execute();
+                                        $check_result = $check_cart->get_result();
+                                        $in_cart = $check_result->num_rows > 0;
+                                        $check_cart->close();
+                                    }
 
-                                echo '
+                                    echo '
                                 <div class="card page-1">
                                         <a href="thongtinsp.php?id=' . $row["id"] . '">
                                             <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
@@ -405,53 +425,40 @@ if ($username && !$customer_id) {
                                         <a href="thongtinsp.php?id=' . $row['id'] . '" class="mua" style="text-decoration: none; text-align: center; display: inline-block;color:white;">Xem chi tiết</a>
                                         </div>
                                 </div>';
+                                }
+                            } else {
+                                echo '<p class="no-products">Không có sản phẩm nào trong danh mục này</p>';
                             }
-                        } else {
-                            echo '<p class="no-products">Không có sản phẩm nào trong danh mục này</p>';
-                        }
-                        ?>
+                            ?>
 
-                    </div>
-                    <div class="pagination">
-                        <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
-                        <div id="pageNumbers" class="page-numbers"></div>
-                        <button id="nextBtn" onclick="changePage(1)">&#10095;</button>
+                        </div>
+                        </tbody>
+                        <div class="pagination">
+                            <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
+                            <div id="pageNumbers" class="page-numbers"></div>
+                            <button id="nextBtn" onclick="changePage(1)">&#10095;</button>
+                        </div>
                     </div>
 
-                    </div>
                 </ul>
             </div>
         </div>
 
     </main>
-
-    <?php include 'footer.php'; ?>
-
-
-    <script>
-        // Lấy tên người dùng từ localStorage
-        const loggedInUser = localStorage.getItem('loggedInUser');
-
-        // Kiểm tra nếu có người dùng đã đăng nhập, hiển thị tên
-        if (loggedInUser) {
-            document.getElementById('userDisplayName').textContent = loggedInUser;
-        }
-
-        // Hàm đăng xuất
-        function logout() {
-            // Xóa thông tin người dùng khỏi localStorage
-            localStorage.removeItem('loggedInUser');
-
-            // Chuyển hướng về trang đăng nhập
-            window.location.href = 'index.php';
-        }
-    </script>
+    <?php include 'footer.php' ?>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
-    <script src="js/main.js"></script>
-
+    <script src="js/filter.js"></script>
+    <script>
+        const isLoggedIn = <?php echo isset($_SESSION['customer_id']) ? 'true' : 'false'; ?>;
+    </script>
 </body>
+<?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo "<script>if(window.history.replaceState){window.history.replaceState(null, null, window.location.href);}</script>";
+}
+?>
+<?php $conn->close(); ?>
 
 </html>
