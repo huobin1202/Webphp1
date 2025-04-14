@@ -372,7 +372,6 @@ if ($selected_category != '') {
                         ?>
 
                     </div>
-                    </tbody>
                     <div class="pagination">
                         <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
                         <div id="pageNumbers" class="page-numbers"></div>

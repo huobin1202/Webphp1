@@ -431,16 +431,15 @@ if ($selected_category != '') {
                                 echo '<p class="no-products">Không có sản phẩm nào trong danh mục này</p>';
                             }
                             ?>
-
-                        </div>
-                        </tbody>
-                        <div class="pagination">
+  <div class="pagination">
                             <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
                             <div id="pageNumbers" class="page-numbers"></div>
                             <button id="nextBtn" onclick="changePage(1)">&#10095;</button>
                         </div>
+                        </div>
+                  
                     </div>
-
+                  
                 </ul>
             </div>
         </div>

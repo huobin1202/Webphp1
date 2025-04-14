@@ -557,7 +557,7 @@ if (isset($_POST['add_to_cart'])) {
                 </div>
 
                 <!-- Phần tổng kết đơn hàng -->
-                <div style="width: 300px;">
+                <div style="width: 450px;">
                     <div style="background: #f5f5f5; padding: 20px; border-radius: 8px;">
                         <h3 style="margin-bottom: 20px;">TÓM TẮT HÓA ĐƠN</h3>
 
