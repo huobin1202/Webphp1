@@ -112,9 +112,15 @@ if ($selected_category != '') {
                 </div>
                 <div class="header-middle-center">
                     <form action="timkiem.php" method="GET" class="form-search">
+<<<<<<< HEAD
                         <button type="submit" class="search-btn">
                             <i class="fa-light fa-magnifying-glass"></i>
                         </button>
+=======
+                            <button type="submit" class="search-btn">
+                                <i class="fa-light fa-magnifying-glass"></i>
+                            </button>
+>>>>>>> cb59b77b9d91eaa5e25d4ea0a7a34ead61b6ca37
                         <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
                     </form>
