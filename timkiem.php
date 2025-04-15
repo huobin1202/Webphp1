@@ -306,8 +306,8 @@ if ($selected_category != '') {
             </div>
 
 
-            <form action="" method="GET" class="form-search">
-                <button type="submit" class="search-btn">
+            <form action="" method="GET" class="form-search" >
+                <button type="submit" class="search-btn" >
                     <i class="fa-light fa-magnifying-glass"></i>
                 </button>
                 <input type="text" name="tukhoa" class="form-search-input" id="searchBox"
