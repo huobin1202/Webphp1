@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <button type="submit" class="search-btn">
                                 <i class="fa-light fa-magnifying-glass"></i>
                             </button>
-                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
+                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm"
                             onkeyup="searchProducts()">
                     </form>
                 </div>

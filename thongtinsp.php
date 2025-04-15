@@ -407,7 +407,7 @@ if ($result->num_rows > 0) {
                         <button class="filter-btn">
                             <i class="fa-light fa-magnifying-glass"></i>
                         </button>
-                        <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
+                        <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm"
                             onkeyup="searchProducts()">
 
                     </form>

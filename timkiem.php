@@ -125,8 +125,9 @@ if ($selected_category != '') {
                         <button type="submit" class="search-btn">
                             <i class="fa-light fa-magnifying-glass"></i>
                         </button>
-                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
+                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm"
                             onkeyup="searchProducts()">
+                            
                     </form>
                 </div>
                 <div class="header-middle-right">
@@ -307,12 +308,12 @@ if ($selected_category != '') {
 
 
             <form action="" method="GET" class="form-search" >
-                <button type="submit" class="search-btn" >
+                <button type="submit" class="search-btn" style="height:80px;">
                     <i class="fa-light fa-magnifying-glass"></i>
                 </button>
-                <input type="text" name="tukhoa" class="form-search-input" id="searchBox"
+                <input type="text" name="tukhoa" class="form-search-input" id="searchBox" style="height:80px; width:100%;"
                     value="<?php echo isset($_GET['tukhoa']) ? htmlspecialchars($_GET['tukhoa']) : ''; ?>"
-                    placeholder="Tìm kiếm xe..."
+                    placeholder="TÌM KIẾM "
                     onkeyup="searchProducts()">
             </form>
 

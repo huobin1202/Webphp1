@@ -66,10 +66,17 @@ header {
     padding: 10px 20px;
     padding-left: 10px;
     width: 65%;
-
+    transition: all 0.3s ease;
+    border-top-right-radius: 5px;
+    border-top-right-radius: 5px;
+    font-weight: 600;
 
 }
-
+.form-search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
 .filter-btn,
 .search-btn {
     border: none;
@@ -84,16 +91,15 @@ header {
 }
 
 .search-btn {
-    background-color: #139b3a;
+    background-color: #f0f0f0;
     border-top-left-radius: 5px;
-    border-botto-left-radius: 5px;
-
-
+    border-bottom-left-radius: 5px;
+    transition: all 0.3s ease;
+}
+.search-btn:hover {
+    color: #007bff;
 }
 
-.fa-magnifying-glass {
-    color: white;
-}
 
 .fa-magnifying-glass-dollar {
     color: white;
