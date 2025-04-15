@@ -71,7 +71,8 @@ if ($result->num_rows > 0) {
     }
 
     .mua.in-cart {
-        background-color: #dc3545 !important; /* Màu đỏ */
+        background-color: #dc3545 !important;
+        /* Màu đỏ */
     }
 
     .cart-button {
@@ -382,7 +383,7 @@ if ($result->num_rows > 0) {
         .main-image img {
             max-height: 300px;
         }
-        
+
         .thumb {
             width: 80px;
             height: 60px;
@@ -403,12 +404,12 @@ if ($result->num_rows > 0) {
                 </div>
                 <div class="header-middle-center">
                     <form action="" class="form-search">
-                    <button class="filter-btn">
-                                <i class="fa-light fa-magnifying-glass"></i>
+                        <button class="filter-btn">
+                            <i class="fa-light fa-magnifying-glass"></i>
                         </button>
                         <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
-                       
+
                     </form>
                 </div>
                 <div class="header-middle-right">
@@ -489,9 +490,9 @@ if ($result->num_rows > 0) {
                                 </div>
                                 <div class="hoadon">
                                     <a href="giohang.php" style="text-decoration: none; color: inherit;">
-                                    <span class="ravao">
-                                        <i class="fa-light fa-basket-shopping"></i> Giỏ hàng
-                                    </span>
+                                        <span class="ravao">
+                                            <i class="fa-light fa-basket-shopping"></i> Giỏ hàng
+                                        </span>
                                     </a>
                                 </div>
 
@@ -581,11 +582,11 @@ if ($result->num_rows > 0) {
                                 ?>
 
                                 <div class="display" style="display:flex;">
-                                    <button type="button" 
-                                            class="mua cart-button <?php echo $in_cart ? 'in-cart' : ''; ?>" 
-                                            data-product-id="<?php echo $row["id"]; ?>"
-                                            data-product-price="<?php echo $row["giaban"]; ?>"
-                                            data-product-img="<?php echo $row["hinhanh"]; ?>">
+                                    <button type="button"
+                                        class="mua cart-button <?php echo $in_cart ? 'in-cart' : ''; ?>"
+                                        data-product-id="<?php echo $row["id"]; ?>"
+                                        data-product-price="<?php echo $row["giaban"]; ?>"
+                                        data-product-img="<?php echo $row["hinhanh"]; ?>">
                                         <?php echo $in_cart ? '- Xóa khỏi giỏ hàng' : '+ Thêm vào giỏ hàng'; ?>
                                     </button>
                                 </div>
@@ -610,44 +611,44 @@ if ($result->num_rows > 0) {
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
     <script>
-    function changeImage(element) {
-        // Cập nhật ảnh chính
-        document.getElementById('mainImage').src = element.src;
-        
-        // Xóa class active từ tất cả thumbnails
-        document.querySelectorAll('.thumb').forEach(thumb => {
-            thumb.classList.remove('active');
-        });
-        
-        // Thêm class active vào thumbnail được chọn
-        element.classList.add('active');
-    }
+        function changeImage(element) {
+            // Cập nhật ảnh chính
+            document.getElementById('mainImage').src = element.src;
+
+            // Xóa class active từ tất cả thumbnails
+            document.querySelectorAll('.thumb').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+
+            // Thêm class active vào thumbnail được chọn
+            element.classList.add('active');
+        }
     </script>
 
     <script>
-    let currentZoom = 1;
-    const ZOOM_STEP = 0.1;
-    const MAX_ZOOM = 1.5;
-    const MIN_ZOOM = 1;
+        let currentZoom = 1;
+        const ZOOM_STEP = 0.1;
+        const MAX_ZOOM = 1.5;
+        const MIN_ZOOM = 1;
 
-    function zoomIn() {
-        if (currentZoom < MAX_ZOOM) {
-            currentZoom = Math.min(currentZoom + ZOOM_STEP, MAX_ZOOM);
-            updateZoom();
+        function zoomIn() {
+            if (currentZoom < MAX_ZOOM) {
+                currentZoom = Math.min(currentZoom + ZOOM_STEP, MAX_ZOOM);
+                updateZoom();
+            }
         }
-    }
 
-    function zoomOut() {
-        if (currentZoom > MIN_ZOOM) {
-            currentZoom = Math.max(currentZoom - ZOOM_STEP, MIN_ZOOM);
-            updateZoom();
+        function zoomOut() {
+            if (currentZoom > MIN_ZOOM) {
+                currentZoom = Math.max(currentZoom - ZOOM_STEP, MIN_ZOOM);
+                updateZoom();
+            }
         }
-    }
 
-    function updateZoom() {
-        const mainImage = document.getElementById('mainImage');
-        mainImage.style.transform = `scale(${currentZoom})`;
-    }
+        function updateZoom() {
+            const mainImage = document.getElementById('mainImage');
+            mainImage.style.transform = `scale(${currentZoom})`;
+        }
     </script>
 
     <script>

@@ -111,13 +111,12 @@ if ($selected_category != '') {
                     </div>
                 </div>
                 <div class="header-middle-center">
-                    <form action="" class="form-search">
-                        <button class="filter-btn">
-                            <i class="fa-light fa-magnifying-glass"></i>
-                        </button>
-                        <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
+                    <form action="timkiem.php" method="GET" class="form-search">
+                            <button type="submit" class="search-btn">
+                                <i class="fa-light fa-magnifying-glass"></i>
+                            </button>
+                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
                             onkeyup="searchProducts()">
-
                     </form>
                 </div>
                 <div class="header-middle-right">
@@ -364,7 +363,8 @@ if ($selected_category != '') {
                                         </button>
                                         <a href="thongtinsp.php?id=' . $row['id'] . '" class="mua" style="text-decoration: none; text-align: center; display: inline-block;color:white;">Xem chi tiết</a>
                                         </div>
-                                </div>';
+                                </div>
+                                ';
                             }
                         } else {
                             echo '<p class="no-products">Không có sản phẩm nào trong danh mục này</p>';
@@ -372,7 +372,6 @@ if ($selected_category != '') {
                         ?>
 
                     </div>
-                    </tbody>
                     <div class="pagination">
                         <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
                         <div id="pageNumbers" class="page-numbers"></div>
