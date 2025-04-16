@@ -444,8 +444,8 @@ if ($selected_category != '') {
                                             <input type="hidden" name="sort" value="<?= htmlspecialchars($_GET['sort']) ?>">
                                         <?php endif; ?>
                                         <div class="filter-actions">
-                                            <button type="button" class="filter-btn" onclick="applyFilters()">
-                                                <i class="fa-light fa-filter"></i> Áp dụng bộ lọc
+                                            <button type="button" class="filter-btn" onclick="applyFilters()" style="">
+                                            Áp dụng bộ lọc <i class="fa-light fa-magnifying-glass-dollar"></i> 
                                             </button>
                                         </div>
 
