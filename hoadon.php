@@ -76,8 +76,7 @@ if (isset($_POST['cancel_order'])) {
                             <button type="submit" class="search-btn">
                                 <i class="fa-light fa-magnifying-glass"></i>
                             </button>
-                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm"
-                            onkeyup="searchProducts()">
+                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm">
                     </form>
                 </div>
                 <div class="header-middle-right">

@@ -397,7 +397,7 @@ if ($result->num_rows > 0) {
             <div class="container">
                 <div class="header-middle-left">
                     <div class="header-logo">
-                        <a href="" id="logo">
+                        <a href="index.php" id="logo">
                             <img src="image/logo.png" alt="BMT">
                         </a>
                     </div>
@@ -407,8 +407,7 @@ if ($result->num_rows > 0) {
                         <button class="filter-btn">
                             <i class="fa-light fa-magnifying-glass"></i>
                         </button>
-                        <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm"
-                            onkeyup="searchProducts()">
+                        <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm">
 
                     </form>
                 </div>

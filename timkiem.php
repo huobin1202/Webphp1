@@ -103,7 +103,52 @@ if ($selected_category != '') {
             width: 100%;
         }
 
-   
+        .filter-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .sort-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 16px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sort-btn:hover {
+            background: #e9e9e9;
+        }
+
+        .sort-btn.active {
+            background: #139b3a;
+            color: white;
+            border-color: #139b3a;
+        }
+
+        .reset-btn {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+        }
+
     </style>
     <title>BMT </title>
 </head>
@@ -125,8 +170,7 @@ if ($selected_category != '') {
                         <button type="submit" class="search-btn">
                             <i class="fa-light fa-magnifying-glass"></i>
                         </button>
-                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm"
-                            onkeyup="searchProducts()">
+                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm">
                             
                     </form>
                 </div>
@@ -272,12 +316,13 @@ if ($selected_category != '') {
             $brandchecked = isset($_GET['brands']) ? $_GET['brands'] : [];
             $min_price = isset($_GET['min_price']) && is_numeric($_GET['min_price']) ? (int)$_GET['min_price'] : 0;
             $max_price = isset($_GET['max_price']) && is_numeric($_GET['max_price']) ? (int)$_GET['max_price'] : PHP_INT_MAX;
+            $sort = isset($_GET['sort']) ? $_GET['sort'] : '';
 
             // Bắt đầu xây dựng câu truy vấn
             $conditions = [];
             if (!empty($tukhoa)) {
                 $safe_keyword = $conn->real_escape_string($tukhoa);
-                $conditions[] = "(tensp LIKE '%$safe_keyword%' OR dongsp LIKE '%$safe_keyword%' )";
+                $conditions[] = "(tensp LIKE '%$safe_keyword%' OR dongsp LIKE '%$safe_keyword%')";
             }
 
             if (!empty($brandchecked)) {
@@ -294,8 +339,18 @@ if ($selected_category != '') {
             // Gộp các điều kiện lại
             $where_sql = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 
+            // Thêm sắp xếp
+            $order_sql = "";
+            if ($sort === 'price_asc') {
+                $order_sql = "ORDER BY giaban ASC";
+            } elseif ($sort === 'price_desc') {
+                $order_sql = "ORDER BY giaban DESC";
+            } else {
+                $order_sql = "ORDER BY tensp";
+            }
+
             // Câu truy vấn cuối cùng
-            $sql = "SELECT * FROM products $where_sql ORDER BY tensp";
+            $sql = "SELECT * FROM products $where_sql $order_sql";
 
             // Thực thi truy vấn
             $result = $conn->query($sql);
@@ -306,35 +361,44 @@ if ($selected_category != '') {
                 <div class="border-line"></div>
             </div>
 
+            <div class="filter-controls">
+                <form action="" method="GET" class="form-search">
+                    <button type="submit" class="search-btn" style="height:80px;">
+                        <i class="fa-light fa-magnifying-glass"></i>
+                    </button>
+                    <input type="text" name="tukhoa" class="form-search-input" id="searchBox" style="height:80px; width:100%;font-size:23px;"
+                        value="<?php echo isset($_GET['tukhoa']) ? htmlspecialchars($_GET['tukhoa']) : ''; ?>"
+                        placeholder="TÌM KIẾM">
+                </form>
 
-            <form action="" method="GET" class="form-search" >
-                <button type="submit" class="search-btn" style="height:80px;">
-                    <i class="fa-light fa-magnifying-glass"></i>
-                </button>
-                <input type="text" name="tukhoa" class="form-search-input" id="searchBox" style="height:80px; width:100%;"
-                    value="<?php echo isset($_GET['tukhoa']) ? htmlspecialchars($_GET['tukhoa']) : ''; ?>"
-                    placeholder="TÌM KIẾM "
-                    onkeyup="searchProducts()">
-            </form>
-
+                <div class="sort-controls">
+                    <a href="?<?php echo http_build_query(array_merge($_GET, ['sort' => 'price_asc'])); ?>" 
+                       class="sort-btn <?php echo $sort === 'price_asc' ? 'active' : ''; ?>">
+                        <i class="fa-regular fa-arrow-up-short-wide"></i> Giá tăng dần
+                    </a>
+                    <a href="?<?php echo http_build_query(array_merge($_GET, ['sort' => 'price_desc'])); ?>" 
+                       class="sort-btn <?php echo $sort === 'price_desc' ? 'active' : ''; ?>">
+                        <i class="fa-regular fa-arrow-down-wide-short"></i> Giá giảm dần
+                    </a>
+                    <a href="timkiem.php" class="sort-btn reset-btn">
+                        <i class="fa-light fa-arrow-rotate-right"></i> Làm mới
+                    </a>
+                </div>
+            </div>
 
             <div class="page-nav">
-
                 <ul class="page-nav-list">
                     <div class="filter-row">
-
                         <div class="filter">
                             <div class="filter-box">
                                 <div class="container">
-                                    <form action="" method="GET">
+                                    <form action="" method="GET" id="filterForm">
                                         <h3 class="advanced-title">Bộ lọc tìm kiếm</h3>
                                         <div class="advanced-search-container">
                                             <!--Lọc theo danh mục sản phẩm-->
                                             <legend class="advanced-search-header">Theo danh mục</legend>
-
                                             <div class="advanced-search-category">
                                                 <?php
-
                                                 // Truy vấn danh mục sản phẩm
                                                 $brand_query = "SELECT DISTINCT dongsp FROM products";
                                                 $brand_query_run = mysqli_query($conn, $brand_query);
@@ -347,7 +411,7 @@ if ($selected_category != '') {
 
                                                 if (mysqli_num_rows($brand_query_run) > 0) {
                                                     while ($brandlist = mysqli_fetch_assoc($brand_query_run)) {
-                                                        $brandName = $brandlist['dongsp']; // ✅ sửa chỗ này
+                                                        $brandName = $brandlist['dongsp'];
                                                         $isChecked = in_array($brandName, $checked) ? 'checked' : '';
                                                 ?>
                                                         <div>
@@ -356,39 +420,33 @@ if ($selected_category != '') {
                                                         </div>
                                                 <?php
                                                     }
-                                                } else {
-                                                    echo "<p>Không tìm thấy danh mục sản phẩm.</p>";
                                                 }
-
                                                 ?>
-
                                             </div>
-
                                         </div>
                                         <div class="advanced-search-container">
                                             <!--Lọc theo khoảng giá-->
                                             <legend class="advanced-search-header">Khoảng giá</legend>
                                             <div class="advanced-search-price">
-
-                                                <input type="number" placeholder="₫ TỪ" name="min_price" id="min-price" onchange="searchProducts()" min="0" max="10000000000"
-                                                    value="<?php echo isset($_GET['min_price']) ? $_GET['min_price'] : ''; ?>">
-
-                                                <input type="number" placeholder="₫ ĐẾN" name="max_price" id="max-price" onchange="searchProducts()" min="0" max="10000000000"
-                                                    value="<?php echo isset($_GET['max_price']) ? $_GET['max_price'] : ''; ?>">
-
-
+                                                <input type="number" placeholder="₫ TỪ" name="min_price" id="min-price" 
+                                                    value="<?php echo isset($_GET['min_price']) ? $_GET['min_price'] : ''; ?>"
+                                                    min="0" max="10000000000">
+                                                <input type="number" placeholder="₫ ĐẾN" name="max_price" id="max-price" 
+                                                    value="<?php echo isset($_GET['max_price']) ? $_GET['max_price'] : ''; ?>"
+                                                    min="0" max="10000000000">
                                             </div>
-
                                         </div>
-                                        <button id="advanced-price-btn" style="" aria-label="">Áp dụng <i class="fa-light fa-magnifying-glass-dollar"></i></button>
-                                        <div class="advanced-search-control" style="padding-top: 15px;">
-                                            <button id="sort-ascending" onclick="searchProducts(1)"><i
-                                                    class="fa-regular fa-arrow-up-short-wide"></i></button>
-                                            <button id="sort-descending" onclick="searchProducts(2)"><i
-                                                    class="fa-regular fa-arrow-down-wide-short"></i></button>
-                                            <button id="reset-search" onclick="searchProducts(0)"><i
-                                                    class="fa-light fa-arrow-rotate-right"></i></button>
-                                            <button onclick="closeSearchAdvanced()"><i class="fa-light fa-xmark"></i></button>
+                                        <!-- Giữ lại các tham số GET khác -->
+                                        <?php if (isset($_GET['tukhoa'])): ?>
+                                            <input type="hidden" name="tukhoa" value="<?= htmlspecialchars($_GET['tukhoa']) ?>">
+                                        <?php endif; ?>
+                                        <?php if (isset($_GET['sort'])): ?>
+                                            <input type="hidden" name="sort" value="<?= htmlspecialchars($_GET['sort']) ?>">
+                                        <?php endif; ?>
+                                        <div class="filter-actions">
+                                            <button type="button" class="filter-btn" onclick="applyFilters()">
+                                                <i class="fa-light fa-filter"></i> Áp dụng bộ lọc
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
@@ -460,6 +518,38 @@ if ($selected_category != '') {
     <script src="js/filter.js"></script>
     <script>
         const isLoggedIn = <?php echo isset($_SESSION['customer_id']) ? 'true' : 'false'; ?>;
+    </script>
+    <script>
+    function applyFilters() {
+        const form = document.getElementById('filterForm');
+        const formData = new FormData(form);
+        const params = new URLSearchParams();
+        
+        // Thêm các tham số từ form
+        for (const [key, value] of formData.entries()) {
+            if (value) {
+                if (key === 'brands[]') {
+                    params.append('brands[]', value);
+                } else {
+                    params.append(key, value);
+                }
+            }
+        }
+        
+        // Thêm các tham số GET hiện tại
+        const currentParams = new URLSearchParams(window.location.search);
+        for (const [key, value] of currentParams.entries()) {
+            if (!formData.has(key)) {
+                params.append(key, value);
+            }
+        }
+        
+        // Chuyển hướng với các tham số đã lọc
+        window.location.href = 'timkiem.php?' + params.toString();
+    }
+
+    // Thêm sự kiện click cho nút áp dụng bộ lọc
+    document.querySelector('.filter-btn').addEventListener('click', applyFilters);
     </script>
 </body>
 <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
