@@ -1056,11 +1056,16 @@ li {
     outline: none;
     border-radius: 5px;
     cursor: pointer;
+    background-color: #139b3a;
+    color: #fff;
+    font-size: 15px;
+    transition: all 0.3s ease;
+
 
 }
 
-#advanced-price-btn {
-    background-color: #139b3a;
+#advanced-price-btn:hover {
+    background-color: #0f7a2d;
     color: #fff;
     font-size: 15px;
 }

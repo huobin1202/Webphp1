@@ -399,8 +399,8 @@ if ($selected_category != '') {
                                             <legend class="advanced-search-header">Theo danh mục</legend>
                                             <div class="advanced-search-category">
                                                 <?php
-                                                // Truy vấn danh mục sản phẩm
-                                                $brand_query = "SELECT DISTINCT dongsp FROM products";
+                                                // Truy vấn danh mục sản phẩm và số lượng sản phẩm
+                                                $brand_query = "SELECT dongsp, COUNT(*) as count FROM products GROUP BY dongsp";
                                                 $brand_query_run = mysqli_query($conn, $brand_query);
 
                                                 // Lưu giá trị đã chọn (nếu có)
@@ -412,11 +412,12 @@ if ($selected_category != '') {
                                                 if (mysqli_num_rows($brand_query_run) > 0) {
                                                     while ($brandlist = mysqli_fetch_assoc($brand_query_run)) {
                                                         $brandName = $brandlist['dongsp'];
+                                                        $productCount = $brandlist['count'];
                                                         $isChecked = in_array($brandName, $checked) ? 'checked' : '';
                                                 ?>
                                                         <div>
                                                             <input type="checkbox" name="brands[]" value="<?= htmlspecialchars($brandName) ?>" <?= $isChecked ?> />
-                                                            <?= htmlspecialchars($brandName) ?>
+                                                            <?= htmlspecialchars($brandName) ?> (<?= $productCount ?>)
                                                         </div>
                                                 <?php
                                                     }
@@ -444,9 +445,8 @@ if ($selected_category != '') {
                                             <input type="hidden" name="sort" value="<?= htmlspecialchars($_GET['sort']) ?>">
                                         <?php endif; ?>
                                         <div class="filter-actions">
-                                            <button type="button" class="filter-btn" onclick="applyFilters()" style="">
-                                            Áp dụng bộ lọc <i class="fa-light fa-magnifying-glass-dollar"></i> 
-                                            </button>
+                                            <button type="button" id="advanced-price-btn" onclick="applyFilters()">Áp dụng <i class="fa-light fa-magnifying-glass-dollar"></i></button>
+
                                         </div>
 
                                     </form>
