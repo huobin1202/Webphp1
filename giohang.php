@@ -39,7 +39,8 @@ if ($username && !$customer_id) {
 
 // Kiểm tra đăng nhập
 if (!isset($_SESSION['customer_id'])) {
-    header("Location: dn.php");
+    $_SESSION['error'] = "Đăng nhập để sử dụng giỏ hàng! ";
+    header("Location: index.php");
     exit;
 }
 
@@ -87,6 +88,7 @@ if (isset($_GET['remove']) && isset($_SESSION['customer_id'])) {
 // Xử lý thêm sản phẩm vào giỏ hàng
 if (isset($_POST['add_to_cart'])) {
     if (!isset($_SESSION['customer_id'])) {
+
         header("Location: dn.php");
         exit;
     }

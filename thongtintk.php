@@ -2,6 +2,7 @@
 session_start();
 include('database.php');
 include('toast.php');
+include('logout.php');
 
 // Kiểm tra đăng nhập
 if (!isset($_SESSION['customer_id'])) {

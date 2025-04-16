@@ -2,14 +2,8 @@
 session_start();
 include('database.php');
 include('toast.php');
+include('logout.php');
 
-// Xử lý đăng xuất
-if (isset($_GET['logout'])) {
-    session_unset();
-    session_destroy();
-    header("Location: index.php");
-    exit;
-}
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
 

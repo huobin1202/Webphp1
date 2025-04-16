@@ -2,6 +2,7 @@
 session_start();
 include('database.php');
 include('toast.php');
+include('logout.php');
 
 if (!isset($_SESSION['customer_id'])) {
     $_SESSION['error'] = "Đăng nhập để thanh toán!";

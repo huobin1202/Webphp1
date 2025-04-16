@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.cart-button').forEach(button => {
         button.addEventListener('click', function() {
             if (!isLoggedIn) {
-                window.location.href = 'dn.php';
+                showToast("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng", "error");
                 return;
             }
 
