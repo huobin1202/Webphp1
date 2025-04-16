@@ -496,7 +496,7 @@ if (isset($_POST['add_to_cart'])) {
                     ?>
                         <div style="text-align: center; padding: 20px;">
                             <p>Giỏ hàng trống</p>
-                            <a href="index.php" class="mua" style="display: inline-block; margin-top: 20px;">Tiếp tục mua sắm</a>
+                            <a href="index.php" class="mua" style="display: inline-block; margin-top: 20px;">Mua sắm ngay!</a>
                         </div>
                         <?php else:
                         while ($item = $result->fetch_assoc()):

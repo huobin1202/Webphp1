@@ -18,7 +18,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $name = trim($_POST['name']);
         $contact = trim($_POST['contact']);
         $email = trim($_POST['email']);
-        $address = trim($_POST['address']);
         $password = trim($_POST['password']);
         $password_confirm = trim($_POST['password_confirm']);
 
@@ -36,10 +35,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['error'] = "Tài khoản hoặc số điện thoại đã tồn tại!";
             } else {
                 // Thêm tài khoản mới vào CSDL
-                $sql = "INSERT INTO customer (name, contact, joindate, status, password, email, address, role) 
-                VALUES (?, ?, NOW(), '1', ?, ?, ?, 'user')";
+                $sql = "INSERT INTO customer (name, contact, joindate, status, password, email, role) 
+                VALUES (?, ?, NOW(), '1', ?, ?, 'user')";
                 $stmt = $conn->prepare($sql);
-                $stmt->bind_param("sssss", $name, $contact, $password, $email, $address);
+                $stmt->bind_param("ssss", $name, $contact, $password, $email);
 
 
                 if ($stmt->execute()) {
@@ -166,7 +165,7 @@ $conn->close();
         <form method="post">
             <input type="text" id="newUsername" placeholder="Tên đăng nhập" name="name" maxlength="20" required>
             <input type="text" id="newContact" placeholder="Số điện thoại" name="contact" maxlength="11" required>
-
+            <input type="email" id="newEmail" placeholder="Email" name="email" maxlength="30" required>
             <input type="password" id="newPassword" placeholder="Mật khẩu" name="password" maxlength="20" required>
             <input type="password" id="confirmPassword" placeholder="Xác nhận mật khẩu" name="password_confirm" maxlength="20" required>
             <button name="register">Đăng ký</button>
