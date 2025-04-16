@@ -448,6 +448,7 @@ if ($selected_category != '') {
                                                 <i class="fa-light fa-filter"></i> Áp dụng bộ lọc
                                             </button>
                                         </div>
+
                                     </form>
                                 </div>
                             </div>
