@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 08, 2025 at 04:01 AM
+-- Generation Time: Apr 26, 2025 at 05:18 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -48,6 +48,13 @@ CREATE TABLE `customer` (
   `password` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `address` varchar(255) NOT NULL,
+  `city_code` varchar(10) DEFAULT NULL,
+  `city_name` varchar(100) DEFAULT NULL,
+  `district_code` varchar(10) DEFAULT NULL,
+  `district_name` varchar(100) DEFAULT NULL,
+  `ward_code` varchar(10) DEFAULT NULL,
+  `ward_name` varchar(100) DEFAULT NULL,
+  `street_address` varchar(255) DEFAULT NULL,
   `role` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -55,18 +62,21 @@ CREATE TABLE `customer` (
 -- Dumping data for table `customer`
 --
 
-INSERT INTO `customer` (`id`, `name`, `contact`, `joindate`, `status`, `password`, `email`, `address`, `role`) VALUES
-(72, '1234', '123', '2025-03-28', 1, '123', 'anvabinh123@gmail.com', 'kaka', 'admin'),
-(73, 'kakas', '521123', '2025-03-29', 1, '321', '123@da.com', '123', 'user'),
-(74, '124', '124', '2025-03-30', 1, '124', '', '', ''),
-(75, '53463', '116', '2025-03-30', 1, '123', '', '', ''),
-(76, '3214', '51512', '2025-03-30', 1, '123', '123@dsa.com', 'dfdvdvf', 'user'),
-(77, '532525', '21352135', '2025-03-30', 1, '4321', '52135@gmail.com', '423235', 'user'),
-(78, 'jaja', '123456', '2025-03-31', 1, '123', 'ikik@gmail.com', 'c5', 'user'),
-(79, 'haha', '56116', '2025-03-31', 1, '123', '1515@dsa.com', 'kaka', 'user'),
-(80, '543', '15151', '2025-03-31', 1, '123', 'anvabinh123@gmail.com', 'dsds', 'user'),
-(81, 'dada', '52352', '2025-04-01', 1, '123', '123@dsa.com', '12515', 'user'),
-(82, 'kdfjgid', '124124', '2025-04-03', 1, '123', '', '', '');
+INSERT INTO `customer` (`id`, `name`, `contact`, `joindate`, `status`, `password`, `email`, `address`, `city_code`, `city_name`, `district_code`, `district_name`, `ward_code`, `ward_name`, `street_address`, `role`) VALUES
+(72, '1234', '123', '2025-03-28', 1, '123', 'anvabinh123@gmail.com', 'C5/10B, Huyện Chiêm Hóa, Tỉnh Tuyên Quang', '8', 'Tỉnh Tuyên Quang', '73', 'Huyện Chiêm Hóa', '2347', '', 'C5/10B', 'admin'),
+(73, 'kakas', '521123', '2025-03-29', 1, '321', '123@da.com', '123', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user'),
+(74, '124', '124', '2025-03-30', 1, '124', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, ''),
+(75, '53463', '116', '2025-03-30', 1, '123', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, ''),
+(76, '3214', '51512', '2025-03-30', 1, '123', '123@dsa.com', 'dfdvdvf', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user'),
+(77, '532525', '21352135', '2025-03-30', 1, '4321', '52135@gmail.com', '423235', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user'),
+(78, 'jaja', '123456', '2025-03-31', 1, '123', 'ikik@gmail.com', 'c5', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user'),
+(79, 'haha', '56116', '2025-03-31', 1, '123', '1515@dsa.com', 'kaka', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user'),
+(80, '543', '15151', '2025-03-31', 1, '123', 'anvabinh123@gmail.com', 'dsds', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user'),
+(81, 'dada', '52352', '2025-04-01', 1, '123', '123@dsa.com', '12515', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user'),
+(82, 'kdfjgid', '124124', '2025-04-03', 1, '123', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, ''),
+(83, 'jajaja', '346346', '2025-04-16', 1, '321', 'dsadsa@gmail.com', '141f1f', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user'),
+(84, 'mizu', '456456', '2025-04-16', 1, '123', '123@gmail.com', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user'),
+(85, 'uytuty', '525235', '2025-04-16', 1, '123', 'koka@gmail.com', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'user');
 
 -- --------------------------------------------------------
 
@@ -82,19 +92,6 @@ CREATE TABLE `giohang` (
   `price` int(255) NOT NULL,
   `img` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `giohang`
---
-
-INSERT INTO `giohang` (`id`, `customer_id`, `product_id`, `soluong`, `price`, `img`) VALUES
-(146, 79, 113, 1, 75000000, 'uploads/KLX110R.jpg'),
-(147, 79, 88, 1, 233000000, 'uploads/z650rsabs.jpg'),
-(154, 78, 88, 3, 233000000, 'uploads/z650rsabs.jpg'),
-(155, 78, 97, 1, 320900000, 'uploads/z900abs.png'),
-(156, 78, 101, 1, 194000000, 'uploads/0_15.jpg'),
-(157, 78, 104, 1, 765700000, 'uploads/n-zx10r.jpg'),
-(226, 72, 97, 1, 320900000, 'uploads/z900abs.png');
 
 -- --------------------------------------------------------
 
@@ -156,29 +153,29 @@ INSERT INTO `orders` (`id`, `customer_id`, `total`, `note`, `payment_method`, `d
 (77, 72, '1875000000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-03-31', '', '1235151551512', '12421412', '105 Bà Huyện Thanh Quan'),
 (78, 78, '570900000', '123', 'Chuyển khoản', 'Mua trực tiếp', '2025-03-31', '', 'kakas', '5252', '273 An Dương Vương'),
 (79, 78, '765700000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-02', 'dahuy', '123', '123', '273 An Dương Vương'),
-(80, 78, '233000000', '321', 'Tiền mặt', 'Mua trực tiếp', '2025-04-02', 'chuaxuly', '321', '321', '273 An Dương Vương'),
+(80, 78, '233000000', '321', 'Tiền mặt', 'Mua trực tiếp', '2025-04-02', 'dahuy', '321', '321', '273 An Dương Vương'),
 (81, 72, '320900000', '234', 'Tiền mặt', 'Mua trực tiếp', '2025-04-03', 'dahuy', '234', '234', '273 An Dương Vương'),
-(82, 72, '1531400000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-03', 'chuaxuly', '123', '321', '273 An Dương Vương'),
-(83, 72, '148700000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '432', '532', '273 An Dương Vương'),
-(84, 72, '320900000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', '', '321', '123', ''),
+(82, 72, '1531400000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-03', 'dahuy', '123', '321', '273 An Dương Vương'),
+(83, 72, '148700000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'daxuly', '432', '532', '273 An Dương Vương'),
+(84, 72, '320900000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'daxuly', '321', '123', ''),
 (85, 72, '320900000', '124', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'dahuy', '321', '412', '273 An Dương Vương'),
 (86, 72, '320900000', '632', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'dahuy', '632', '632', ''),
-(87, 72, '320900000', '125125', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '512512', '12515', '273 An Dương Vương'),
-(88, 72, '233000000', '124', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', 'siu nhan gao', '4242424242', '105 Bà Huyện Thanh Quan'),
-(89, 72, '250000000', '42114', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'chuaxuly', 'hahaha', '421312312412414124', ''),
+(87, 72, '320900000', '125125', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'daxuly', '512512', '12515', '273 An Dương Vương'),
+(88, 72, '233000000', '124', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'dagiao', 'siu nhan gao', '4242424242', '105 Bà Huyện Thanh Quan'),
+(89, 72, '250000000', '42114', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'dahuy', 'hahaha', '421312312412414124', ''),
 (90, 72, '233000000', '421', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '421', '421', ''),
-(91, 72, '194000000', '', 'Tiền mặt', '273 An Dương Vương', '2025-04-05', 'chuaxuly', '424124', '4214144', '273 An Dương Vương'),
-(92, 72, '320900000', '123', 'Tiền mặt', '273 An Dương Vương', '2025-04-05', 'chuaxuly', '123', '123', '273 An Dương Vương'),
-(93, 72, '233000000', '123123', 'Chuyển khoản', '273 An Dương Vương', '2025-04-05', 'chuaxuly', '1231', '123', '273 An Dương Vương'),
-(94, 72, '233000000', '124124', 'Tiền mặt', '04 Tôn Đức Thắng', '2025-04-05', 'chuaxuly', '123123', '412412414', '04 Tôn Đức Thắng'),
-(95, 72, '150000000', '', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', ''),
-(96, 72, '233000000', '543', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '543', '345', '105 Bà Huyện Thanh Quan'),
-(97, 72, '194000000', '321', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123123', '123123', ''),
-(98, 72, '320900000', '231', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '2321', '321', '04 Tôn Đức Thắng'),
-(99, 72, '320900000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', 'kaka', '123', '105 Bà Huyện Thanh Quan'),
-(100, 72, '194000000', '321', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '321', '321', ''),
-(101, 72, '194000000', 'ada', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'chuaxuly', 'ád', '123', ''),
-(102, 72, '194000000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '321', '321', ''),
+(91, 72, '194000000', '', 'Tiền mặt', '273 An Dương Vương', '2025-04-05', 'dahuy', '424124', '4214144', '273 An Dương Vương'),
+(92, 72, '320900000', '123', 'Tiền mặt', '273 An Dương Vương', '2025-04-05', 'daxuly', '123', '123', '273 An Dương Vương'),
+(93, 72, '233000000', '123123', 'Chuyển khoản', '273 An Dương Vương', '2025-04-05', 'daxuly', '1231', '123', '273 An Dương Vương'),
+(94, 72, '233000000', '124124', 'Tiền mặt', '04 Tôn Đức Thắng', '2025-04-05', 'dahuy', '123123', '412412414', '04 Tôn Đức Thắng'),
+(95, 72, '150000000', '', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'daxuly', '123', '123', ''),
+(96, 72, '233000000', '543', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'daxuly', '543', '345', '105 Bà Huyện Thanh Quan'),
+(97, 72, '194000000', '321', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'dahuy', '123123', '123123', ''),
+(98, 72, '320900000', '231', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'dahuy', '2321', '321', '04 Tôn Đức Thắng'),
+(99, 72, '320900000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'dahuy', 'kaka', '123', '105 Bà Huyện Thanh Quan'),
+(100, 72, '194000000', '321', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'dahuy', '321', '321', ''),
+(101, 72, '194000000', 'ada', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'daxuly', 'ád', '123', ''),
+(102, 72, '194000000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'dahuy', '321', '321', ''),
 (103, 72, '320900000', '124124', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', 'kaka'),
 (104, 72, '320900000', '151515', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '4214124', '12312312', 'kaka'),
 (105, 72, '320900000', '234', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '342234', '234234', 'kaka'),
@@ -199,7 +196,10 @@ INSERT INTO `orders` (`id`, `customer_id`, `total`, `note`, `payment_method`, `d
 (120, 72, '233000000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', 'haha', '123', 'haha'),
 (121, 72, '75000000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', 'kaka'),
 (122, 72, '765700000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '321', '321', 'Mua trực tiếp'),
-(123, 72, '194000000', '321', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '123', '123', '04 Tôn Đức Thắng');
+(123, 72, '194000000', '321', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '123', '123', '04 Tôn Đức Thắng'),
+(124, 83, '233000000', '', 'Tiền mặt', 'Giao tận nơi', '2025-04-16', 'daxuly', 'bình', '124124', 'haha'),
+(125, 79, '308000000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-16', 'dahuy', '321', '123', '273 An Dương Vương'),
+(126, 79, '320900000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-26', 'dahuy', '321', '123', '273 An Dương Vương');
 
 -- --------------------------------------------------------
 
@@ -276,7 +276,11 @@ INSERT INTO `order_details` (`id`, `order_id`, `product_id`, `soluong`, `price`)
 (134, 120, 88, 1, '233000000'),
 (135, 121, 113, 1, '75000000'),
 (136, 122, 104, 1, '765700000'),
-(137, 123, 101, 1, '194000000');
+(137, 123, 101, 1, '194000000'),
+(138, 124, 88, 1, '233000000'),
+(139, 125, 113, 1, '75000000'),
+(140, 125, 88, 1, '233000000'),
+(141, 126, 97, 1, '320900000');
 
 -- --------------------------------------------------------
 
@@ -317,6 +321,101 @@ INSERT INTO `products` (`id`, `tensp`, `dongsp`, `status`, `giaban`, `thongtinsp
 (111, 'KLX230SM', 'Dòng KLX', '1', 151000000, '', '', 'uploads/KLX230SM.png', '', ''),
 (112, 'KLX230R', 'Dòng KLX', '1', 148700000, 'KLX230R sẽ đưa những chuyến phiêu lưu của bạn đến tầm cao mới. Với hệ thống treo hành trình dài và khoảng sáng gầm xe lớn, cùng trọng lượng nhẹ, KLX230R – mẫu xe cào cào đích thực – được sinh ra để phục vụ những tay lái mong muốn tìm kiếm niềm vui ở những nơi đầy cát-gió-bùn đất một cách tuyệt vời nhất.', '', 'uploads/KLX230R.jpg', 'uploads/KLX230R2.jpg', 'uploads/KLX230R3.jpg'),
 (113, 'KLX110R', 'Dòng KLX', '1', 75000000, 'Dù là dành cho người mới bắt đầu hay đơn thuần chỉ là công cụ giải trí, KLX110R L luôn sẵn sàng cho nhiệm vụ. Động cơ 112 cm³ vui tươi và khung gầm nhỏ gọn đủ linh hoạt để xử lý và thú vị cho bất kỳ tay đua trẻ nào.', '', 'uploads/KLX110R.jpg', '', '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `provinces`
+--
+
+CREATE TABLE `provinces` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `code` varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Table structure for table `districts`
+--
+
+CREATE TABLE `districts` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `province_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Table structure for table `wards`
+--
+
+CREATE TABLE `wards` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `code` varchar(10) NOT NULL,
+  `district_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Indexes for table `provinces`
+--
+ALTER TABLE `provinces`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`);
+
+--
+-- Indexes for table `districts`
+--
+ALTER TABLE `districts`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`),
+  ADD KEY `province_id` (`province_id`);
+
+--
+-- Indexes for table `wards`
+--
+ALTER TABLE `wards`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `code` (`code`),
+  ADD KEY `district_id` (`district_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `provinces`
+--
+ALTER TABLE `provinces`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `districts`
+--
+ALTER TABLE `districts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `wards`
+--
+ALTER TABLE `wards`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `districts`
+--
+ALTER TABLE `districts`
+  ADD CONSTRAINT `districts_ibfk_1` FOREIGN KEY (`province_id`) REFERENCES `provinces` (`id`);
+
+--
+-- Constraints for table `wards`
+--
+ALTER TABLE `wards`
+  ADD CONSTRAINT `wards_ibfk_1` FOREIGN KEY (`district_id`) REFERENCES `districts` (`id`);
 
 --
 -- Indexes for dumped tables
@@ -392,13 +491,13 @@ ALTER TABLE `addresses`
 -- AUTO_INCREMENT for table `customer`
 --
 ALTER TABLE `customer`
-  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 
 --
 -- AUTO_INCREMENT for table `giohang`
 --
 ALTER TABLE `giohang`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=227;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=254;
 
 --
 -- AUTO_INCREMENT for table `loaiproducts`
@@ -416,13 +515,13 @@ ALTER TABLE `nhanvien`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
 
 --
 -- AUTO_INCREMENT for table `order_details`
 --
 ALTER TABLE `order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=138;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
 
 --
 -- AUTO_INCREMENT for table `products`

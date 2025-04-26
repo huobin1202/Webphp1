@@ -14,6 +14,8 @@ if (!isset($_SESSION['customer_id'])) {
 $customer_id = $_SESSION['customer_id'];
 $role = null;
 $total_price=0;
+$fullAddress = ''; // Khởi tạo biến $fullAddress
+
 if ($username && !$customer_id) {
     $stmt = $conn->prepare("SELECT id, role FROM customer WHERE name = ?");
     $stmt->bind_param("s", $username);
@@ -28,10 +30,10 @@ if ($username && !$customer_id) {
     $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
 }
 // Lấy thông tin khách hàng
-$stmt = $conn->prepare("SELECT name, contact, email, address, password FROM customer WHERE id = ?");
+$stmt = $conn->prepare("SELECT name, contact, email, city_code, city_name, district_code, district_name, ward_code, ward_name, street_address, address, password FROM customer WHERE id = ?");
 $stmt->bind_param("i", $customer_id);
 $stmt->execute();
-$stmt->bind_result($tenUser, $sdtUser, $emailUser, $diachiUser, $current_password);
+$stmt->bind_result($tenUser, $sdtUser, $emailUser, $cityCode, $cityName, $districtCode, $districtName, $wardCode, $wardName, $streetAddress, $fullAddress, $current_password);
 $stmt->fetch();
 $stmt->close();
 
@@ -39,10 +41,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $tenUser = trim($_POST['infoname']);
     $sdtUser = trim($_POST['infophone']);
     $emailUser = trim($_POST['infoemail']);
-    $diachiUser = trim($_POST['infoaddress']);
+    $cityCode = trim($_POST['city']);
+    $districtCode = trim($_POST['district']);
+    $wardCode = trim($_POST['ward']);
+    $streetAddress = trim($_POST['infoaddress']);
     $mkHientai = trim($_POST['current-pass']);
     $mkMoi = trim($_POST['new-pass']);
     $xnMkMoi = trim($_POST['confirm-new-pass']);
+
+    // Lấy tên địa chỉ từ API
+    $cityName = '';
+    $districtName = '';
+    $wardName = '';
+    
+    if ($cityCode) {
+        $response = file_get_contents("https://provinces.open-api.vn/api/p/" . $cityCode);
+        if ($response !== false) {
+            $cityData = json_decode($response, true);
+            $cityName = $cityData['name'];
+        }
+    }
+    
+    if ($districtCode) {
+        $response = file_get_contents("https://provinces.open-api.vn/api/d/" . $districtCode);
+        if ($response !== false) {
+            $districtData = json_decode($response, true);
+            $districtName = $districtData['name'];
+        }
+    }
+    
+    if ($wardCode) {
+        $response = file_get_contents("https://provinces.open-api.vn/api/w/" . $wardCode);
+        if ($response !== false) {
+            $wardData = json_decode($response, true);
+            if (isset($wardData['name'])) {
+                $wardName = $wardData['name'];
+                // Lưu thông tin xã/phường vào cơ sở dữ liệu ngay khi có dữ liệu
+                $stmt = $conn->prepare("UPDATE customer SET ward_code = ?, ward_name = ? WHERE id = ?");
+                $stmt->bind_param("ssi", $wardCode, $wardName, $customer_id);
+                $stmt->execute();
+                $stmt->close();
+            }
+        }
+    }
 
     // Kiểm tra email hợp lệ
     if (!filter_var($emailUser, FILTER_VALIDATE_EMAIL)) {
@@ -76,8 +117,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
 
             if (!isset($_SESSION['error'])) {
-                $stmt = $conn->prepare("UPDATE customer SET name=?, contact=?, email=?, address=?, password=? WHERE id=?");
-                $stmt->bind_param("sssssi", $tenUser, $sdtUser, $emailUser, $diachiUser, $passwordToUpdate, $customer_id);
+                // Tạo địa chỉ đầy đủ
+                $fullAddress = $streetAddress;
+                if ($wardName && $wardName !== '') {
+                    $fullAddress .= ", " . $wardName;
+                }
+                if ($districtName && $districtName !== '') {
+                    $fullAddress .= ", " . $districtName;
+                }
+                if ($cityName && $cityName !== '') {
+                    $fullAddress .= ", " . $cityName;
+                }
+
+                // Debug thông tin địa chỉ
+                error_log("City Code: " . $cityCode);
+                error_log("City Name: " . $cityName);
+                error_log("District Code: " . $districtCode);
+                error_log("District Name: " . $districtName);
+                error_log("Ward Code: " . $wardCode);
+                error_log("Ward Name: " . $wardName);
+                error_log("Street Address: " . $streetAddress);
+                error_log("Full Address: " . $fullAddress);
+                error_log("Ward Data: " . print_r($wardData, true));
+
+                $stmt = $conn->prepare("UPDATE customer SET name=?, contact=?, email=?, city_code=?, city_name=?, district_code=?, district_name=?, ward_code=?, ward_name=?, street_address=?, address=?, password=? WHERE id=?");
+                $stmt->bind_param("ssssssssssssi", $tenUser, $sdtUser, $emailUser, $cityCode, $cityName, $districtCode, $districtName, $wardCode, $wardName, $streetAddress, $fullAddress, $passwordToUpdate, $customer_id);
 
                 if ($stmt->execute()) {
                     if ($stmt->affected_rows > 0) {
@@ -282,9 +346,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                     <div class="form-group">
                         <label for="infoaddress" class="form-label">Địa chỉ</label>
-                            <input class="form-control" type="text" name="infoaddress" id="infoaddress" value="<?php echo htmlspecialchars(string: $diachiUser); ?>" required><br>
-
-                            
+                        <div class="address-inputs">
+                            <select class="form-control" name="city" id="city" required>
+                                <option value="">Chọn Tỉnh/Thành phố</option>
+                            </select>
+                            <select class="form-control" name="district" id="district" required>
+                                <option value="">Chọn Quận/Huyện</option>
+                            </select>
+                            <select class="form-control" name="ward" id="ward" required>
+                                <option value="">Chọn Phường/Xã</option>
+                            </select>
+                            <input class="form-control" type="text" name="infoaddress" id="infoaddress" placeholder="Số nhà, tên đường..." value="<?php echo htmlspecialchars($streetAddress); ?>" required>
+                            <div class="full-address-display">
+                                <label class="form-label">Địa chỉ đầy đủ:</label>
+                                <div class="address-value"><?php echo htmlspecialchars($fullAddress); ?></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inforole" class="form-label">Vai trò</label>
+                        <span class="role-badge <?php echo $role === 'admin' ? 'admin-role' : 'user-role'; ?>">
+                            <?php echo htmlspecialchars($role === 'admin' ? 'Admin' : 'User'); ?>
+                        </span>
                     </div>
                 </div>
                 <div class="main-account-body-col">
@@ -332,9 +415,197 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
 
+    <style>
+        .role-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .admin-role {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #90caf9;
+        }
+        .user-role {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #e0e0e0;
+        }
+        .address-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .address-inputs select,
+        .address-inputs input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .full-address-display {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .address-value {
+            font-weight: 500;
+            color: #333;
+            margin-top: 5px;
+        }
+    </style>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // API endpoint for Vietnam administrative divisions
+        const API_URL = 'https://provinces.open-api.vn/api/';
+        
+        // Fetch provinces
+        fetch(API_URL + '?depth=1')
+            .then(response => response.json())
+            .then(provinces => {
+                const citySelect = document.getElementById('city');
+                provinces.forEach(province => {
+                    const option = document.createElement('option');
+                    option.value = province.code;
+                    option.textContent = province.name;
+                    if (province.code === '<?php echo $cityCode; ?>') {
+                        option.selected = true;
+                    }
+                    citySelect.appendChild(option);
+                });
+                
+                // Nếu có city_code, load districts
+                if ('<?php echo $cityCode; ?>') {
+                    loadDistricts('<?php echo $cityCode; ?>');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading provinces:', error);
+            });
 
+        // Handle city change
+        document.getElementById('city').addEventListener('change', function() {
+            const cityCode = this.value;
+            const districtSelect = document.getElementById('district');
+            const wardSelect = document.getElementById('ward');
+            
+            // Clear existing options
+            districtSelect.innerHTML = '<option value="">Chọn Quận/Huyện</option>';
+            wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+            
+            if (cityCode) {
+                loadDistricts(cityCode);
+            }
+        });
 
+        // Handle district change
+        document.getElementById('district').addEventListener('change', function() {
+            const districtCode = this.value;
+            const wardSelect = document.getElementById('ward');
+            
+            // Clear existing options
+            wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+            
+            if (districtCode) {
+                loadWards(districtCode);
+            }
+        });
+
+        function loadDistricts(cityCode) {
+            fetch(API_URL + 'p/' + cityCode + '?depth=2')
+                .then(response => response.json())
+                .then(data => {
+                    const districtSelect = document.getElementById('district');
+                    data.districts.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.code;
+                        option.textContent = district.name;
+                        if (district.code === '<?php echo $districtCode; ?>') {
+                            option.selected = true;
+                        }
+                        districtSelect.appendChild(option);
+                    });
+                    
+                    // Nếu có district_code, load wards
+                    if ('<?php echo $districtCode; ?>') {
+                        loadWards('<?php echo $districtCode; ?>');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading districts:', error);
+                });
+        }
+
+        function loadWards(districtCode) {
+            fetch(API_URL + 'd/' + districtCode + '?depth=2')
+                .then(response => response.json())
+                .then(data => {
+                    const wardSelect = document.getElementById('ward');
+                    wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+                    
+                    if (data.wards && data.wards.length > 0) {
+                        data.wards.forEach(ward => {
+                            const option = document.createElement('option');
+                            option.value = ward.code;
+                            option.textContent = ward.name;
+                            if (ward.code === '<?php echo $wardCode; ?>') {
+                                option.selected = true;
+                                // Cập nhật địa chỉ đầy đủ ngay khi tìm thấy xã/phường đã chọn
+                                updateFullAddress();
+                            }
+                            wardSelect.appendChild(option);
+                        });
+                    } else {
+                        console.error('No wards found for district:', districtCode);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading wards:', error);
+                });
+        }
+
+        function updateFullAddress() {
+            const streetAddress = document.getElementById('infoaddress').value;
+            const citySelect = document.getElementById('city');
+            const districtSelect = document.getElementById('district');
+            const wardSelect = document.getElementById('ward');
+            
+            const cityName = citySelect.options[citySelect.selectedIndex]?.text || '';
+            const districtName = districtSelect.options[districtSelect.selectedIndex]?.text || '';
+            const wardName = wardSelect.options[wardSelect.selectedIndex]?.text || '';
+            
+            let fullAddress = streetAddress;
+            if (wardName && wardName !== 'Chọn Phường/Xã') {
+                fullAddress += ', ' + wardName;
+            }
+            if (districtName && districtName !== 'Chọn Quận/Huyện') {
+                fullAddress += ', ' + districtName;
+            }
+            if (cityName && cityName !== 'Chọn Tỉnh/Thành phố') {
+                fullAddress += ', ' + cityName;
+            }
+            
+            document.querySelector('.address-value').textContent = fullAddress;
+            
+            // Debug
+            console.log('Ward Name:', wardName);
+            console.log('Full Address:', fullAddress);
+        }
+
+        // Thêm event listeners cho các trường địa chỉ
+        document.getElementById('infoaddress').addEventListener('input', updateFullAddress);
+        document.getElementById('city').addEventListener('change', updateFullAddress);
+        document.getElementById('district').addEventListener('change', updateFullAddress);
+        document.getElementById('ward').addEventListener('change', updateFullAddress);
+
+        // Cập nhật địa chỉ đầy đủ khi trang tải xong
+        document.addEventListener('DOMContentLoaded', updateFullAddress);
+    });
+    </script>
 
 </body>
 <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {

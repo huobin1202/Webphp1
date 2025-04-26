@@ -5,15 +5,7 @@ if (!isset($_SESSION['username'])) {
     header("Location: dnurl.php");
     exit();
 }
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "admindoan";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
+include('../database.php');
 
 
 // XỬ LÝ CẬP NHẬT TRẠNG THÁI NẾU POST
@@ -27,7 +19,30 @@ if (isset($_POST['process_order'])) {
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $order_id = intval($_POST['order_id']);
+    $new_status = $_POST['new_status'];
+    
+    $stmt = $conn->prepare("UPDATE orders SET status = ? WHERE id = ?");
+    $stmt->bind_param("si", $new_status, $order_id);
+    
+    if ($stmt->execute()) {
+        $_SESSION['success'] = "Cập nhật trạng thái thành công!";
+    } else {
+        $_SESSION['error'] = "Không thể cập nhật trạng thái!";
+    }
+    
+    // Redirect back với các tham số tìm kiếm
+    $redirect_url = 'donhang.php';
+    if (!empty($_SERVER['HTTP_REFERER'])) {
+        $parts = parse_url($_SERVER['HTTP_REFERER']);
+        if (isset($parts['query'])) {
+            $redirect_url .= '?' . $parts['query'];
+        }
+    }
+    
+    header("Location: " . $redirect_url);
+}
 
 // Lấy tất cả đơn hàng & chi tiết để hiển thị
 $sql = "SELECT orders.*, customer.name AS customer_name 
@@ -86,7 +101,6 @@ if ($result->num_rows > 0) {
         $orders[] = $row;
     }
 }
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -234,7 +248,7 @@ $conn->close();
                                         <td><?php echo date('d/m/Y', strtotime($order['created_at'])); ?></td>
                                         <td><?php echo number_format($order['total'], 0, ',', '.') . 'đ'; ?></td>
                                         <td>
-                                            <form method="POST" action="update_order_status.php" class="status-form">
+                                            <form method="POST" action="" class="status-form">
                                                 <input type="hidden" name="order_id" value="<?php echo $order['id']; ?>">
                                                 <select name="new_status" onchange="this.form.submit()">
                                                     <option value="chuaxuly" <?php echo $order['status'] == 'chuaxuly' ? 'selected' : ''; ?>>Chưa xử lý</option>
