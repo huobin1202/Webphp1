@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Lấy tất cả đơn hàng & chi tiết để hiển thị
-$sql = "SELECT orders.*, customer.name AS customer_name 
+$sql = "SELECT orders.*, customer.name AS customer_name, customer.city_code, customer.city_name, customer.district_code, customer.district_name, customer.ward_code, customer.ward_name
         FROM orders 
         INNER JOIN customer ON orders.customer_id = customer.id 
         WHERE 1=1";
@@ -53,13 +53,28 @@ $params = array();
 
 if (isset($_GET['search']) && !empty($_GET['search'])) {
     $search = '%' . $_GET['search'] . '%';
-    $sql .= " AND (orders.id LIKE ? OR customer.id LIKE ? OR customer.name LIKE ?)";
-    array_push($params, $search, $search, $search);
+    $sql .= " AND (orders.id LIKE ? OR customer.id LIKE ? OR customer.name LIKE ? OR orders.recipient_name LIKE ? OR orders.recipient_phone LIKE ?)";
+    array_push($params, $search, $search, $search, $search, $search);
 }
 
 if (isset($_GET['status']) && $_GET['status'] != '4') {
     $sql .= " AND orders.status = ?";
     array_push($params, $_GET['status']);
+}
+
+if (isset($_GET['city']) && !empty($_GET['city'])) {
+    $sql .= " AND (orders.city_code = ? OR customer.city_code = ?)";
+    array_push($params, $_GET['city'], $_GET['city']);
+}
+
+if (isset($_GET['district']) && !empty($_GET['district'])) {
+    $sql .= " AND (orders.district_code = ? OR customer.district_code = ?)";
+    array_push($params, $_GET['district'], $_GET['district']);
+}
+
+if (isset($_GET['ward']) && !empty($_GET['ward'])) {
+    $sql .= " AND (orders.ward_code = ? OR customer.ward_code = ?)";
+    array_push($params, $_GET['ward'], $_GET['ward']);
 }
 
 if (isset($_GET['start_date']) && !empty($_GET['start_date'])) {
@@ -191,12 +206,54 @@ if ($result->num_rows > 0) {
                 <div class="admin-control">
                     <form method="GET" action="" class="admin-control-wrapper" style="width: 100%;display: flex;justify-content: space-between;">
                         <div class="admin-control-left">
-                            <select name="status"  class="form-control" onchange="this.form.submit()">
+                            <select name="status" class="form-control" onchange="this.form.submit()">
                                 <option value="4" <?php echo (isset($_GET['status']) && $_GET['status'] == '4') ? 'selected' : ''; ?>>Tất cả</option>
                                 <option value="chuaxuly" <?php echo (isset($_GET['status']) && $_GET['status'] == 'chuaxuly') ? 'selected' : ''; ?>>Chưa xử lý</option>
                                 <option value="daxuly" <?php echo (isset($_GET['status']) && $_GET['status'] == 'daxuly') ? 'selected' : ''; ?>>Đã xử lý</option>
                                 <option value="dahuy" <?php echo (isset($_GET['status']) && $_GET['status'] == 'dahuy') ? 'selected' : ''; ?>>Đã hủy</option>
                                 <option value="dagiao" <?php echo (isset($_GET['status']) && $_GET['status'] == 'dagiao') ? 'selected' : ''; ?>>Đã giao</option>
+                            </select>
+                        </div>
+                        <div class="admin-control-location">
+                            <select name="city" id="city"  onchange="loadDistricts(this.value)" style="margin-left:25px;">
+                                <option value="">Chọn Tỉnh/Thành phố</option>
+                                <?php
+                                $city_query = $conn->query("SELECT DISTINCT city_code, city_name FROM customer WHERE city_code IS NOT NULL AND city_name IS NOT NULL ORDER BY city_name");
+                                while ($city = $city_query->fetch_assoc()) {
+                                    $selected = (isset($_GET['city']) && $_GET['city'] == $city['city_code']) ? 'selected' : '';
+                                    echo "<option value='{$city['city_code']}' {$selected}>{$city['city_name']}</option>";
+                                }
+                                ?>
+                            </select>
+                            <select name="district" id="district"  onchange="loadWards(this.value)">
+                                <option value="">Chọn Quận/Huyện</option>
+                                <?php
+                                if (isset($_GET['city'])) {
+                                    $district_query = $conn->prepare("SELECT DISTINCT district_code, district_name FROM customer WHERE city_code = ? AND district_code IS NOT NULL AND district_name IS NOT NULL ORDER BY district_name");
+                                    $district_query->bind_param("s", $_GET['city']);
+                                    $district_query->execute();
+                                    $district_result = $district_query->get_result();
+                                    while ($district = $district_result->fetch_assoc()) {
+                                        $selected = (isset($_GET['district']) && $_GET['district'] == $district['district_code']) ? 'selected' : '';
+                                        echo "<option value='{$district['district_code']}' {$selected}>{$district['district_name']}</option>";
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <select name="ward" id="ward" >
+                                <option value="">Chọn Phường/Xã</option>
+                                <?php
+                                if (isset($_GET['district'])) {
+                                    $ward_query = $conn->prepare("SELECT DISTINCT ward_code, ward_name FROM customer WHERE district_code = ? AND ward_code IS NOT NULL AND ward_name IS NOT NULL ORDER BY ward_name");
+                                    $ward_query->bind_param("s", $_GET['district']);
+                                    $ward_query->execute();
+                                    $ward_result = $ward_query->get_result();
+                                    while ($ward = $ward_result->fetch_assoc()) {
+                                        $selected = (isset($_GET['ward']) && $_GET['ward'] == $ward['ward_code']) ? 'selected' : '';
+                                        echo "<option value='{$ward['ward_code']}' {$selected}>{$ward['ward_name']}</option>";
+                                    }
+                                }
+                                ?>
                             </select>
                         </div>
                         <div class="admin-control-center">
@@ -366,7 +423,157 @@ if ($result->num_rows > 0) {
         <?php endif; ?>
     </div>
     <script src="../assets/js/admin.js"></script>
+    <script>
+    // API endpoint for Vietnam administrative divisions
+    const API_URL = 'https://provinces.open-api.vn/api/';
+    
+    function loadProvinces() {
+        fetch(API_URL)
+            .then(response => response.json())
+            .then(data => {
+                const citySelect = document.getElementById('city');
+                citySelect.innerHTML = '<option value="">Chọn Tỉnh/Thành phố</option>';
+                data.forEach(province => {
+                    const option = document.createElement('option');
+                    option.value = province.code;
+                    option.textContent = province.name;
+                    if (province.code === '<?php echo isset($_GET['city']) ? $_GET['city'] : ''; ?>') {
+                        option.selected = true;
+                    }
+                    citySelect.appendChild(option);
+                });
+                
+                // Nếu có city_code, load districts
+                if ('<?php echo isset($_GET['city']) ? $_GET['city'] : ''; ?>') {
+                    loadDistricts('<?php echo isset($_GET['city']) ? $_GET['city'] : ''; ?>');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading provinces:', error);
+            });
+    }
 
+    function loadDistricts(cityCode) {
+        fetch(API_URL + 'p/' + cityCode + '?depth=2')
+            .then(response => response.json())
+            .then(data => {
+                const districtSelect = document.getElementById('district');
+                districtSelect.innerHTML = '<option value="">Chọn Quận/Huyện</option>';
+                
+                data.districts.forEach(district => {
+                    const option = document.createElement('option');
+                    option.value = district.code;
+                    option.textContent = district.name;
+                    if (district.code === '<?php echo isset($_GET['district']) ? $_GET['district'] : ''; ?>') {
+                        option.selected = true;
+                    }
+                    districtSelect.appendChild(option);
+                });
+                
+                // Nếu có district_code, load wards
+                if ('<?php echo isset($_GET['district']) ? $_GET['district'] : ''; ?>') {
+                    loadWards('<?php echo isset($_GET['district']) ? $_GET['district'] : ''; ?>');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading districts:', error);
+            });
+    }
+
+    function loadWards(districtCode) {
+        fetch(API_URL + 'd/' + districtCode + '?depth=2')
+            .then(response => response.json())
+            .then(data => {
+                const wardSelect = document.getElementById('ward');
+                wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
+                
+                if (data.wards && data.wards.length > 0) {
+                    data.wards.forEach(ward => {
+                        const option = document.createElement('option');
+                        option.value = ward.code;
+                        option.textContent = ward.name;
+                        if (ward.code === '<?php echo isset($_GET['ward']) ? $_GET['ward'] : ''; ?>') {
+                            option.selected = true;
+                        }
+                        wardSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error loading wards:', error);
+            });
+    }
+
+    // Load provinces when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadProvinces();
+
+        // Thêm sự kiện onchange cho select tỉnh/thành phố
+        document.getElementById('city').addEventListener('change', function() {
+            const cityCode = this.value;
+            // Reset district và ward khi thay đổi province
+            document.getElementById('district').innerHTML = '<option value="">Chọn Quận/Huyện</option>';
+            document.getElementById('ward').innerHTML = '<option value="">Chọn Phường/Xã</option>';
+            loadDistricts(cityCode);
+            if (cityCode) {
+                searchOrders();
+            }
+        });
+
+        // Thêm sự kiện onchange cho select quận/huyện
+        document.getElementById('district').addEventListener('change', function() {
+            const districtCode = this.value;
+            // Reset ward khi thay đổi district
+            document.getElementById('ward').innerHTML = '<option value="">Chọn Phường/Xã</option>';
+            loadWards(districtCode);
+            if (districtCode) {
+                searchOrders();
+            }
+        });
+
+        // Thêm sự kiện onchange cho select phường/xã
+        document.getElementById('ward').addEventListener('change', function() {
+            const wardCode = this.value;
+            if (wardCode) {
+                searchOrders();
+            }
+        });
+    });
+
+    function searchOrders() {
+        const form = document.querySelector('form');
+        const formData = new FormData(form);
+        
+        // Hiển thị loading
+        const tbody = document.getElementById('showOrder');
+        tbody.innerHTML = '<tr><td colspan="7" class="loading">Đang tải dữ liệu...</td></tr>';
+
+        fetch('search_orders.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(html => {
+            tbody.innerHTML = html;
+            updateURL(formData);
+        })
+        .catch(error => {
+            console.error('Error searching orders:', error);
+            tbody.innerHTML = '<tr><td colspan="7" class="error">Có lỗi xảy ra khi tải dữ liệu</td></tr>';
+        });
+    }
+
+    function updateURL(formData) {
+        const params = new URLSearchParams();
+        for (const [key, value] of formData.entries()) {
+            if (value) {
+                params.set(key, value);
+            }
+        }
+        const newUrl = window.location.pathname + '?' + params.toString();
+        window.history.pushState({}, '', newUrl);
+    }
+    </script>
 </body>
 
 </html>

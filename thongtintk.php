@@ -71,19 +71,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     
     if ($wardCode) {
-        $response = file_get_contents("https://provinces.open-api.vn/api/w/" . $wardCode);
+        $response = file_get_contents("https://open.oapi.vn/location/wards/" . $districtCode . "?page=0&size=30");
         if ($response !== false) {
             $wardData = json_decode($response, true);
-            if (isset($wardData['name'])) {
-                $wardName = $wardData['name'];
-                // Lưu thông tin xã/phường vào cơ sở dữ liệu ngay khi có dữ liệu
-                $stmt = $conn->prepare("UPDATE customer SET ward_code = ?, ward_name = ? WHERE id = ?");
-                $stmt->bind_param("ssi", $wardCode, $wardName, $customer_id);
-                $stmt->execute();
-                $stmt->close();
+            if (isset($wardData['data']) && is_array($wardData['data'])) {
+                foreach ($wardData['data'] as $ward) {
+                    if ($ward['id'] === $wardCode) {
+                        $wardName = $ward['name'];
+                        break;
+                    }
+                }
             }
         }
     }
+    
 
     // Kiểm tra email hợp lệ
     if (!filter_var($emailUser, FILTER_VALIDATE_EMAIL)) {
@@ -357,10 +358,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <option value="">Chọn Phường/Xã</option>
                             </select>
                             <input class="form-control" type="text" name="infoaddress" id="infoaddress" placeholder="Số nhà, tên đường..." value="<?php echo htmlspecialchars($streetAddress); ?>" required>
-                            <div class="full-address-display">
-                                <label class="form-label">Địa chỉ đầy đủ:</label>
-                                <div class="address-value"><?php echo htmlspecialchars($fullAddress); ?></div>
-                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -464,11 +461,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         const API_URL = 'https://provinces.open-api.vn/api/';
         
         // Fetch provinces
-        fetch(API_URL + '?depth=1')
+        fetch(API_URL)
             .then(response => response.json())
-            .then(provinces => {
+            .then(data => {
                 const citySelect = document.getElementById('city');
-                provinces.forEach(province => {
+                data.forEach(province => {
                     const option = document.createElement('option');
                     option.value = province.code;
                     option.textContent = province.name;
@@ -554,56 +551,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             option.textContent = ward.name;
                             if (ward.code === '<?php echo $wardCode; ?>') {
                                 option.selected = true;
-                                // Cập nhật địa chỉ đầy đủ ngay khi tìm thấy xã/phường đã chọn
-                                updateFullAddress();
                             }
                             wardSelect.appendChild(option);
                         });
-                    } else {
-                        console.error('No wards found for district:', districtCode);
                     }
                 })
                 .catch(error => {
                     console.error('Error loading wards:', error);
                 });
         }
-
-        function updateFullAddress() {
-            const streetAddress = document.getElementById('infoaddress').value;
-            const citySelect = document.getElementById('city');
-            const districtSelect = document.getElementById('district');
-            const wardSelect = document.getElementById('ward');
-            
-            const cityName = citySelect.options[citySelect.selectedIndex]?.text || '';
-            const districtName = districtSelect.options[districtSelect.selectedIndex]?.text || '';
-            const wardName = wardSelect.options[wardSelect.selectedIndex]?.text || '';
-            
-            let fullAddress = streetAddress;
-            if (wardName && wardName !== 'Chọn Phường/Xã') {
-                fullAddress += ', ' + wardName;
-            }
-            if (districtName && districtName !== 'Chọn Quận/Huyện') {
-                fullAddress += ', ' + districtName;
-            }
-            if (cityName && cityName !== 'Chọn Tỉnh/Thành phố') {
-                fullAddress += ', ' + cityName;
-            }
-            
-            document.querySelector('.address-value').textContent = fullAddress;
-            
-            // Debug
-            console.log('Ward Name:', wardName);
-            console.log('Full Address:', fullAddress);
-        }
-
-        // Thêm event listeners cho các trường địa chỉ
-        document.getElementById('infoaddress').addEventListener('input', updateFullAddress);
-        document.getElementById('city').addEventListener('change', updateFullAddress);
-        document.getElementById('district').addEventListener('change', updateFullAddress);
-        document.getElementById('ward').addEventListener('change', updateFullAddress);
-
-        // Cập nhật địa chỉ đầy đủ khi trang tải xong
-        document.addEventListener('DOMContentLoaded', updateFullAddress);
     });
     </script>
 
