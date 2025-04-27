@@ -193,64 +193,20 @@ INSERT INTO `orders` (`id`, `customer_id`, `total`, `note`, `payment_method`, `d
 (110, 72, '250000000', '123123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123123', '123', 'kaka', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (111, 72, '194000000', '11111111111111111111111111', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '11111111111111111111', '11111111111111111111', 'kaka', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (112, 72, '765700000', '34534535', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '5435345', '45345345', 'kaka', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-INSERT INTO `orders` (`id`, `customer_id`, `total`, `note`, `payment_method`, `delivery_type`, `created_at`, `status`, `recipient_name`, `recipient_phone`, `address`) VALUES
-(70, 72, '123.00', '321', 'Tiền mặt', 'Giao tận nơi', '2025-03-28', '', '321', '321', ''),
-(71, 72, '861.00', '321', 'Tiền mặt', 'Giao tận nơi', '2025-03-29', 'dahuy', '321', '321', ''),
-(72, 73, '10692.00', '124', 'Tiền mặt', 'Giao tận nơi', '2025-03-29', 'dagiao', '421', '421', ''),
-(73, 72, '2481.00', '321', 'Tiền mặt', 'Giao tận nơi', '2025-03-30', 'daxuly', '312', '123', '123123'),
-(74, 72, '99999999.99', '', 'Tiền mặt', 'Giao tận nơi', '2025-03-31', 'dahuy', '123', '123', ''),
-(75, 72, '99999999.99', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-03-31', 'dahuy', 'ronaldo', '1245113', '273 An Dương Vương'),
-(76, 72, '1875000000', '421', 'Chuyển khoản', 'Giao tận nơi', '2025-03-31', 'dahuy', '5252525235235', '421', ''),
-(77, 72, '1875000000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-03-31', '', '1235151551512', '12421412', '105 Bà Huyện Thanh Quan'),
-(78, 78, '570900000', '123', 'Chuyển khoản', 'Mua trực tiếp', '2025-03-31', '', 'kakas', '5252', '273 An Dương Vương'),
-(79, 78, '765700000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-02', 'dahuy', '123', '123', '273 An Dương Vương'),
-(80, 78, '233000000', '321', 'Tiền mặt', 'Mua trực tiếp', '2025-04-02', 'dahuy', '321', '321', '273 An Dương Vương'),
-(81, 72, '320900000', '234', 'Tiền mặt', 'Mua trực tiếp', '2025-04-03', 'dahuy', '234', '234', '273 An Dương Vương'),
-(82, 72, '1531400000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-03', 'dahuy', '123', '321', '273 An Dương Vương'),
-(83, 72, '148700000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'daxuly', '432', '532', '273 An Dương Vương'),
-(84, 72, '320900000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'daxuly', '321', '123', ''),
-(85, 72, '320900000', '124', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'dahuy', '321', '412', '273 An Dương Vương'),
-(86, 72, '320900000', '632', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'dahuy', '632', '632', ''),
-(87, 72, '320900000', '125125', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'daxuly', '512512', '12515', '273 An Dương Vương'),
-(88, 72, '233000000', '124', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'dagiao', 'siu nhan gao', '4242424242', '105 Bà Huyện Thanh Quan'),
-(89, 72, '250000000', '42114', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'dahuy', 'hahaha', '421312312412414124', ''),
-(90, 72, '233000000', '421', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '421', '421', ''),
-(91, 72, '194000000', '', 'Tiền mặt', '273 An Dương Vương', '2025-04-05', 'dahuy', '424124', '4214144', '273 An Dương Vương'),
-(92, 72, '320900000', '123', 'Tiền mặt', '273 An Dương Vương', '2025-04-05', 'daxuly', '123', '123', '273 An Dương Vương'),
-(93, 72, '233000000', '123123', 'Chuyển khoản', '273 An Dương Vương', '2025-04-05', 'daxuly', '1231', '123', '273 An Dương Vương'),
-(94, 72, '233000000', '124124', 'Tiền mặt', '04 Tôn Đức Thắng', '2025-04-05', 'dahuy', '123123', '412412414', '04 Tôn Đức Thắng'),
-(95, 72, '150000000', '', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'daxuly', '123', '123', ''),
-(96, 72, '233000000', '543', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'daxuly', '543', '345', '105 Bà Huyện Thanh Quan'),
-(97, 72, '194000000', '321', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'dahuy', '123123', '123123', ''),
-(98, 72, '320900000', '231', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'dahuy', '2321', '321', '04 Tôn Đức Thắng'),
-(99, 72, '320900000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'dahuy', 'kaka', '123', '105 Bà Huyện Thanh Quan'),
-(100, 72, '194000000', '321', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'dahuy', '321', '321', ''),
-(101, 72, '194000000', 'ada', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'daxuly', 'ád', '123', ''),
-(102, 72, '194000000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'dahuy', '321', '321', ''),
-(103, 72, '320900000', '124124', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', 'kaka'),
-(104, 72, '320900000', '151515', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '4214124', '12312312', 'kaka'),
-(105, 72, '320900000', '234', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '342234', '234234', 'kaka'),
-(106, 72, '320900000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', 'kaka'),
-(107, 72, '194000000', '234234', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '234234', '234234', 'kaka'),
-(108, 72, '250000000', '123123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', 'kaka'),
-(109, 72, '194000000', '123', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', 'kaka'),
-(110, 72, '250000000', '123123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123123', '123', 'kaka'),
-(111, 72, '194000000', '11111111111111111111111111', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '11111111111111111111', '11111111111111111111', 'kaka'),
-(112, 72, '765700000', '34534535', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '5435345', '45345345', 'kaka'),
-(113, 72, '194000000', '234234', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '234234', '234234', '123'),
-(114, 72, '75000000', 'agag', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', 'agagagag'),
-(115, 72, '75000000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', 'haha do thái', '123', 'Mua trực tiếp'),
-(116, 72, '320900000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '123', '421', 'Mua trực tiếp'),
-(117, 72, '320900000', '234', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '234', '234', 'kaka'),
-(118, 72, '250000000', '234234', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '342234', '234', '23424'),
-(119, 72, '194000000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', 'haha', '321', 'Mua trực tiếp'),
-(120, 72, '233000000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', 'haha', '123', 'haha'),
-(121, 72, '75000000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', 'kaka'),
-(122, 72, '765700000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '321', '321', 'Mua trực tiếp'),
-(123, 72, '194000000', '321', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '123', '123', '04 Tôn Đức Thắng'),
-(124, 83, '233000000', '', 'Tiền mặt', 'Giao tận nơi', '2025-04-16', 'daxuly', 'bình', '124124', 'haha'),
-(125, 79, '308000000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-16', 'dahuy', '321', '123', '273 An Dương Vương'),
-(126, 79, '320900000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-26', 'dahuy', '321', '123', '273 An Dương Vương');
+(113, 72, '194000000', '234234', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '234234', '234234', '123', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(114, 72, '75000000', 'agag', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', 'agagagag', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(115, 72, '75000000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', 'haha do thái', '123', 'Mua trực tiếp', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(116, 72, '320900000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '123', '421', 'Mua trực tiếp', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(117, 72, '320900000', '234', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '234', '234', 'kaka', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(118, 72, '250000000', '234234', 'Chuyển khoản', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '342234', '234', '23424', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(119, 72, '194000000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', 'haha', '321', 'Mua trực tiếp', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(120, 72, '233000000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', 'haha', '123', 'haha', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(121, 72, '75000000', '123', 'Tiền mặt', 'Giao tận nơi', '2025-04-05', 'chuaxuly', '123', '123', 'kaka', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(122, 72, '765700000', '123', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '321', '321', 'Mua trực tiếp', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(123, 72, '194000000', '321', 'Tiền mặt', 'Mua trực tiếp', '2025-04-05', 'chuaxuly', '123', '123', '04 Tôn Đức Thắng', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(124, 83, '233000000', '', 'Tiền mặt', 'Giao tận nơi', '2025-04-16', 'daxuly', 'bình', '124124', 'haha', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(125, 79, '308000000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-16', 'dahuy', '321', '123', '273 An Dương Vương', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(126, 79, '320900000', '', 'Tiền mặt', 'Mua trực tiếp', '2025-04-26', 'dahuy', '321', '123', '273 An Dương Vương', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -609,6 +565,34 @@ ALTER TABLE `orders`
 ALTER TABLE `order_details`
   ADD CONSTRAINT `order_details_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   ADD CONSTRAINT `order_details_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+
+--
+-- Table structure for table `branch_addresses`
+--
+
+CREATE TABLE `branch_addresses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `branch_name` varchar(255) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `city_code` varchar(10) DEFAULT NULL,
+  `city_name` varchar(100) DEFAULT NULL,
+  `district_code` varchar(10) DEFAULT NULL,
+  `district_name` varchar(100) DEFAULT NULL,
+  `ward_code` varchar(10) DEFAULT NULL,
+  `ward_name` varchar(100) DEFAULT NULL,
+  `street_address` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `branch_addresses`
+--
+
+INSERT INTO `branch_addresses` (`branch_name`, `address`, `city_code`, `city_name`, `district_code`, `district_name`, `ward_code`, `ward_name`, `street_address`) VALUES
+('Chi nhánh 1', '273 An Dương Vương, Phường 3, Quận 5', '79', 'Thành phố Hồ Chí Minh', '760', 'Quận 5', '26734', 'Phường 3', '273 An Dương Vương'),
+('Chi nhánh 2', '04 Tôn Đức Thắng, Phường Bến Nghé, Quận 1', '79', 'Thành phố Hồ Chí Minh', '760', 'Quận 1', '26734', 'Phường Bến Nghé', '04 Tôn Đức Thắng'),
+('Chi nhánh 3', '105 Bà Huyện Thanh Quan, Phường Võ Thị Sáu, Quận 3', '79', 'Thành phố Hồ Chí Minh', '760', 'Quận 3', '26734', 'Phường Võ Thị Sáu', '105 Bà Huyện Thanh Quan');
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

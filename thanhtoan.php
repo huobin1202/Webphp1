@@ -39,7 +39,6 @@ while ($row = $cart_result->fetch_assoc()) {
 if (empty($cart)) {
     $_SESSION['error'] = "Vui lòng thêm sản phẩm ";
     header("Location: index.php");
-
     exit();
 }
 
@@ -48,72 +47,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tennguoinhan = $_POST['tennguoinhan'];
     $sdt = $_POST['sdtnhan'];
     $ghichu = $_POST['ghichu'] ?? '';
-    $payment = $_POST['payment_method'] ?? 'Tiền mặt';
-    $delivery = $_POST['delivery_type'] ?? 'Giao tận nơi';
     $delivery_mode = $_POST['delivery_mode']; // "Mua trực tiếp" hoặc "Giao tận nơi"
-
-    // Debug all POST data
-    error_log("POST data received: " . print_r($_POST, true));
-
-    // Get the final address from the form
-    $order_address = $_POST['final_address'] ?? '';
     
-    // If final_address is empty, try to get it from the old fields
-    if (empty($order_address)) {
-        if ($delivery_mode === 'Giao tận nơi') {
-            if (isset($_POST['address_type']) && $_POST['address_type'] === 'saved') {
-                $order_address = $_POST['diachinhan'] ?? '';
-            } else {
-                $order_address = $_POST['diachinhan_new'] ?? '';
-            }
+    // Xử lý phương thức thanh toán
+    if ($delivery_mode === 'Giao tận nơi') {
+        $payment = $_POST['payment_method'] ?? 'Tiền mặt';
+    } else {
+        $payment = $_POST['payment_method_store'] ?? 'Tiền mặt';
+    }
+
+    // Initialize address components
+    $city_code = $_POST['city_new'] ?? '';
+    $district_code = $_POST['district_new'] ?? '';
+    $ward_code = $_POST['ward_new'] ?? '';
+    $street_address = $_POST['street_address_new'] ?? '';
+    $order_address = '';
+
+    // Handle address based on delivery mode
+    if ($delivery_mode === 'Giao tận nơi') {
+        if (isset($_POST['address_type']) && $_POST['address_type'] === 'saved') {
+            $order_address = $_POST['diachinhan'] ?? '';
         } else {
-            // Khi chọn "Tự đến lấy", sử dụng địa chỉ cửa hàng
-            $order_address = "Cửa hàng BMT - 123 Đường ABC, Quận XYZ, TP.HCM";
+            $order_address = $_POST['diachinhan_new'] ?? '';
+            $city_code = $_POST['city_new'] ?? '';
+            $district_code = $_POST['district_new'] ?? '';
+            $ward_code = $_POST['ward_new'] ?? '';
+            $street_address = $_POST['street_address_new'] ?? '';
+        }
+    } else {
+        // Khi chọn "Tự đến lấy", lấy địa chỉ chi nhánh được chọn
+        $branch_address = $_POST['delivery_type'] ?? '';
+        if (!empty($branch_address)) {
+            // Lấy thông tin chi nhánh từ database
+            $branch_query = $conn->prepare("SELECT * FROM branch_addresses WHERE address = ?");
+            $branch_query->bind_param("s", $branch_address);
+            $branch_query->execute();
+            $branch_result = $branch_query->get_result();
+            $branch = $branch_result->fetch_assoc();
+            
+            if ($branch) {
+                $order_address = $branch['address'];
+                $city_code = $branch['city_code'];
+                $city_name = $branch['city_name'];
+                $district_code = $branch['district_code'];
+                $district_name = $branch['district_name'];
+                $ward_code = $branch['ward_code'];
+                $ward_name = $branch['ward_name'];
+                $street_address = $branch['street_address'];
+            }
         }
     }
-    
-    // Log the final address that will be saved
-    error_log("Final order address: " . $order_address);
-    
-    // Check if address is empty and log a warning
-    if (empty($order_address)) {
-        error_log("WARNING: Order address is empty!");
-        $order_address = "Không có địa chỉ";
-    }
-    
-    // Check if the address field exists in the database
-    $check_address_field = $conn->query("SHOW COLUMNS FROM orders LIKE 'address'");
-    if ($check_address_field->num_rows == 0) {
-        error_log("WARNING: 'address' column does not exist in the orders table!");
-        // Add the address column if it doesn't exist
-        $conn->query("ALTER TABLE orders ADD COLUMN address VARCHAR(255)");
-        error_log("Added 'address' column to orders table");
-    }
-    
+
+    // Log the address information for debugging
+    error_log("Order address information: " . print_r([
+        'delivery_mode' => $delivery_mode,
+        'order_address' => $order_address,
+        'city_code' => $city_code,
+        'city_name' => $city_name,
+        'district_code' => $district_code,
+        'district_name' => $district_name,
+        'ward_code' => $ward_code,
+        'ward_name' => $ward_name,
+        'street_address' => $street_address
+    ], true));
+
     // Lưu đơn hàng
     $order_stmt = $conn->prepare("
-        INSERT INTO orders (customer_id, total, note, payment_method, delivery_type, status, recipient_name, recipient_phone, address, city_code, city_name, district_code, district_name, ward_code, ward_name, street_address) 
-        VALUES (?, ?, ?, ?, ?, 'chuaxuly', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO orders (
+            customer_id, total, note, payment_method, delivery_type, 
+            status, recipient_name, recipient_phone, address, 
+            city_code, city_name, district_code, district_name, 
+            ward_code, ward_name, street_address
+        ) VALUES (?, ?, ?, ?, ?, 'chuaxuly', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
-
-    // Lấy thông tin địa chỉ từ form
-    $city_code = $_POST['city_new'] ?? '';
-    $city_name = $_POST['city_name'] ?? '';
-    $district_code = $_POST['district_new'] ?? '';
-    $district_name = $_POST['district_name'] ?? '';
-    $ward_code = $_POST['ward_new'] ?? '';
-    $ward_name = $_POST['ward_name'] ?? '';
-    $street_address = $_POST['street_address_new'] ?? '';
-
-    // Kiểm tra và gán giá trị mặc định nếu rỗng
-    $city_code = empty($city_code) ? '' : $city_code;
-    $city_name = empty($city_name) ? '' : $city_name;
-    $district_code = empty($district_code) ? '' : $district_code;
-    $district_name = empty($district_name) ? '' : $district_name;
-    $ward_code = empty($ward_code) ? '' : $ward_code;
-    $ward_name = empty($ward_name) ? '' : $ward_name;
-    $street_address = empty($street_address) ? '' : $street_address;
-
 
     $order_stmt->bind_param("idsssssssssssss", 
         $customer_id, 
@@ -133,9 +139,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $street_address
     );
     
-    // Log the SQL query and parameters for debugging
-    error_log("SQL Query: INSERT INTO orders (customer_id, total, note, payment_method, delivery_type, status, recipient_name, recipient_phone, address, city_code, city_name, district_code, district_name, ward_code, ward_name, street_address) VALUES ($customer_id, $total, '$ghichu', '$payment', '$delivery_mode', 'chuaxuly', '$tennguoinhan', '$sdt', '$order_address', '$city_code', '$city_name', '$district_code', '$district_name', '$ward_code', '$ward_name', '$street_address')");
-    
     if (!$order_stmt->execute()) {
         error_log("Error executing order statement: " . $order_stmt->error);
         throw new Exception("Lỗi khi lưu đơn hàng: " . $order_stmt->error);
@@ -143,6 +146,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $order_id = $conn->insert_id;
     error_log("Order created successfully with ID: " . $order_id);
+
+    // Verify the inserted data
+    $verify_query = $conn->prepare("SELECT * FROM orders WHERE id = ?");
+    $verify_query->bind_param("i", $order_id);
+    $verify_query->execute();
+    $verify_result = $verify_query->get_result();
+    $inserted_order = $verify_result->fetch_assoc();
+    
+    error_log("Inserted order data: " . print_r($inserted_order, true));
 
     // Lưu chi tiết đơn hàng
     foreach ($cart as $item) {
@@ -161,8 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-
-<!DOCTYPE php>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -212,17 +223,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <div id="new-address" class="form-group" style="display: none;">
                                     <div class="address-inputs">
-                                        <select class="form-control" name="city_new" id="city_new" required>
+                                        <select class="form-control" name="city_new" id="city_new" style="margin-bottom:10px;" data-selected="<?php echo htmlspecialchars($city_code); ?>">
                                             <option value="">Chọn Tỉnh/Thành phố</option>
                                         </select>
-                                        <select class="form-control" name="district_new" id="district_new" required>
+                                        <select class="form-control" name="district_new" id="district_new" style="margin-bottom:10px;" data-selected="<?php echo htmlspecialchars($district_code); ?>">
                                             <option value="">Chọn Quận/Huyện</option>
                                         </select>
-                                        <select class="form-control" name="ward_new" id="ward_new" required>
+                                        <select class="form-control" name="ward_new" id="ward_new" style="margin-bottom:10px;" data-selected="<?php echo htmlspecialchars($ward_code); ?>">
                                             <option value="">Chọn Phường/Xã</option>
                                         </select>
-                                        <input type="text" name="street_address_new" id="street_address_new" value=""
-                                            placeholder="Số nhà, tên đường..." class="form-control chk-ship" required>
+                                        <input type="text" name="street_address_new" id="street_address_new" value="<?php echo htmlspecialchars($street_address); ?>" placeholder="Số nhà, tên đường..." class="form-control chk-ship">
                                     </div>
                                 </div>
                                 <input type="hidden" name="final_address" id="final_address" value="">
@@ -304,18 +314,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         <p class="checkout-content-label">Lấy hàng tại chi nhánh</p>
-                        <div class="delivery-time">
-                            <input type="radio" name="delivery_type" value="273 An Dương Vương" id="chinhanh-1" class="radio" checked>
-                            <label for="chinhanh-1">273 An Dương Vương, Phường 3, Quận 5</label>
-                        </div>
-                        <div class="delivery-time">
-                            <input type="radio" name="delivery_type" value="04 Tôn Đức Thắng" id="chinhanh-2" class="radio">
-                            <label for="chinhanh-2">04 Tôn Đức Thắng, Phường Bến Nghé, Quận 1</label>
-                        </div>
-                        <div class="delivery-time">
-                            <input type="radio" name="delivery_type" value="105 Bà Huyện Thanh Quan" id="chinhanh-3" class="radio">
-                            <label for="chinhanh-3">105 Bà Huyện Thanh Quan, Phường Võ Thị Sáu, Quận 3</label>
-                        </div>
+                        <?php
+                        // Lấy danh sách chi nhánh từ database
+                        $branch_query = $conn->query("SELECT * FROM branch_addresses");
+                        while ($branch = $branch_query->fetch_assoc()) {
+                            echo '<div class="delivery-time">';
+                            echo '<input type="radio" name="delivery_type" value="' . htmlspecialchars($branch['address']) . '" id="chinhanh-' . $branch['id'] . '" class="radio"' . ($branch['id'] == 1 ? ' checked' : '') . '>';
+                            echo '<label for="chinhanh-' . $branch['id'] . '">' . htmlspecialchars($branch['address']) . '</label>';
+                            echo '</div>';
+                        }
+                        ?>
                     </div>
 
                     <div class="content-group">
@@ -345,7 +353,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="price-final" id="checkout-cart-price-final"><?php echo number_format($total); ?>₫</div>
                 </div>
             </div>
-            <a href="mua_thanhcong.php"><button type="submit" class="complete-checkout-btn">Đặt hàng</button></a>
+            <button type="submit" class="complete-checkout-btn">Đặt hàng</button>
         </div>
         </form>
     </main>
@@ -354,173 +362,91 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script src="js/checkout.js"></script>
 
 <script>
+    // Truyền giá trị đã chọn từ PHP ra JS
+    const selectedCity = "<?php echo isset($city_code) ? htmlspecialchars($city_code, ENT_QUOTES) : ''; ?>";
+    const selectedDistrict = "<?php echo isset($district_code) ? htmlspecialchars($district_code, ENT_QUOTES) : ''; ?>";
+    const selectedWard = "<?php echo isset($ward_code) ? htmlspecialchars($ward_code, ENT_QUOTES) : ''; ?>";
+    const selectedStreet = "<?php echo isset($street_address) ? htmlspecialchars($street_address, ENT_QUOTES) : ''; ?>";
+</script>
+<script>
 document.addEventListener('DOMContentLoaded', function() {
-    // API endpoint for Vietnam administrative divisions
     const API_URL = 'https://provinces.open-api.vn/api/';
-    
+    const citySelect = document.getElementById('city_new');
+    const districtSelect = document.getElementById('district_new');
+    const wardSelect = document.getElementById('ward_new');
+    const streetInput = document.getElementById('street_address_new');
+
     // Fetch provinces
     fetch(API_URL)
         .then(response => response.json())
         .then(data => {
-            const citySelect = document.getElementById('city_new');
-            // Filter for Ho Chi Minh City
-            const hcmCity = data.find(province => province.name.includes('Hồ Chí Minh'));
-            if (hcmCity) {
+            citySelect.innerHTML = '<option value="">Chọn Tỉnh/Thành phố</option>';
+            data.forEach(province => {
                 const option = document.createElement('option');
-                option.value = hcmCity.code;
-                option.textContent = hcmCity.name;
+                option.value = province.code;
+                option.textContent = province.name;
                 citySelect.appendChild(option);
+            });
+            // Nếu có city đã chọn thì set value và load districts
+            if (selectedCity) {
+                citySelect.value = selectedCity;
+                loadDistricts(selectedCity, selectedDistrict, selectedWard);
             }
-        })
-        .catch(error => {
-            console.error('Error loading provinces:', error);
         });
 
-    // Handle city change
-    document.getElementById('city_new').addEventListener('change', function() {
-        const cityCode = this.value;
-        const districtSelect = document.getElementById('district_new');
-        const wardSelect = document.getElementById('ward_new');
-        
-        // Clear existing options
-        districtSelect.innerHTML = '<option value="">Chọn Quận/Huyện</option>';
-        wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
-        
-        if (cityCode) {
-            loadDistricts(cityCode);
-        }
+    // Khi chọn tỉnh/thành
+    citySelect.addEventListener('change', function() {
+        loadDistricts(this.value, '', '');
     });
 
-    // Handle district change
-    document.getElementById('district_new').addEventListener('change', function() {
-        const districtCode = this.value;
-        const wardSelect = document.getElementById('ward_new');
-        
-        // Clear existing options
-        wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
-        
-        if (districtCode) {
-            loadWards(districtCode);
-        }
+    // Khi chọn quận/huyện
+    districtSelect.addEventListener('change', function() {
+        loadWards(this.value, '');
     });
 
-    function loadDistricts(cityCode) {
+    // Hàm load quận/huyện
+    function loadDistricts(cityCode, districtCode, wardCode) {
         fetch(API_URL + 'p/' + cityCode + '?depth=2')
             .then(response => response.json())
             .then(data => {
-                const districtSelect = document.getElementById('district_new');
                 districtSelect.innerHTML = '<option value="">Chọn Quận/Huyện</option>';
-                
                 data.districts.forEach(district => {
                     const option = document.createElement('option');
                     option.value = district.code;
-                    option.setAttribute('data-name', district.name);
                     option.textContent = district.name;
                     districtSelect.appendChild(option);
                 });
-            })
-            .catch(error => {
-                console.error('Error loading districts:', error);
+                if (districtCode) {
+                    districtSelect.value = districtCode;
+                    loadWards(districtCode, wardCode);
+                }
             });
     }
 
-    function loadWards(districtCode) {
+    // Hàm load phường/xã
+    function loadWards(districtCode, wardCode) {
         fetch(API_URL + 'd/' + districtCode + '?depth=2')
             .then(response => response.json())
             .then(data => {
-                const wardSelect = document.getElementById('ward_new');
                 wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
-                
                 if (data.wards && data.wards.length > 0) {
                     data.wards.forEach(ward => {
                         const option = document.createElement('option');
                         option.value = ward.code;
-                        option.setAttribute('data-name', ward.name);
                         option.textContent = ward.name;
                         wardSelect.appendChild(option);
                     });
                 }
-            })
-            .catch(error => {
-                console.error('Error loading wards:', error);
+                if (wardCode) {
+                    wardSelect.value = wardCode;
+                }
             });
     }
 
-    // Update final address when address components change
-    function updateFinalAddress() {
-        const citySelect = document.getElementById('city_new');
-        const districtSelect = document.getElementById('district_new');
-        const wardSelect = document.getElementById('ward_new');
-        const streetAddress = document.getElementById('street_address_new').value;
-        
-        const cityName = citySelect.options[citySelect.selectedIndex]?.text || '';
-        const districtName = districtSelect.options[districtSelect.selectedIndex]?.text || '';
-        const wardName = wardSelect.options[wardSelect.selectedIndex]?.text || '';
-        
-        let fullAddress = streetAddress;
-        if (wardName && wardName !== 'Chọn Phường/Xã') {
-            fullAddress += ', ' + wardName;
-        }
-        if (districtName && districtName !== 'Chọn Quận/Huyện') {
-            fullAddress += ', ' + districtName;
-        }
-        if (cityName && cityName !== 'Chọn Tỉnh/Thành phố') {
-            fullAddress += ', ' + cityName;
-        }
-        
-        document.getElementById('final_address').value = fullAddress;
+    // Set lại giá trị street nếu có
+    if (selectedStreet) {
+        streetInput.value = selectedStreet;
     }
-
-    // Add event listeners for address components
-    document.getElementById('city_new').addEventListener('change', updateFinalAddress);
-    document.getElementById('district_new').addEventListener('change', updateFinalAddress);
-    document.getElementById('ward_new').addEventListener('change', updateFinalAddress);
-    document.getElementById('street_address_new').addEventListener('input', updateFinalAddress);
-
-    // Handle address type radio buttons
-    document.querySelectorAll('input[name="address_type"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            const savedAddress = document.getElementById('saved-address');
-            const newAddress = document.getElementById('new-address');
-            
-            if (this.value === 'saved') {
-                savedAddress.style.display = 'block';
-                newAddress.style.display = 'none';
-                document.getElementById('final_address').value = document.querySelector('input[name="diachinhan"]').value;
-            } else {
-                savedAddress.style.display = 'none';
-                newAddress.style.display = 'block';
-                updateFinalAddress();
-            }
-        });
-    });
-
-    // Thêm các trường ẩn để lưu tên địa chỉ
-    document.getElementById('city_new').addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        document.getElementById('city_name').value = selectedOption.text;
-        loadDistricts(this.value);
-    });
-
-    document.getElementById('district_new').addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        document.getElementById('district_name').value = selectedOption.text;
-        loadWards(this.value);
-    });
-
-    document.getElementById('ward_new').addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        document.getElementById('ward_name').value = selectedOption.text;
-    });
-
-    // Thêm các input ẩn vào form
-    const form = document.querySelector('form');
-    const hiddenInputs = `
-        <input type="hidden" name="city_name" id="city_name">
-        <input type="hidden" name="district_name" id="district_name">
-        <input type="hidden" name="ward_name" id="ward_name">
-    `;
-    form.insertAdjacentHTML('beforeend', hiddenInputs);
 });
 </script>
 

@@ -85,12 +85,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const addressTypeRadios = document.querySelectorAll('input[name="address_type"]');
     const savedAddressDiv = document.getElementById('saved-address');
     const newAddressDiv = document.getElementById('new-address');
-    const savedAddressInput = savedAddressDiv.querySelector('input[name="diachinhan"]');
-    const newAddressInput = newAddressDiv.querySelector('input[name="diachinhan_new"]');
 
     // Function to update address fields based on selection
     function updateAddressFields() {
-        const selectedValue = document.querySelector('input[name="address_type"]:checked').value;
+        const selectedValue = document.querySelector('input[name="address_type"]:checked')?.value;
+        if (!selectedValue) return;
+
+        const savedAddressInput = savedAddressDiv?.querySelector('input[name="diachinhan"]');
+        const newAddressInput = newAddressDiv?.querySelector('input[name="diachinhan_new"]');
+        
+        if (!savedAddressInput || !newAddressInput) return;
         
         if (selectedValue === 'saved') {
             savedAddressDiv.style.display = 'block';
@@ -103,11 +107,6 @@ document.addEventListener('DOMContentLoaded', function() {
             savedAddressInput.setAttribute('name', 'diachinhan_new');
             newAddressInput.setAttribute('name', 'diachinhan');
         }
-        
-        // Log the current state for debugging
-        console.log('Address type changed to:', selectedValue);
-        console.log('Saved address input name:', savedAddressInput.getAttribute('name'));
-        console.log('New address input name:', newAddressInput.getAttribute('name'));
     }
 
     // Add event listeners to radio buttons
@@ -122,10 +121,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function(e) {
             // Make sure the correct address field is used based on the selected address type
-            const selectedValue = document.querySelector('input[name="address_type"]:checked').value;
+            const selectedValue = document.querySelector('input[name="address_type"]:checked')?.value;
             const deliveryMode = document.getElementById('delivery_mode').value;
             
             // Get the address values
+            const savedAddressInput = savedAddressDiv?.querySelector('input[name="diachinhan"]');
+            const newAddressInput = newAddressDiv?.querySelector('input[name="diachinhan_new"]');
             const savedAddress = savedAddressInput ? savedAddressInput.value : '';
             const newAddress = newAddressInput ? newAddressInput.value : '';
             
@@ -151,21 +152,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const finalAddressInput = document.getElementById('final_address');
             if (finalAddressInput) {
                 finalAddressInput.value = finalAddress;
-            }
-            
-            // Log debugging information
-            console.log('Form submission details:');
-            console.log('Delivery mode:', deliveryMode);
-            console.log('Address type:', selectedValue);
-            console.log('Saved address:', savedAddress);
-            console.log('New address:', newAddress);
-            console.log('Final address:', finalAddress);
-            
-            // Log all form data
-            const formData = new FormData(checkoutForm);
-            console.log('Form data:');
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ': ' + pair[1]);
             }
         });
     }

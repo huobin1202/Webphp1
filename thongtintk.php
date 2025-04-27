@@ -465,19 +465,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             .then(response => response.json())
             .then(data => {
                 const citySelect = document.getElementById('city');
+                citySelect.innerHTML = '<option value="">Chọn Tỉnh/Thành phố</option>';
                 data.forEach(province => {
                     const option = document.createElement('option');
                     option.value = province.code;
                     option.textContent = province.name;
-                    if (province.code === '<?php echo $cityCode; ?>') {
+                    if (option.value === "<?php echo htmlspecialchars($cityCode, ENT_QUOTES); ?>") {
                         option.selected = true;
                     }
                     citySelect.appendChild(option);
                 });
-                
                 // Nếu có city_code, load districts
-                if ('<?php echo $cityCode; ?>') {
-                    loadDistricts('<?php echo $cityCode; ?>');
+                if ("<?php echo htmlspecialchars($cityCode, ENT_QUOTES); ?>") {
+                    loadDistricts("<?php echo htmlspecialchars($cityCode, ENT_QUOTES); ?>");
                 }
             })
             .catch(error => {
@@ -517,19 +517,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 .then(response => response.json())
                 .then(data => {
                     const districtSelect = document.getElementById('district');
+                    districtSelect.innerHTML = '<option value="">Chọn Quận/Huyện</option>';
                     data.districts.forEach(district => {
                         const option = document.createElement('option');
                         option.value = district.code;
                         option.textContent = district.name;
-                        if (district.code === '<?php echo $districtCode; ?>') {
+                        if (option.value === "<?php echo htmlspecialchars($districtCode, ENT_QUOTES); ?>") {
                             option.selected = true;
                         }
                         districtSelect.appendChild(option);
                     });
-                    
                     // Nếu có district_code, load wards
-                    if ('<?php echo $districtCode; ?>') {
-                        loadWards('<?php echo $districtCode; ?>');
+                    if ("<?php echo htmlspecialchars($districtCode, ENT_QUOTES); ?>") {
+                        loadWards("<?php echo htmlspecialchars($districtCode, ENT_QUOTES); ?>");
                     }
                 })
                 .catch(error => {
@@ -543,13 +543,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 .then(data => {
                     const wardSelect = document.getElementById('ward');
                     wardSelect.innerHTML = '<option value="">Chọn Phường/Xã</option>';
-                    
                     if (data.wards && data.wards.length > 0) {
                         data.wards.forEach(ward => {
                             const option = document.createElement('option');
                             option.value = ward.code;
                             option.textContent = ward.name;
-                            if (ward.code === '<?php echo $wardCode; ?>') {
+                            if (option.value === "<?php echo htmlspecialchars($wardCode, ENT_QUOTES); ?>") {
                                 option.selected = true;
                             }
                             wardSelect.appendChild(option);
