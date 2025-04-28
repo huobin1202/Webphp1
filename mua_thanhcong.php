@@ -3,18 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kawakaki </title>
+    <title>Kawakaki</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #e5f6fa,rgb(142, 197, 159));
+            background-repeat: no-repeat;
+            background-size: cover;
+            min-height: 100vh;
+            margin: 0;
         }
+        
+        
         .container {
             width: 90%;
             max-width: 400px;
             margin: 50px auto;
             background:rgb(170, 213, 216);
+      
             color: white;
             padding: 20px;
             border-radius: 10px;
@@ -49,6 +56,7 @@
     </style>
 </head>
 <body>
+    <div class="all">
     <div class="container">
         <div class="icon">✅</div>
         <h2 class="message">Thanh toán thành công</h2>
@@ -56,6 +64,7 @@
             <a href="index.php" class="btn">Trở về trang chủ</a>
             <a href="don_mua.php" class="btn">Đơn mua</a>
         </div>
+    </div>
     </div>
 </body>
 </html>

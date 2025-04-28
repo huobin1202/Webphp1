@@ -62,7 +62,8 @@ $details_result = $details_query->get_result();
     body {
         font-family: Arial, sans-serif;
         text-align: center;
-        background-color: #f5f5f5;
+        background: linear-gradient(135deg, #e5f6fa,rgb(142, 197, 159));
+        min-height: 100vh;
     }
 
     .container {
