@@ -1,14 +1,25 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "admindoan";
+session_start();
+include('database.php');
+include('toast.php');
+include('logout.php');
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
+$username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
+$customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
+
+// Nếu có username, lấy ID từ bảng customer
+if ($username && !$customer_id) {
+    $stmt = $conn->prepare("SELECT id, role FROM customer WHERE name = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->bind_result($customer_id, $role);
+    if ($stmt->fetch()) {
+        $_SESSION["customer_id"] = $customer_id;
+        $_SESSION["role"] = $role;
+    }
+} else {
+    $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
 }
-
 // Lấy ID sản phẩm từ URL
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -30,357 +41,617 @@ if ($result->num_rows > 0) {
 } else {
     die("Sản phẩm không tồn tại!");
 }
+
 ?>
+<!DOCTYPE html>
+<html lang="en">
 
-<!DOCTYPE php>
-<php lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="./assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css">
+    <script src="https://fontawesome.com/v6/search" crossorigin="anonymous"></script>
+    <title>BMT </title>
+</head>
+<style>
+    .form-inline .form-control {
+        border-radius: 25px;
+        padding: 8px 15px;
+        border: 1px solid #ccc;
+    }
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title><?php echo $row["tensp"]; ?></title>
-        <link rel="stylesheet" href="css/app.css">
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                line-height: 1.6;
-                background-color: #f1f1f1;
-                margin: 0;
-                padding: 0;
-            }
+    .mua.in-cart {
+        background-color: #dc3545 !important;
+        /* Màu đỏ */
+    }
 
-            .form-inline .form-control {
-                border-radius: 25px;
-                padding: 8px 15px;
-                border: 1px solid #ccc;
-            }
+    .cart-button {
+        transition: all 0.3s ease;
+    }
 
-            .container {
-                max-width: 1200px;
-                margin: 30px auto;
-            }
+    .card2 {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+    }
 
-            .card {
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                margin-top: 30px;
-                border: none;
-                border-radius: 10px;
-                overflow: hidden;
-            }
+    .wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 20px;
+    }
 
-            .wrapper {
-                display: flex;
-                flex-wrap: wrap;
-                padding: 20px;
-            }
+    .preview {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-            .preview {
-                flex: 1;
-                padding: 20px;
-            }
+    .main-image {
+        width: 100%;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+    }
 
-            .preview img {
-                width: 100%;
-                border-radius: 8px;
-                object-fit: cover;
-            }
+    .zoom-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        z-index: 10;
+    }
 
-            .details {
-                flex: 1;
-                padding: 20px;
-            }
+    .zoom-btn {
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        transition: all 0.3s ease;
+    }
 
-            .product-title {
-                font-size: 2.2em;
-                font-weight: bold;
-                color: #333;
-                margin-bottom: 15px;
-            }
+    .zoom-btn:hover {
+        background: #139b3a;
+        color: white;
+        border-color: #139b3a;
+    }
 
-            .product-description {
-                font-size: 1.1em;
-                color: #555;
-                margin-bottom: 25px;
-            }
+    .main-image img {
+        width: 100%;
+        max-height: 400px;
+        object-fit: contain;
+        border-radius: 8px;
+        transition: transform 0.3s ease;
+        transform-origin: center center;
+    }
 
-            .price {
-                font-size: 1.6em;
-                font-weight: bold;
-                color: #e74c3c;
-                margin-bottom: 25px;
-            }
+    .thumbnail-section {
+        width: 100%;
+        margin-top: 20px;
+        border-top: 1px dashed #ccc;
+        padding-top: 20px;
+    }
 
-            .vote {
-                font-size: 1.1em;
-                margin-bottom: 20px;
-                color: #2ecc71;
-            }
+    .thumbnail-title {
+        text-align: center;
+        font-size: 14px;
+        color: #76767c;
+        margin-bottom: 15px;
+        font-weight: 500;
+        position: relative;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
 
-            h4,
-            h5 {
-                font-weight: bold;
-                color: #333;
-                margin-top: 20px;
-                margin-bottom: 10px;
-            }
+    .thumbnail-title:before,
+    .thumbnail-title:after {
+        content: "―";
+        display: inline-block;
+        position: relative;
+        top: -3px;
+        padding: 0 10px;
+        color: #76767c;
+    }
 
-            h3 {
-                font-size: 1.8em;
-                border-bottom: 2px solid #ddd;
-                padding-bottom: 5px;
-            }
+    .thumbnail-images {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        width: 100%;
+        padding: 10px;
+    }
 
-            h4 {
-                font-size: 1.5em;
-                margin-top: 15px;
-                color: #555;
-            }
+    .thumb {
+        width: 120px;
+        height: 80px;
+        object-fit: cover;
+        cursor: pointer;
+        border: 1px solid #ddd;
+        padding: 3px;
+        background: white;
+        transition: all 0.3s ease;
+    }
 
-            h5 {
-                font-size: 1.3em;
-                margin-top: 10px;
-                color: #777;
-            }
+    .thumb:hover {
+        border-color: #139b3a;
+    }
 
-            .product-details {
-                list-style-type: none;
-                padding: 0;
-                margin: 20px 0;
-            }
+    .thumb.active {
+        border-color: #139b3a;
+        border-width: 2px;
+    }
 
-            .product-details li {
-                font-size: 1em;
-                margin: 8px 0;
-            }
+    .details {
+        flex: 1;
+        padding: 20px;
+    }
 
-            .product-details li strong {
-                color: #333;
-            }
+    .product-title {
+        font-size: 2.2em;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+    }
 
-            .form-group {
-                margin-top: 20px;
-            }
+    .product-description {
+        font-size: 1.1em;
+        color: #555;
+        margin-bottom: 25px;
+    }
 
-            #soluong {
-                width: 100px;
-                padding: 8px;
-                border-radius: 5px;
-                border: 1px solid #ccc;
-            }
+    .price {
+        font-size: 1.6em;
+        font-weight: bold;
+        color: #e74c3c;
+        margin-bottom: 25px;
+    }
 
-            .action button {
-                background-color: #28a745;
-                color: white;
-                border: none;
-                padding: 12px 25px;
-                border-radius: 5px;
-                cursor: pointer;
-                margin-right: 10px;
-                font-size: 1.2em;
-                transition: background-color 0.3s ease;
-            }
+    .vote {
+        font-size: 1.1em;
+        margin-bottom: 20px;
+        color: #2ecc71;
+    }
 
-            .action button:hover {
-                background-color: #218838;
-            }
+    h4,
+    h5 {
+        font-weight: bold;
+        color: #333;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
 
-            .like {
-                background-color: #f8f9fa;
-                border: 1px solid #ccc;
-                color: #333;
-                padding: 12px 20px;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 1.3em;
-                transition: color 0.3s ease;
-            }
+    h3 {
+        font-size: 1.8em;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+    }
 
-            .like:hover {
-                color: #e74c3c;
-            }
+    h4 {
+        font-size: 1.5em;
+        margin-top: 15px;
+        color: #555;
+    }
 
-            .footer {
-                background-color: #343a40;
-                color: white;
-                padding: 20px 0;
-            }
+    h5 {
+        font-size: 1.3em;
+        margin-top: 10px;
+        color: #777;
+    }
 
-            .footer .container {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
+    .product-details {
+        list-style-type: none;
+        padding: 0;
+        margin: 20px 0;
+    }
 
-            .footer .container span {
-                font-size: 1em;
-            }
+    .product-details li {
+        font-size: 1em;
+        margin: 8px 0;
+    }
 
-            .footer a {
-                color: #28a745;
-                text-decoration: none;
-            }
+    .product-details li strong {
+        color: #333;
+    }
 
-            .footer a:hover {
-                text-decoration: underline;
-            }
+    .form-group {
+        margin-top: 20px;
+    }
 
-            .float-right a {
-                color: white;
-                font-size: 1em;
-            }
+    #soluong {
+        width: 100px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
 
-            .mua {
-                background-color: #28a745;
-                /* Màu xanh lá cây */
-                color: white;
-                /* Màu chữ trắng */
-                border: none;
-                /* Bỏ viền */
-                padding: 10px 20px;
-                /* Khoảng cách bên trong nút */
-                border-radius: 5px;
-                /* Bo tròn góc */
-                cursor: pointer;
-                /* Đổi biểu tượng chuột thành hình tay */
-                font-size: 16px;
-                /* Kích thước chữ */
-                transition: background-color 0.3s ease;
-                /* Hiệu ứng chuyển màu khi hover */
-            }
+    .action button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+        font-size: 1.2em;
+        transition: background-color 0.3s ease;
+    }
 
-            .mua:hover {
-                background-color: #218838;
-                /* Màu xanh lá cây đậm hơn khi hover */
-            }
+    .action button:hover {
+        background-color: #218838;
+    }
 
-            .tc {
-                top: 20px;
-                right: 20px;
-                background-color: green;
-                color: white;
-                border: none;
-                padding: 10px 15px;
-                cursor: pointer;
-                border-radius: 5px;
-                transition: background-color 0.3s ease;
-            }
+    .like {
+        background-color: #f8f9fa;
+        border: 1px solid #ccc;
+        color: #333;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.3em;
+        transition: color 0.3s ease;
+    }
 
+    .like:hover {
+        color: #e74c3c;
+    }
 
-            @media (max-width: 768px) {
-                .wrapper {
-                    flex-direction: column;
-                }
+    .float-right a {
+        color: white;
+        font-size: 1em;
+    }
 
-                .preview,
-                .details {
-                    width: 100%;
-                }
+    .mua {
+        background-color: #28a745;
+        /* Màu xanh lá cây */
+        color: white;
+        /* Màu chữ trắng */
+        border: none;
+        /* Bỏ viền */
+        padding: 10px 20px;
+        /* Khoảng cách bên trong nút */
+        border-radius: 5px;
+        /* Bo tròn góc */
+        cursor: pointer;
+        /* Đổi biểu tượng chuột thành hình tay */
+        font-size: 16px;
+        /* Kích thước chữ */
+        transition: background-color 0.3s ease;
+        /* Hiệu ứng chuyển màu khi hover */
+    }
 
-                .product-title {
-                    font-size: 1.8em;
-                }
+    .mua:hover {
+        background-color: #218838;
+        /* Màu xanh lá cây đậm hơn khi hover */
+    }
 
-                .product-description {
-                    font-size: 1em;
-                }
+    @media (max-width: 768px) {
+        .wrapper {
+            flex-direction: column;
+        }
 
-                .price {
-                    font-size: 1.4em;
-                }
+        .preview,
+        .details {
+            width: 100%;
+        }
 
-                .vote {
-                    font-size: 1.1em;
-                }
+        .product-title {
+            font-size: 1.8em;
+        }
 
-                .form-group {
-                    width: 100%;
-                }
+        .product-description {
+            font-size: 1em;
+        }
 
-                .form-control {
-                    width: 100%;
-                }
+        .price {
+            font-size: 1.4em;
+        }
 
-            }
-        </style>
-    </head>
+        .vote {
+            font-size: 1.1em;
+        }
 
-    <body>
-        <div class="container" style="display: flex; justify-content: space-between;margin-top: 0px">
-            <a class="tc" href="index.php" style="margin-left: 200px;  text-decoration: none;">Trang chủ</a>
-            <span class="ravao" style="margin-right: 200px;">Giỏ hàng</span>
-        </div>
-        <main role="main">
-            <div class="container mt-4">
-                <div class="card">
-                    <div class="container-fliud">
-                        <form name="frmsanphamchitiet11" id="frmsanphamchitiet11" method="POST">
-                            <div class="wrapper row">
-                                <div class="preview col-md-6">
-                                    <img src="sanpham/<?php echo $row['hinhanh']; ?>" alt="<?php echo $row['tensp']; ?>">
-                                    <img src="sanpham/<?php echo $row['hinhanh2']; ?>" alt="<?php echo $row['tensp']; ?>">
-                                    <img src="sanpham/<?php echo $row['hinhanh3']; ?>" alt="<?php echo $row['tensp']; ?>">
-                                </div>
-                                <div class="details col-md-6">
-                                    <h3><?php echo $row["tensp"]; ?></h3>
-                                    <div class="price"><?php echo number_format($row["giaban"], 0, ',', '.'); ?>đ</div>
-                                    <button class="mua" onclick="addToCart('<?php echo $row['tensp']; ?>', <?php echo $row['giaban']; ?>, 'sanpham/<?php echo $row['hinhanh']; ?>')">
-                                        Thêm vào giỏ hàng
-                                    </button>
-                                    <p class="vote"><?php echo $row["thongtinsp"]; ?></p>
-                                    <h4>Thông số kỹ thuật</h4>
-                                    <ul class="product-details">
-                                        <li><?php echo nl2br($row["thongsokt"]); ?></li>
-                                    </ul>
-                                </div>
+        .form-group {
+            width: 100%;
+        }
 
-                                <section class="cart">
-                                    <button class="dong">Đóng</button>
+        .form-control {
+            width: 100%;
+        }
 
-                                    <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
-                                    <form action="">
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>
-                                                        Sản phẩm
-                                                    </th>
-                                                    <th>Giá</th>
-                                                    <th>Số lượng</th>
-                                                    <th>Chọn</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
+        .main-image img {
+            max-height: 300px;
+        }
 
-                                                <!-- <td style="display: flex;align-items: center;"><img style ="width: 120px;"src="image/ninja-1000sx.png"alt ="">Ninja</td>
-                                                    <td><p><span>1500</span><sup>đ</sup></p></td>
-                                                     <td><input style="width: 40px; outline: none;" type="number"value ="1"min="1""max="2""></td>
-                                                     <td style="cursor: pointer;">Xóa </td>
-                                                 -->
-                                            </tbody>
-                                        </table>
-                                        <div style="text-align: center;" class="price-total">
-                                            <p style=" font-weight: bold;margin-top: 10px; margin-bottom: 20px;">Tổng tiền:<span>0</span><sup></sup> </p>
-                                        </div>
-                                        <a class="thanhtoan" href="thanhtoan.php">Thanh toán</a>
-                                    </form>
-                                </section>
-                            </div>
-                        </form>
+        .thumb {
+            width: 80px;
+            height: 60px;
+        }
+    }
+</style>
+
+<body>
+    <header>
+        <div class="header-middle">
+            <div class="container">
+                <div class="header-middle-left">
+                    <div class="header-logo">
+                        <a href="index.php" id="logo">
+                            <img src="image/logo.png" alt="BMT">
+                        </a>
                     </div>
                 </div>
+                <div class="header-middle-center">
+                    <form action="timkiem.php" method="GET" class="form-search">
+                            <button type="submit" class="search-btn">
+                                <i class="fa-light fa-magnifying-glass"></i>
+                            </button>
+                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... ">
+                    </form>
+                </div>
+                <div class="header-middle-right">
+                    <ul class="header-middle-right-list">
+                        <li class="header-middle-right-item open">
+                            <i class="fa-light fa-user" style="color:#139b3a"></i>
+
+                            <div class="auth-container">
+                                <div class="user-info">
+                                    <div class="dropdownb">
+                                        <h1 class="welcome">
+                                            <div class="drip" style="display:flex;flex-direction:column">
+
+                                                <!-- Dòng trên -->
+                                                <span style="font-size:12px">
+                                                    <?php
+                                                    if (isset($_SESSION['customer_id'])) {
+                                                        echo "Tài khoản";
+                                                    } else {
+                                                        echo "Đăng nhập/ Đăng ký";
+                                                    }
+                                                    ?>
+                                                </span>
+
+                                                <!-- Dòng dưới -->
+
+                                                <span class="dropdownb-toggle" style="color:green;font-size:17px">
+
+
+                                                    <?php
+                                                    if (isset($_SESSION['customer_id'])) {
+                                                        // Lấy tên khách hàng
+                                                        $stmt = $conn->prepare("SELECT name FROM customer WHERE id = ?");
+                                                        $stmt->bind_param("i", $_SESSION['customer_id']);
+                                                        $stmt->execute();
+                                                        $stmt->bind_result($name);
+                                                        if ($stmt->fetch()) {
+                                                            echo htmlspecialchars($name);
+                                                        } else {
+                                                            echo "Tài khoản";
+                                                        }
+                                                        $stmt->close();
+                                                    } else {
+                                                        echo "Tài khoản";
+                                                    }
+                                                    ?>
+                                                    <i class="fa-sharp fa-solid fa-caret-down" style="font-size:12px;"></i>
+                                                </span>
+                                            </div>
+                                        </h1>
+
+                                        <!-- Dropdown -->
+                                        <div class="dropdownb-menu">
+                                            <?php if (isset($_SESSION['customer_id'])): ?>
+                                                <a href="dnurl.php">
+                                                    <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i> Quản lý</div>
+                                                </a>
+                                                <a href="thongtintk.php">
+                                                    <div class="hd"><i class="fa-light fa-circle-user" style="font-size:20px"></i> Tài khoản của tôi</div>
+                                                </a>
+                                                <a href="hoadon.php">
+                                                    <div class="hd"><i class="fa-regular fa-bags-shopping" style="font-size:20px"> </i> Đơn hàng đã mua</div>
+                                                </a>
+
+                                                <a href="index.php?logout=1" onclick="return confirm('Bạn có muốn đăng xuất?')">
+                                                    <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i> Đăng xuất</div>
+                                                </a>
+                                            <?php else: ?>
+                                                <a href="dn.php">
+                                                    <div class="hd"><i class="fa-light fa-right-to-bracket" style="font-size:20px;color:green"></i> Đăng nhập</div>
+                                                </a>
+                                                <a href="dk.php">
+                                                    <div class="hd"><i class="fa-light fa-user-plus" style="font-size:20px;color:green"></i> Đăng ký</div>
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="hoadon">
+                                    <a href="giohang.php" style="text-decoration: none; color: inherit;">
+                                        <span class="ravao">
+                                            <i class="fa-light fa-basket-shopping"></i> Giỏ hàng
+                                        </span>
+                                    </a>
+                                </div>
+
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+
             </div>
-        </main>
+        </div>
+    </header>
+
+    <div class="green-line-header"></div>
+
+    <nav class="header-bottom">
+        <div class="container">
+            <ul class="menu-list">
+                <li class="menu-list-item"><a href="index.php" class="menu-link">Trang chủ</a></li>
+
+                <div class="dropdown">
+                    <span>Sản phẩm</span>
+                    <div class="dropdown-content">
+                        <li class="menu-list-item"> <a href="index.php?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                                Dòng Ninja
+                            </a></li>
+                        <li class="menu-list-item"> <a href="index.php?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                                Dòng Z
+                            </a></li>
+                        <li class="menu-list-item"><a href="index.php?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
+                                Dòng KLX
+                            </a></li>
+                    </div>
+                </div>
+                <li class="menu-list-item"><a href="index.php" class="menu-link">Tin tức </a></li>
+                <li class="menu-list-item"><a href="index.php" class="menu-link">Điều khoản</a></li>
+
+            </ul>
+        </div>
+    </nav>
 
 
-        <footer class="footer bg-dark text-white mt-4">
-            <div class="container">
-                <span>© 2024 BMT Shop</span>
-                <div class="float-right">
-                    <a href="index.php" class="text-white">Quay lại đầu trang</a>
+
+
+    <main role="main">
+        <div class="container mt-4">
+            <div class="card2">
+                <div class="container-fliud">
+                    <form name="frmsanphamchitiet11" id="frmsanphamchitiet11" method="POST">
+                        <div class="wrapper row">
+                            <div class="preview col-md-6">
+                                <div class="main-image">
+                                    <div class="zoom-controls">
+                                        <button type="button" onclick="zoomIn()" class="zoom-btn">
+                                            <i class="fa-light fa-plus"></i>
+                                        </button>
+                                        <button type="button" onclick="zoomOut()" class="zoom-btn">
+                                            <i class="fa-light fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    <img id="mainImage" src="sanpham/<?php echo $row['hinhanh']; ?>" alt="<?php echo $row['tensp']; ?>">
+                                </div>
+                                <div class="thumbnail-section">
+                                    <p class="thumbnail-title">CHỌN GÓC NHÌN</p>
+                                    <div class="thumbnail-images">
+                                        <img class="thumb active" src="sanpham/<?php echo $row['hinhanh']; ?>" alt="<?php echo $row['tensp']; ?>" onclick="changeImage(this)">
+                                        <img class="thumb" src="sanpham/<?php echo $row['hinhanh2']; ?>" alt="<?php echo $row['tensp']; ?>" onclick="changeImage(this)">
+                                        <img class="thumb" src="sanpham/<?php echo $row['hinhanh3']; ?>" alt="<?php echo $row['tensp']; ?>" onclick="changeImage(this)">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="details col-md-6">
+                                <h3><?php echo $row["tensp"]; ?></h3>
+                                <div class="price"><?php echo number_format($row["giaban"], 0, ',', '.'); ?>đ</div>
+
+                                <?php
+                                // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+                                $in_cart = false;
+                                if (isset($_SESSION['customer_id'])) {
+                                    $check_cart = $conn->prepare("SELECT id FROM giohang WHERE customer_id = ? AND product_id = ?");
+                                    $check_cart->bind_param("ii", $_SESSION['customer_id'], $row["id"]);
+                                    $check_cart->execute();
+                                    $check_result = $check_cart->get_result();
+                                    $in_cart = $check_result->num_rows > 0;
+                                    $check_cart->close();
+                                }
+                                ?>
+
+                                <div class="display" style="display:flex;">
+                                    <button type="button"
+                                        class="mua cart-button <?php echo $in_cart ? 'in-cart' : ''; ?>"
+                                        data-product-id="<?php echo $row["id"]; ?>"
+                                        data-product-price="<?php echo $row["giaban"]; ?>"
+                                        data-product-img="<?php echo $row["hinhanh"]; ?>">
+                                        <?php echo $in_cart ? '- Xóa khỏi giỏ hàng' : '+ Thêm vào giỏ hàng'; ?>
+                                    </button>
+                                </div>
+
+                                <p class="vote"><?php echo $row["thongtinsp"]; ?></p>
+                                <h4>Thông số kỹ thuật</h4>
+                                <ul class="product-details">
+                                    <li><?php echo nl2br($row["thongsokt"]); ?></li>
+                                </ul>
+                            </div>
+
+                        </div>
+                    </form>
                 </div>
             </div>
-        </footer>
-        <script src="js/giohang.js"></script>
-    </body>
+        </div>
+    </main>
 
-</php>
+    <?php include 'footer.php' ?>
+    <!-- <script src="js/hoadon.js"></script> -->
+    <script src="js/giohang.js"></script>
+    <script src="js/phantrang.js"></script>
+    <script src="js/ssbutton.js"></script>
+    <script>
+        function changeImage(element) {
+            // Cập nhật ảnh chính
+            document.getElementById('mainImage').src = element.src;
+
+            // Xóa class active từ tất cả thumbnails
+            document.querySelectorAll('.thumb').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+
+            // Thêm class active vào thumbnail được chọn
+            element.classList.add('active');
+        }
+    </script>
+
+    <script>
+        let currentZoom = 1;
+        const ZOOM_STEP = 0.1;
+        const MAX_ZOOM = 1.5;
+        const MIN_ZOOM = 1;
+
+        function zoomIn() {
+            if (currentZoom < MAX_ZOOM) {
+                currentZoom = Math.min(currentZoom + ZOOM_STEP, MAX_ZOOM);
+                updateZoom();
+            }
+        }
+
+        function zoomOut() {
+            if (currentZoom > MIN_ZOOM) {
+                currentZoom = Math.max(currentZoom - ZOOM_STEP, MIN_ZOOM);
+                updateZoom();
+            }
+        }
+
+        function updateZoom() {
+            const mainImage = document.getElementById('mainImage');
+            mainImage.style.transform = `scale(${currentZoom})`;
+        }
+    </script>
+
+    <script>
+        const isLoggedIn = <?php echo isset($_SESSION['customer_id']) ? 'true' : 'false'; ?>;
+    </script>
+
+</body>
+<?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo "<script>if(window.history.replaceState){window.history.replaceState(null, null, window.location.href);}</script>";
+}
+?>
+<?php $conn->close(); ?>
+
+</html>

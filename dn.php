@@ -65,7 +65,7 @@ session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim($_POST['name']);
-    $password = trim($_POST['password']); // Đổi tên biến để tránh trùng lặp
+    $password = trim($_POST['password']);
 
     $servername = "localhost";
     $username = "root";
@@ -78,17 +78,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Kết nối thất bại: " . $conn->connect_error);
     }
 
-    $error_message = "";
+    // Prepared statement to get user id, status
+    $stmt = $conn->prepare("SELECT id, status FROM customer WHERE name = ? AND password = ?");
+    $stmt->bind_param("ss", $name, $password);
+    $stmt->execute();
+    $stmt->store_result();
 
-    // Sử dụng prepared statements để tránh SQL Injection
-    $result = $conn->prepare("SELECT id FROM customer WHERE name = ? AND password = ?");
-    $result->bind_param("ss", $name, $password);
-    $result->execute();
-    $result->store_result();
+    if ($stmt->num_rows == 1) {
+        $stmt->bind_result($user_id, $status);
+        $stmt->fetch();
 
-    if ($result->num_rows == 1) {
-        $result->bind_result($user_id);
-        $result->fetch();
+        if ($status == 0) {
+            $_SESSION['error'] = "Tài khoản của bạn đã bị khóa!";
+            header("Location: dn.php");
+            exit();
+        }
 
         session_unset();
         session_destroy();
@@ -96,32 +100,69 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $_SESSION['user_id'] = $user_id;
         $_SESSION['username'] = $name;
+        $_SESSION['success'] = "Đăng nhập thành công!";
         header("Location: index.php");
         exit();
     } else {
-        $error_message = "Tên đăng nhập hoặc mật khẩu không đúng!";
+        $_SESSION['error'] = "Tên đăng nhập hoặc mật khẩu không đúng!";
+        header("Location: dn.php");
+        exit();
     }
 
-    $result->close();
+    $stmt->close();
     $conn->close();
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .nav-buttons {
+            margin-top: 10px;
+        }
+        .nav-buttons a {
+            display: flex;
+            padding: 10px;
+            margin: 5px;
+            text-decoration: none;
+            color: white;
+            background-color: #139b3a;
+            
+            border-radius: 5px;
+            position: sticky;
+            right:100%;
+            height:30px;
+            width:50px;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+
+        }
+        .nav-buttons a:hover {
+            background-color:darkgreen;
+            color:white;
+        }
+    </style>
+</head>
 
 <body>
+<div class="nav-buttons">
+                <a href="index.php">&#10094;</a>
+            </div>
+    <?php include 'toast.php'; ?>
     <form method="post">
-
         <div class="login-container">
-            <h2 style="">Đăng nhập</h2>
-            <?php if (!empty($error_message)): ?>
-                <p style="color: red; text-align:center;"><?php echo $error_message; ?></p>
-            <?php endif; ?>
+            <h2>Đăng nhập</h2>
             <input type="text" id="username" name="name" placeholder="Tên đăng nhập" required maxlength="20">
             <input type="password" id="password" name="password" placeholder="Mật khẩu" maxlength="20" required>
             <button type="submit" name="login">Đăng nhập</button>
-            <p id="error-message" class="error-message"></p>
-            <p class="back-to-login" style="color:#28a745; text-align:center">Chưa có tài khoản? <a href=dk.php style="color:#28a745;  "> Đăng ký ngay!</a></p>
-
+            <p class="back-to-login" style="color:#28a745; text-align:center">Chưa có tài khoản? <a href="dk.php" style="color:#28a745">Đăng ký ngay!</a></p>
         </div>
     </form>
 </body>

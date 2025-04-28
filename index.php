@@ -1,29 +1,37 @@
 <?php
 session_start();
 include('database.php');
+include('toast.php');
+include('logout.php');
 
-// Xử lý đăng xuất
-if (isset($_GET['logout'])) {
-    session_unset();
-    session_destroy();
-    header("Location: index.php");
-    exit;
-}
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : null;
 $customer_id = isset($_SESSION["customer_id"]) ? $_SESSION["customer_id"] : null;
+$total_price = 0;
+$role = null;
 
-// Nếu có username, lấy ID từ bảng customer
+
 if ($username && !$customer_id) {
-    $stmt = $conn->prepare("SELECT id FROM customer WHERE name = ?");
+    $stmt = $conn->prepare("SELECT id, role FROM customer WHERE name = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $stmt->bind_result($customer_id);
+    $stmt->bind_result($customer_id, $role);
     if ($stmt->fetch()) {
         $_SESSION["customer_id"] = $customer_id;
+        $_SESSION["role"] = $role;
     }
     $stmt->close();
+} else {
+    $role = isset($_SESSION["role"]) ? $_SESSION["role"] : null;
 }
 
+// Khởi tạo biến category
+$selected_category = isset($_GET['category']) ? $_GET['category'] : '';
+
+// Xây dựng câu truy vấn SQL dựa trên category được chọn
+$sql = "SELECT id, tensp, giaban, hinhanh, dongsp FROM products WHERE status = 1";
+if ($selected_category != '') {
+    $sql .= " AND dongsp = '" . mysqli_real_escape_string($conn, $selected_category) . "'";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -37,6 +45,48 @@ if ($username && !$customer_id) {
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="./assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css">
     <script src="https://fontawesome.com/v6/search" crossorigin="anonymous"></script>
+    <style>
+        .display {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .menu-link.active {
+            color: #139b3a !important;
+            font-weight: bold;
+        }
+
+        .menu-link.active::after {
+            width: 100%;
+        }
+
+        .no-products {
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Thêm hiệu ứng transition cho menu links */
+        .menu-link {
+            transition: color 0.3s ease;
+        }
+
+        .menu-link:hover {
+            color: #139b3a !important;
+        }
+
+        .mua.in-cart {
+            background-color: #dc3545 !important;
+            /* Màu đỏ */
+        }
+
+        .cart-button {
+            transition: all 0.3s ease;
+        }
+    </style>
     <title>BMT </title>
 </head>
 
@@ -46,118 +96,116 @@ if ($username && !$customer_id) {
             <div class="container">
                 <div class="header-middle-left">
                     <div class="header-logo">
-                        <a href="" id="logo">
+                        <a href="index.php" id="logo">
                             <img src="image/logo.png" alt="BMT">
                         </a>
                     </div>
                 </div>
                 <div class="header-middle-center">
-                    <form action="" class="form-search">
-                        <span class="search-btn">
-                            <a href="">
+                    <form action="timkiem.php" method="GET" class="form-search">
+                            <button type="submit" class="search-btn">
                                 <i class="fa-light fa-magnifying-glass"></i>
-                            </a>
-                        </span>
-                        <input type="text" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... "
-                            onkeyup="searchProducts()">
-                        <button class="filter-btn">
-                            <i class="fa-light fa-filter-list"></i>
-                            <span style="font-size: 14px;">Lọc</span>
-                        </button>
+                            </button>
+                        <input type="text" name="tukhoa" class="form-search-input" id="searchBox" placeholder="Tìm kiếm xe... ">
                     </form>
                 </div>
                 <div class="header-middle-right">
                     <ul class="header-middle-right-list">
-                        <li class="header-middle-right-item dropdown open">
                         <li class="header-middle-right-item open">
-                            <div class="auth-container" method="POST">
-                                <?php if ($username): ?>
-                                    <?php
-                                    $stmt = $conn->prepare("SELECT id, name FROM customer WHERE name = ?");
-                                    $stmt->bind_param("s", $username);
-                                    $stmt->execute();
-                                    $result = $stmt->get_result();if (isset($_SESSION['success_message'])) {
-                                        echo "<div class='alert alert-success'>{$_SESSION['success_message']}</div>";
-                                        unset($_SESSION['success_message']);
-                                    }
+                            <i class="fa-light fa-user" style="color:#139b3a"></i>
 
-                                    if ($result->num_rows > 0) {
-                                        $row = $result->fetch_assoc();
-                                    ?>
-                                        <div class="user-info">
-                                            <div class="dropdownb">
-                                                <h1 class="welcome">
-                                                    <i class="fa-light fa-user"></i>
+                            <div class="auth-container">
+                                <div class="user-info">
+                                    <div class="dropdownb">
+                                        <h1 class="welcome">
+                                            <div class="drip" style="display:flex;flex-direction:column">
 
-                                                    <span class="dropdownb-toggle" style="color:green;"><?php echo htmlspecialchars($row["name"]); ?></span>
-                                                </h1>
-                                                <div class="dropdownb-menu">
+                                                <!-- Dòng trên -->
+                                                <span style="font-size:12px">
+                                                    <?php
+                                                    if (isset($_SESSION['customer_id'])) {
+                                                        echo "Tài khoản";
+                                                    } else {
+                                                        echo "Đăng nhập/ Đăng ký";
+                                                    }
+                                                    ?>
+                                                </span>
 
-                                                    <a href="hoadon.php">
-                                                        <div class="hd">Đơn hàng đã mua </div>
-                                                        <a href="dnurl.php">
-                                                            
-                                                            <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i>Quản lý</div>
-                                                        </a>
-                                                        <a href="index.php?logout=<?php echo $id; ?>" onclick="return confirm('bạn có muốn đăng xuất?')">
-                                                            <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i>Đăng xuất</div>
-                                                        </a>
+                                                <!-- Dòng dưới -->
+
+                                                <span class="dropdownb-toggle" style="color:green;font-size:17px">
 
 
-                                                    </a>
-                                                </div>
+                                                    <?php
+                                                    if (isset($_SESSION['customer_id'])) {
+                                                        // Lấy tên khách hàng
+                                                        $stmt = $conn->prepare("SELECT name FROM customer WHERE id = ?");
+                                                        $stmt->bind_param("i", $_SESSION['customer_id']);
+                                                        $stmt->execute();
+                                                        $stmt->bind_result($name);
+                                                        if ($stmt->fetch()) {
+                                                            echo htmlspecialchars($name);
+                                                        } else {
+                                                            echo "Tài khoản";
+                                                        }
+                                                        $stmt->close();
+                                                    } else {
+                                                        echo "Tài khoản";
+                                                    }
+                                                    ?>
+                                                    <i class="fa-sharp fa-solid fa-caret-down" style="font-size:12px;"></i>
+                                                </span>
                                             </div>
+                                        </h1>
+
+                                        <!-- Dropdown -->
+                                        <div class="dropdownb-menu">
+                                            <?php if (isset($_SESSION['customer_id'])): ?>
+                                                <a href="thongtintk.php">
+                                                    <div class="hd"><i class="fa-light fa-circle-user" style="font-size:20px"></i> Tài khoản của tôi</div>
+                                                </a>
+                                                <a href="hoadon.php">
+                                                    <div class="hd"><i class="fa-regular fa-bags-shopping" style="font-size:20px"></i> Đơn hàng đã mua</div>
+                                                </a>
+                                                <a href="index.php?logout=1" onclick="return confirm('Bạn có muốn đăng xuất?')">
+                                                    <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i> Đăng xuất</div>
+                                                </a>
+                                                <?php if ($role === 'admin'): ?>
+                                                    <a href="dnurl.php">
+                                                        <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i> Quản lý</div>
+                                                    </a>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <a href="dn.php">
+                                                    <div class="hd"><i class="fa-light fa-right-to-bracket" style="font-size:20px;color:green"></i> Đăng nhập</div>
+                                                </a>
+                                                <a href="dk.php">
+                                                    <div class="hd"><i class="fa-light fa-user-plus" style="font-size:20px;color:green"></i> Đăng ký</div>
+                                                </a>
+                                            <?php endif; ?>
                                         </div>
-                                    <?php } ?>
-                                    <?php $stmt->close(); ?>
-                                <?php else: ?>
-                                    <a href="dn.php"><button class="login-btn" style="font-size: 17px;">Đăng nhập</button></a>
-                                <?php endif; ?>
+
+                                    </div>
+                                </div>
 
                                 <div class="hoadon">
-
-                                    <span class="ravao" onclick="">
-                                        <i class="fa-light fa-basket-shopping"></i>
-                                        Giỏ hàng</span>
+                                    <a href="giohang.php" style="text-decoration: none; color: inherit;">
+                                        <span class="ravao">
+                                            <i class="fa-light fa-basket-shopping"></i> Giỏ hàng
+                                        </span>
+                                    </a>
                                 </div>
+
                             </div>
                         </li>
-                        </li>
-
                     </ul>
                 </div>
+
+
             </div>
         </div>
     </header>
-    <div class="advanced-search">
-        <div class="container">
-            <div class="advanced-search-category">
-                <span>Phân loại </span>
-                <select name="" id="advanced-search-category-select" onchange="searchProducts()">
-                    <option>Tất cả</option>
-                    <option>Dòng Ninja</option>
-                    <option>Dòng Z</option>
-                    <option>Dòng KLX</option>
-                </select>
-            </div>
-            <div class="advanced-search-price">
-                <span>Giá từ</span>
-                <input type="number" placeholder="tối thiểu" id="min-price" onchange="searchProducts()">
-                <span>đến</span>
-                <input type="number" placeholder="tối đa" id="max-price" onchange="searchProducts()">
-                <button id="advanced-search-price-btn"><a href=""><i class="fa-light fa-magnifying-glass-dollar"></i></a></button>
-            </div>
-            <div class="advanced-search-control">
-                <button id="sort-ascending" onclick="searchProducts(1)"><i
-                        class="fa-regular fa-arrow-up-short-wide"></i></button>
-                <button id="sort-descending" onclick="searchProducts(2)"><i
-                        class="fa-regular fa-arrow-down-wide-short"></i></button>
-                <button id="reset-search" onclick="searchProducts(0)"><i
-                        class="fa-light fa-arrow-rotate-right"></i></button>
-                <button onclick="closeSearchAdvanced()"><i class="fa-light fa-xmark"></i></button>
-            </div>
-        </div>
-    </div>
+
     <div class="green-line-header"></div>
 
     <nav class="header-bottom">
@@ -168,9 +216,23 @@ if ($username && !$customer_id) {
                 <div class="dropdown">
                     <span>Sản phẩm</span>
                     <div class="dropdown-content">
-                        <li class="menu-list-item"><a href="NINJA.php" class="menu-link">Dòng Ninja</a></li>
-                        <li class="menu-list-item"><a href="Z.php" class="menu-link">Dòng Z</a></li>
-                        <li class="menu-list-item"><a href="KLX.php" class="menu-link">Dòng KLX</a></li>
+
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="?category=Dòng Ninja" class="menu-link <?php echo $selected_category == 'Dòng Ninja' ? 'active' : ''; ?>">
+                                Dòng Ninja
+                            </a>
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="?category=Dòng Z" class="menu-link <?php echo $selected_category == 'Dòng Z' ? 'active' : ''; ?>">
+                                Dòng Z
+                            </a>
+                        </li>
+                        <li class="menu-list-item">
+                            <a href="?category=Dòng KLX" class="menu-link <?php echo $selected_category == 'Dòng KLX' ? 'active' : ''; ?>">
+                                Dòng KLX
+                            </a>
+                        </li>
                     </div>
                 </div>
                 <li class="menu-list-item"><a href="index.php" class="menu-link">Tin tức </a></li>
@@ -179,41 +241,32 @@ if ($username && !$customer_id) {
             </ul>
         </div>
     </nav>
-    
+
 
 
     <main class="main-wrapper">
         <div class="slideshow-container">
             <div class="mySlides fade">
-
-                <img src="image/web1.jpg">
-
+                <img src="image/web1.jpg" alt="Slide 1">
             </div>
             <div class="mySlides fade">
-
-                <img src="image/web2.jpg">
-
+                <img src="image/web2.jpg" alt="Slide 2">
             </div>
             <div class="mySlides fade">
-
-                <img src="image/web3.png">
-
+                <img src="image/web3.png" alt="Slide 3">
             </div>
             <div class="mySlides fade">
-
-                <img src="image/web4.jpg">
-
+                <img src="image/web4.jpg" alt="Slide 4">
             </div>
-            <div class="dot-wrapper">
 
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-
-            </div>
             <a class="prev" onclick="prevSlide()">&#10094;</a>
-            <a class="next" onclick="showSlides()">&#10095;</a>
+            <a class="next" onclick="nextSlide()">&#10095;</a>
+        </div>
+        <div class="dot-wrapper">
+            <span class="dot" onclick="currentSlide(0)"></span>
+            <span class="dot" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
         </div>
         <div class="container" id="trangchu">
 
@@ -267,13 +320,22 @@ if ($username && !$customer_id) {
                     <div class="grid-container" id="product-list">
 
                         <?php
-                        $sql = "SELECT id, tensp, giaban, hinhanh FROM products";
                         $result = $conn->query($sql);
                         if ($result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
+                                // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+                                $in_cart = false;
+                                if (isset($_SESSION['customer_id'])) {
+                                    $check_cart = $conn->prepare("SELECT id FROM giohang WHERE customer_id = ? AND product_id = ?");
+                                    $check_cart->bind_param("ii", $_SESSION['customer_id'], $row["id"]);
+                                    $check_cart->execute();
+                                    $check_result = $check_cart->get_result();
+                                    $in_cart = $check_result->num_rows > 0;
+                                    $check_cart->close();
+                                }
+
                                 echo '
-                                <form method="POST" action="">
-                                    <div class="card page-1" id="invoiceModal">
+                                <div class="card page-1">
                                         <a href="thongtinsp.php?id=' . $row["id"] . '">
                                             <img src="sanpham/' . $row["hinhanh"] . '" alt="' . $row["tensp"] . '">
                                         </a>
@@ -281,23 +343,25 @@ if ($username && !$customer_id) {
                                         <div class="greenSpacer"></div>
                                         <div class="price">' . number_format($row["giaban"], 0, ',', '.') . 'đ</div>
 
-                                        <input type="hidden" name="product_id" value="' . $row["id"] . '">
-                                        <input type="hidden" name="product_name" value="' . htmlspecialchars($row["tensp"]) . '">
-                                        <input type="hidden" name="product_price" value="' . $row["giaban"] . '">
-                                        <input type="hidden" name="product_img" value="' . $row["hinhanh"] . '">
-                                        <div class=display style="display:flex;">
-                                        <button type="submit" class="mua" name="add_to_cart">Thêm vào giỏ hàng</button>
-                                        <input type="number" min="1" value="1" name="quantity" class="num-input"></input>
+                                    <div class="display" style="display:flex;">
+                                        <button type="button" 
+                                                class="mua cart-button ' . ($in_cart ? 'in-cart' : '') . '" 
+                                                data-product-id="' . $row["id"] . '"
+                                                data-product-price="' . $row["giaban"] . '"
+                                                data-product-img="' . $row["hinhanh"] . '">
+                                            ' . ($in_cart ? '- Xóa khỏi giỏ hàng' : '+ Thêm vào giỏ hàng') . '
+                                        </button>
+                                        <a href="thongtinsp.php?id=' . $row['id'] . '" class="mua" style="text-decoration: none; text-align: center; display: inline-block;color:white;">Xem chi tiết</a>
                                         </div>
-                                    
-                                    </div>
-                                </form>';
+                                </div>
+                                ';
                             }
+                        } else {
+                            echo '<p class="no-products">Không có sản phẩm nào trong danh mục này</p>';
                         }
                         ?>
 
                     </div>
-                    </tbody>
                     <div class="pagination">
                         <button id="prevBtn" onclick="changePage(-1)" disabled>&#10094;</button>
                         <div id="pageNumbers" class="page-numbers"></div>
@@ -308,126 +372,19 @@ if ($username && !$customer_id) {
         </div>
 
     </main>
-
-    <section class="cart">
-        <button class="dong"><i class="fa-regular fa-xmark"></i></button>
-        <!-- <div>Đóng</div> -->
-        <div style="margin-top: 45px;margin-bottom: 20px;">Danh sách mua hàng</div>
-        <form action="" method="POST">
-            <?php
-            if (isset($_POST['add_to_cart'])) {
-                if (!$customer_id) {
-                    die("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
-                }
-            
-                $product_id = $_POST['product_id'];
-                $product_price = $_POST['product_price'];
-                $product_img = $_POST['product_img'];
-                $quantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 1;
-            
-                // Kiểm tra xem sản phẩm đã tồn tại trong giỏ hàng chưa
-                $stmt = $conn->prepare("SELECT soluong FROM giohang WHERE product_id = ? AND customer_id = ?");
-                $stmt->bind_param("ii", $product_id, $customer_id);
-                $stmt->execute();
-                $stmt->store_result();
-            
-                if ($stmt->num_rows > 0) {
-                    $stmt->close();
-                } else {
-                    $stmt = $conn->prepare("INSERT INTO giohang (customer_id, product_id, soluong, price, img) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->bind_param("iiiss", $customer_id, $product_id, $quantity, $product_price, $product_img);
-                    $stmt->execute();
-                    $stmt->close();
-                }
-            }
-            
-
-            ?>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>
-                            Sản phẩm
-                        </th>
-                        <th>Tên</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>Chọn</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    // Kiểm tra xem người dùng đã đăng nhập chưa
-                    if (!isset($_SESSION['customer_id'])) {
-                        echo "<tr><td colspan='4'>Bạn cần đăng nhập để xem giỏ hàng!</td></tr>";
-                    } else {
-                        $customer_id = $_SESSION['customer_id'];
-
-                        // Truy vấn lấy sản phẩm từ bảng giỏ hàng
-                        $sql = "SELECT g.id, g.product_id, g.soluong, g.price, g.img, p.tensp 
-                                FROM giohang g
-                                JOIN products p ON g.product_id = p.id
-                                WHERE g.customer_id = ?";
-
-                        $stmt = $conn->prepare($sql);
-                        $stmt->bind_param("i", $customer_id);
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-
-                        $total_price = 0;
-
-                        if ($result->num_rows > 0) {
-                            while ($row = $result->fetch_assoc()) {
-                                $subtotal = $row["soluong"] * $row["price"];
-                                $total_price += $subtotal;
-                                echo '
-                                <tr>
-                                    <td style="display: flex; align-items: center;">
-                                        <img style="width: 90px;" src="sanpham/' . $row["img"] . '" alt="' . htmlspecialchars($row["tensp"]) . '">
-                                    </td>
-                                    <td><span>' . htmlspecialchars($row["tensp"]) . '</span></td>
-                                    <td>
-                                        <p><span>' . number_format($row["price"], 0, ',', '.') . '</span><sup>đ</sup></p>
-                                    </td>
-                                    <td>
-                                        <input style="width: 40px; outline: none;" type="number" value="' . $row["soluong"] . '" min="1" class="cart-quantity" data-cart-id="' . $row["id"] . '">
-                                    </td>
-                                    <td style="cursor: pointer;" class="delete-item" data-cart-id="' . $row["id"] . '">Xóa</td>
-                                </tr>';
-                            }
-                        } else {
-                            echo "<tr><td colspan='4'>Giỏ hàng của bạn đang trống!</td></tr>";
-                        }
-                    }
-                    ?>
-                </tbody>
-
-            </table>
-            <div style="text-align: center;" class="price-total">
-                <p style="font-weight: bold; margin-top: 10px; margin-bottom: 20px;">
-                    Tổng tiền: <span><?php echo number_format($total_price, 0, ',', '.'); ?></span>đ
-                </p>
-            </div>
-            <a class="thanhtoan" href="thanhtoan.php">Thanh toán</a>
-        </form>
-    </section>
-
-    <div class="green-line-header"></div>
     <?php include 'footer.php' ?>
     <!-- <script src="js/hoadon.js"></script> -->
     <script src="js/giohang.js"></script>
     <script src="js/phantrang.js"></script>
     <script src="js/ssbutton.js"></script>
-
-
-
-
+    <script src="js/filter.js"></script>
+    <script>
+        const isLoggedIn = <?php echo isset($_SESSION['customer_id']) ? 'true' : 'false'; ?>;
+    </script>
 </body>
 <?php if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo "<script>if(window.history.replaceState){window.history.replaceState(null, null, window.location.href);}</script>";
 }
 ?>
-<?php $conn->close(); ?>
 
 </html>

@@ -24,6 +24,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // Update pagination controls
         document.getElementById("prevBtn").disabled = (page === 1);
         document.getElementById("nextBtn").disabled = (page === totalPages);
+
+        // Highlight current page
+        highlightCurrentPage(page);
     }
 
     // Generate page numbers dynamically
@@ -35,6 +38,11 @@ document.addEventListener("DOMContentLoaded", function() {
             const pageButton = document.createElement("button");
             pageButton.innerText = i;
             pageButton.classList.add("page-btn");
+            
+            // Add active class to current page
+            if (i === currentPage) {
+                pageButton.classList.add("active");
+            }
 
             // Prevent page refresh on click
             pageButton.addEventListener("click", function(event) {
@@ -44,6 +52,20 @@ document.addEventListener("DOMContentLoaded", function() {
             });
 
             pageNumbersContainer.appendChild(pageButton);
+        }
+    }
+
+    // Highlight current page
+    function highlightCurrentPage(page) {
+        // Remove active class from all buttons
+        document.querySelectorAll('.page-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Add active class to current button
+        const currentButton = document.querySelector(`.page-btn:nth-child(${page})`);
+        if (currentButton) {
+            currentButton.classList.add('active');
         }
     }
 
