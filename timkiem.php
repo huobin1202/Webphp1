@@ -46,6 +46,8 @@ if ($selected_category != '') {
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="./assets/font/font-awesome-pro-v6-6.2.0/css/all.min.css">
     <script src="https://fontawesome.com/v6/search" crossorigin="anonymous"></script>
+    <title>Kawakaki </title>
+
     <style>
         .display {
             display: flex;
@@ -423,10 +425,10 @@ if ($selected_category != '') {
                                             <div class="advanced-search-price">
                                                 <input type="number" placeholder="₫ TỪ" name="min_price" id="min-price" 
                                                     value="<?php echo isset($_GET['min_price']) ? $_GET['min_price'] : ''; ?>"
-                                                    min="0" max="10000000000">
+                                                    min="0" step="10000000" max="10000000000">
                                                 <input type="number" placeholder="₫ ĐẾN" name="max_price" id="max-price" 
                                                     value="<?php echo isset($_GET['max_price']) ? $_GET['max_price'] : ''; ?>"
-                                                    min="0" max="10000000000">
+                                                    min="0" step="10000000" max="10000000000">
                                             </div>
                                         </div>
                                         <!-- Giữ lại các tham số GET khác -->

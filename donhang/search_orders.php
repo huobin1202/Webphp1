@@ -35,21 +35,21 @@ if (!empty($status) && $status != '4') {
 }
 
 if (!empty($city)) {
-    $sql .= " AND (orders.city_code = ? OR customer.city_code = ?)";
-    $types .= 'ss';
-    array_push($params, $city, $city);
+    $sql .= " AND orders.city_code = ?";
+    $types .= 's';
+    array_push($params, $city);
 }
 
 if (!empty($district)) {
-    $sql .= " AND (orders.district_code = ? OR customer.district_code = ?)";
-    $types .= 'ss';
-    array_push($params, $district, $district);
+    $sql .= " AND orders.district_code = ?";
+    $types .= 's';
+    array_push($params, $district);
 }
 
 if (!empty($ward)) {
-    $sql .= " AND (orders.ward_code = ? OR customer.ward_code = ?)";
-    $types .= 'ss';
-    array_push($params, $ward, $ward);
+    $sql .= " AND orders.ward_code = ?";
+    $types .= 's';
+    array_push($params, $ward);
 }
 
 if (!empty($start_date)) {

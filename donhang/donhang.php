@@ -63,18 +63,18 @@ if (isset($_GET['status']) && $_GET['status'] != '4') {
 }
 
 if (isset($_GET['city']) && !empty($_GET['city'])) {
-    $sql .= " AND (orders.city_code = ? OR customer.city_code = ?)";
-    array_push($params, $_GET['city'], $_GET['city']);
+    $sql .= " AND orders.city_code = ?";
+    array_push($params, $_GET['city']);
 }
 
 if (isset($_GET['district']) && !empty($_GET['district'])) {
-    $sql .= " AND (orders.district_code = ? OR customer.district_code = ?)";
-    array_push($params, $_GET['district'], $_GET['district']);
+    $sql .= " AND orders.district_code = ?";
+    array_push($params, $_GET['district']);
 }
 
 if (isset($_GET['ward']) && !empty($_GET['ward'])) {
-    $sql .= " AND (orders.ward_code = ? OR customer.ward_code = ?)";
-    array_push($params, $_GET['ward'], $_GET['ward']);
+    $sql .= " AND orders.ward_code = ?";
+    array_push($params, $_GET['ward']);
 }
 
 if (isset($_GET['start_date']) && !empty($_GET['start_date'])) {
@@ -508,6 +508,46 @@ if ($result->num_rows > 0) {
     document.addEventListener('DOMContentLoaded', function() {
         loadProvinces();
 
+        // Lưu trạng thái tìm kiếm vào localStorage
+        function saveSearchState() {
+            const searchState = {
+                city: document.getElementById('city').value,
+                district: document.getElementById('district').value,
+                ward: document.getElementById('ward').value,
+                status: document.querySelector('select[name="status"]').value,
+                search: document.querySelector('input[name="search"]').value,
+                start_date: document.querySelector('input[name="start_date"]').value,
+                end_date: document.querySelector('input[name="end_date"]').value
+            };
+            localStorage.setItem('orderSearchState', JSON.stringify(searchState));
+        }
+
+        // Khôi phục trạng thái tìm kiếm từ localStorage
+        function restoreSearchState() {
+            const savedState = localStorage.getItem('orderSearchState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                if (state.city) {
+                    document.getElementById('city').value = state.city;
+                    loadDistricts(state.city);
+                }
+                if (state.district) {
+                    document.getElementById('district').value = state.district;
+                    loadWards(state.district);
+                }
+                if (state.ward) {
+                    document.getElementById('ward').value = state.ward;
+                }
+                document.querySelector('select[name="status"]').value = state.status;
+                document.querySelector('input[name="search"]').value = state.search;
+                document.querySelector('input[name="start_date"]').value = state.start_date;
+                document.querySelector('input[name="end_date"]').value = state.end_date;
+            }
+        }
+
+        // Khôi phục trạng thái khi trang được tải
+        restoreSearchState();
+
         // Thêm sự kiện onchange cho select tỉnh/thành phố
         document.getElementById('city').addEventListener('change', function() {
             const cityCode = this.value;
@@ -518,6 +558,7 @@ if ($result->num_rows > 0) {
             if (cityCode) {
                 searchOrders();
             }
+            saveSearchState();
         });
 
         // Thêm sự kiện onchange cho select quận/huyện
@@ -529,6 +570,7 @@ if ($result->num_rows > 0) {
             if (districtCode) {
                 searchOrders();
             }
+            saveSearchState();
         });
 
         // Thêm sự kiện onchange cho select phường/xã
@@ -537,6 +579,25 @@ if ($result->num_rows > 0) {
             if (wardCode) {
                 searchOrders();
             }
+            saveSearchState();
+        });
+
+        // Thêm sự kiện cho các trường tìm kiếm khác
+        document.querySelector('select[name="status"]').addEventListener('change', saveSearchState);
+        document.querySelector('input[name="search"]').addEventListener('input', saveSearchState);
+        document.querySelector('input[name="start_date"]').addEventListener('change', saveSearchState);
+        document.querySelector('input[name="end_date"]').addEventListener('change', saveSearchState);
+
+        // Sửa lại nút chi tiết để giữ nguyên tham số tìm kiếm
+        document.querySelectorAll('.btn-detail').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const orderId = this.closest('form').querySelector('input[name="view_order"]').value;
+                const currentUrl = new URL(window.location.href);
+                const searchParams = new URLSearchParams(currentUrl.search);
+                searchParams.set('view_order', orderId);
+                window.location.href = currentUrl.pathname + '?' + searchParams.toString();
+            });
         });
     });
 

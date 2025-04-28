@@ -1,15 +1,7 @@
 <?php
 session_start(); // Bắt đầu session
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "admindoan";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
+include('database.php');
 
 $error_message = "";
 
@@ -57,13 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 } else {
                     $error_message = "Lỗi: " . $stmt->error;
                 }
-                $stmt->close();
             }
-            $check_stmt->close();
         }
     }
 }
-$conn->close();
 ?>
 
 
@@ -73,7 +62,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký</title>
+    <title>Kawakaki </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');

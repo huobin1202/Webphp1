@@ -316,8 +316,8 @@ if (isset($_POST['add_to_cart'])) {
             font-size: 12px;
         }
     </style>
-    <title>BMT </title>
-</head>
+    <title>Kawakaki </title>
+    </head>
 
 <body>
     <header>

@@ -6,16 +6,8 @@ if (!isset($_SESSION['username'])) {
 }
 
 // Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "admindoan";
+include('../database.php');
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 // Lấy các tham số từ URL
 $search_term = isset($_GET['search']) ? trim($_GET['search']) : '';

@@ -87,8 +87,8 @@ if ($selected_category != '') {
             transition: all 0.3s ease;
         }
     </style>
-    <title>BMT </title>
-</head>
+    <title>Kawakaki </title>
+    </head>
 
 <body>
     <header>

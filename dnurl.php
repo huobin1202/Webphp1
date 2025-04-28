@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="image/logo.png" rel="icon" type="image/x-icon" />
     <link rel="stylesheet" href="assets/css/style.css">
-    <title>Đăng nhập</title>
+    <title>Kawakaki </title>
     <style>
         /* Thêm style cho nút quay về */
         .back-button {

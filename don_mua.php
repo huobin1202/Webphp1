@@ -57,7 +57,7 @@ $details_result = $details_query->get_result();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Hóa Đơn Mua Hàng</title>
+    <title>Kawakaki </title>
     <style>
     body {
         font-family: Arial, sans-serif;

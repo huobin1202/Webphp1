@@ -1,20 +1,10 @@
 <?php
 session_start();
+include('database.php');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim($_POST['name']);
     $password = trim($_POST['password']);
-
-    $servername = "localhost";
-    $username = "root";
-    $password_db = "";
-    $dbname = "admindoan";
-
-    $conn = new mysqli($servername, $username, $password_db, $dbname);
-
-    if ($conn->connect_error) {
-        die("Kết nối thất bại: " . $conn->connect_error);
-    }
 
     // Prepared statement to get user id, status
     $stmt = $conn->prepare("SELECT id, status FROM customer WHERE name = ? AND password = ?");
@@ -46,9 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: dn.php");
         exit();
     }
-
-    $stmt->close();
-    $conn->close();
 }
 ?>
 
@@ -58,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập</title>
+    <title>Kawakaki </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
