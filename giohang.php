@@ -484,7 +484,7 @@ if (isset($_POST['add_to_cart'])) {
                 <div style="flex: 1;">
                     <?php
                     // Lấy sản phẩm từ giỏ hàng trong database
-                    $sql = "SELECT g.*, p.tensp, p.giaban, p.hinhanh 
+                    $sql = "SELECT g.*, p.tensp, p.giaban, p.hinhanh, p.status 
                            FROM giohang g 
                            JOIN products p ON g.product_id = p.id 
                            WHERE g.customer_id = ?";
@@ -493,6 +493,8 @@ if (isset($_POST['add_to_cart'])) {
                     $stmt->execute();
                     $result = $stmt->get_result();
                     $total = 0;
+                    $has_available_products = false;
+                    $total_items = 0;
 
                     if ($result->num_rows == 0):
                     ?>
@@ -502,10 +504,15 @@ if (isset($_POST['add_to_cart'])) {
                         </div>
                         <?php else:
                         while ($item = $result->fetch_assoc()):
-                            $subtotal = $item['giaban'] * $item['soluong'];
-                            $total += $subtotal;
+                            $is_available = $item['status'] == 1;
+                            if ($is_available) {
+                                $subtotal = $item['giaban'] * $item['soluong'];
+                                $total += $subtotal;
+                                $total_items += $item['soluong'];
+                                $has_available_products = true;
+                            }
                         ?>
-                            <div style="display: flex; padding: 20px; border: 1px solid #eee; margin-bottom: 20px; border-radius: 8px;">
+                            <div style="display: flex; padding: 20px; border: 1px solid #eee; margin-bottom: 20px; border-radius: 8px; <?php echo !$is_available ? 'opacity: 0.7;' : ''; ?>">
                                 <div style="width: 150px; margin-right: 20px;">
                                     <img src="sanpham/<?php echo htmlspecialchars($item['hinhanh']); ?>"
                                         alt="<?php echo htmlspecialchars($item['tensp']); ?>"
@@ -514,25 +521,30 @@ if (isset($_POST['add_to_cart'])) {
                                 <div style="flex: 1;">
                                     <h3 style="margin-bottom: 10px;"><?php echo htmlspecialchars($item['tensp']); ?></h3>
                                     <p style="color: #666; margin-bottom: 5px;">Mã sản phẩm# <?php echo $item['product_id']; ?></p>
+                                    <?php if (!$is_available): ?>
+                                        <p style="color: #f04e2e; margin-bottom: 10px; font-weight: bold;">Sản phẩm đã hết hàng</p>
+                                    <?php endif; ?>
                                     <div class="button-container">
                                         <div class="controls-group">
-                                            <div class="quantity-controls">
-                                                <button type="button" class="quantity-btn minus" onclick="updateQuantity(this, -1)">−</button>
-                                                <input type="number" name="quantity" value="<?php echo $item['soluong']; ?>"
-                                                    min="1" max="10" class="quantity-input"
-                                                    data-product-id="<?php echo $item['product_id']; ?>"
-                                                    data-price="<?php echo $item['giaban']; ?>"
-                                                    readonly>
-                                                <button type="button" class="quantity-btn plus" onclick="updateQuantity(this, 1)">+</button>
-                                            </div>
+                                            <?php if ($is_available): ?>
+                                                <div class="quantity-controls">
+                                                    <button type="button" class="quantity-btn minus" onclick="updateQuantity(this, -1)">−</button>
+                                                    <input type="number" name="quantity" value="<?php echo $item['soluong']; ?>"
+                                                        min="1" max="10" class="quantity-input"
+                                                        data-product-id="<?php echo $item['product_id']; ?>"
+                                                        data-price="<?php echo $item['giaban']; ?>"
+                                                        readonly>
+                                                    <button type="button" class="quantity-btn plus" onclick="updateQuantity(this, 1)">+</button>
+                                                </div>
 
-                                            <form method="POST" action="giohang.php" style="display: inline;">
-                                                <input type="hidden" name="product_id" value="<?php echo $item['product_id']; ?>">
-                                                <input type="hidden" name="quantity" class="quantity-hidden" value="<?php echo $item['soluong']; ?>">
-                                                <button type="submit" name="update_quantity" class="update-btn" onclick="return prepareUpdate(this)">
-                                                    <i class="fa-light fa-check"></i>Cập nhật
-                                                </button>
-                                            </form>
+                                                <form method="POST" action="giohang.php" style="display: inline;">
+                                                    <input type="hidden" name="product_id" value="<?php echo $item['product_id']; ?>">
+                                                    <input type="hidden" name="quantity" class="quantity-hidden" value="<?php echo $item['soluong']; ?>">
+                                                    <button type="submit" name="update_quantity" class="update-btn" onclick="return prepareUpdate(this)">
+                                                        <i class="fa-light fa-check"></i>Cập nhật
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
 
                                             <a href="giohang.php?remove=<?php echo $item['product_id']; ?>"
                                                 class="delete-btn"
@@ -543,8 +555,12 @@ if (isset($_POST['add_to_cart'])) {
 
                                         <div class="product-price">
                                             <?php
-                                            $subtotal = $item['giaban'] * $item['soluong'];
-                                            echo number_format($subtotal, 0, ',', '.') . 'đ';
+                                            if ($is_available) {
+                                                $subtotal = $item['giaban'] * $item['soluong'];
+                                                echo number_format($subtotal, 0, ',', '.') . 'đ';
+                                            } else {
+                                                echo '<span style="color: #f04e2e;">Không tính vào tổng</span>';
+                                            }
                                             ?>
                                         </div>
                                     </div>
@@ -565,11 +581,17 @@ if (isset($_POST['add_to_cart'])) {
                         <!-- Phần tổng tiền -->
                         <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <span>Tổng cộng (<?php echo $result->num_rows; ?> Sản phẩm)</span>
+                                <span>Tổng cộng (<?php echo $total_items; ?> Sản phẩm)</span>
                                 <span><?php echo number_format($total, 0, ',', '.'); ?>đ</span>
                             </div>
 
-                            <a href="thanhtoan.php" class="mua" style="width: 100%; margin-top: 20px; display: block; text-align: center; text-decoration: none; color: white;">Thanh toán</a>
+                            <?php if ($has_available_products): ?>
+                                <a href="thanhtoan.php" class="mua" style="width: 100%; margin-top: 20px; display: block; text-align: center; text-decoration: none; color: white;">Thanh toán</a>
+                            <?php else: ?>
+                                <div style="text-align: center; margin-top: 20px; padding: 10px; background-color: #f8d7da; color: #721c24; border-radius: 5px;">
+                                    Không có sản phẩm nào có thể thanh toán
+                                </div>
+                            <?php endif; ?>
 
                             <div style="margin-top: 20px; text-align: center;">
                                 <a href="index.php" style="color: #139b3a; margin-right: 15px;">Tiếp tục mua hàng</a>

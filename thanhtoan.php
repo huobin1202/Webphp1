@@ -23,7 +23,7 @@ $customer_address = $address_result->fetch_assoc()['address'] ?? '';
 $cart = [];
 $total = 0;
 $cart_query = $conn->prepare("
-    SELECT giohang.*, products.tensp 
+    SELECT giohang.*, products.tensp, products.status 
     FROM giohang 
     JOIN products ON giohang.product_id = products.id 
     WHERE giohang.customer_id = ?");
@@ -31,13 +31,16 @@ $cart_query->bind_param("i", $customer_id);
 $cart_query->execute();
 $cart_result = $cart_query->get_result();
 while ($row = $cart_result->fetch_assoc()) {
-    $cart[] = $row;
-    $total += $row['soluong'] * $row['price'];
+    // Chỉ thêm sản phẩm còn hoạt động vào giỏ hàng
+    if ($row['status'] == 1) {
+        $cart[] = $row;
+        $total += $row['soluong'] * $row['price'];
+    }
 }
 
 // Kiểm tra giỏ hàng trống
 if (empty($cart)) {
-    $_SESSION['error'] = "Vui lòng thêm sản phẩm ";
+    $_SESSION['error'] = "Vui lòng thêm sản phẩm có sẵn vào giỏ hàng";
     header("Location: index.php");
     exit();
 }
@@ -158,9 +161,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Lưu chi tiết đơn hàng
     foreach ($cart as $item) {
-        $detail_stmt = $conn->prepare("INSERT INTO order_details (order_id, product_id, soluong, price) VALUES (?, ?, ?, ?)");
-        $detail_stmt->bind_param("iiid", $order_id, $item['product_id'], $item['soluong'], $item['price']);
-        $detail_stmt->execute();
+        // Chỉ lưu sản phẩm còn hoạt động
+        if ($item['status'] == 1) {
+            $detail_stmt = $conn->prepare("INSERT INTO order_details (order_id, product_id, soluong, price) VALUES (?, ?, ?, ?)");
+            $detail_stmt->bind_param("iiid", $order_id, $item['product_id'], $item['soluong'], $item['price']);
+            $detail_stmt->execute();
+        }
     }
 
     // Xóa giỏ hàng
@@ -338,14 +344,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p class="checkout-content-label">Đơn hàng</p>
           
             <div class="bill-payment">
-                  <div class="bill-total" id="list-order-checkout">
-                <?php foreach ($cart as $item): ?>
-                    <div>
-                        <?php echo htmlspecialchars($item['tensp']); ?> - SL: <?php echo $item['soluong']; ?> - <?php echo number_format($item['price']); ?>₫
-                    </div>
-                <?php endforeach; ?>
-            </div>
-                <div class="total-bill-order"></div>
+                <div class="bill-total" id="list-order-checkout">
+                    <?php 
+                    $total_items = 0;
+                    foreach ($cart as $item): 
+                        if ($item['status'] == 1):
+                            $total_items += $item['soluong'];
+                    ?>
+                        <div>
+                            <?php echo htmlspecialchars($item['tensp']); ?> - SL: <?php echo $item['soluong']; ?> - <?php echo number_format($item['price']); ?>₫
+                        </div>
+                    <?php 
+                        endif;
+                    endforeach; 
+                    ?>
+                </div>
+                <div class="total-bill-order">
+                    <div class="text">Tổng số lượng: <?php echo $total_items; ?> sản phẩm</div>
+                </div>
             </div>
             <div class="total-checkout">
                 <div class="text">Tổng tiền</div>
