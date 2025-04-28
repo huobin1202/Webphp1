@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $_SESSION['error'] = "Số điện thoại này đã được đăng ký!";
     } else {
         // Thêm khách hàng mới
-        $sql = "INSERT INTO customer (name, contact, joindate, password, status) VALUES (?, ?, NOW(), ?, 1)";
+        $sql = "INSERT INTO customer (name, contact, joindate, password, status,role) VALUES (?, ?, NOW(), ?, 1,'user')";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sss", $name, $phone, $password);
         
@@ -42,6 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $phone = $_POST['phone'];
     $password = $_POST['password'];
     $status = isset($_POST['user-status']) ? 1 : 0;
+
+    // Check if user is admin before allowing status change
+    $check_role = $conn->prepare("SELECT role FROM customer WHERE id = ?");
+    $check_role->bind_param("i", $id);
+    $check_role->execute();
+    $role_result = $check_role->get_result();
+    $user_role = $role_result->fetch_assoc()['role'];
+
+    if ($user_role === 'admin' && $status === 0) {
+        $_SESSION['error'] = "Không thể khóa tài khoản admin!";
+        header("Location: khachhang.php");
+        exit();
+    }
 
     $sql = "UPDATE customer SET name=?, contact=?, password=?, status=? WHERE id=?";
     $stmt = $conn->prepare($sql);
@@ -67,7 +80,7 @@ if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
 }
 
 // Xây dựng câu truy vấn SQL với các điều kiện lọc
-$sql = "SELECT id, name, contact, joindate, status FROM customer WHERE 1=1";
+$sql = "SELECT id, name, contact, joindate, status,role FROM customer WHERE 1=1";
 $params = array();
 
 // Lọc theo tìm kiếm
@@ -245,6 +258,7 @@ $result = $stmt->get_result();
                                 <td>Liên hệ</td>
                                 <td>Ngày tham gia</td>
                                 <td>Tình trạng</td>
+                                <td>Vai trò</td>
                                 <td>Thao tác</td>
                             </tr>
                         </thead>
@@ -259,6 +273,8 @@ $result = $stmt->get_result();
                                     echo "<td>" . date('d/m/Y', strtotime($row["joindate"])) . "</td>";
                                     echo "<td><span class='status-" . ($row["status"] == 1 ? "complete" : "no-complete") . "'>" .
                                         ($row["status"] == 1 ? "Hoạt động" : "Bị khóa") . "</span></td>";
+                                        echo "<td>" . htmlspecialchars($row["role"]) . "</td>";
+
                                     echo "<td class='control control-table'>";
                                     echo "<a href='?edit=" . $row["id"] . "'><button class='btn-edit'>";
                                     echo "<i class='fa-light fa-pen-to-square'></i></button></a>";

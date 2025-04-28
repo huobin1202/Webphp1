@@ -130,16 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $fullAddress .= ", " . $cityName;
                 }
 
-                // Debug thông tin địa chỉ
-                error_log("City Code: " . $cityCode);
-                error_log("City Name: " . $cityName);
-                error_log("District Code: " . $districtCode);
-                error_log("District Name: " . $districtName);
-                error_log("Ward Code: " . $wardCode);
-                error_log("Ward Name: " . $wardName);
-                error_log("Street Address: " . $streetAddress);
-                error_log("Full Address: " . $fullAddress);
-                error_log("Ward Data: " . print_r($wardData, true));
+       
 
                 $stmt = $conn->prepare("UPDATE customer SET name=?, contact=?, email=?, city_code=?, city_name=?, district_code=?, district_name=?, ward_code=?, ward_name=?, street_address=?, address=?, password=? WHERE id=?");
                 $stmt->bind_param("ssssssssssssi", $tenUser, $sdtUser, $emailUser, $cityCode, $cityName, $districtCode, $districtName, $wardCode, $wardName, $streetAddress, $fullAddress, $passwordToUpdate, $customer_id);
