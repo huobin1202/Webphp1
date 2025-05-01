@@ -24,8 +24,8 @@ $query = "SELECT
     p.hinhanh,
     p.dongsp,
     COUNT(DISTINCT o.id) as total_orders,
-    SUM(od.soluong) as total_quantity,
-    SUM(od.soluong * od.price) as total_revenue
+    COALESCE(SUM(od.soluong), 0) as total_quantity,
+    COALESCE(SUM(od.soluong * od.price), 0) as total_revenue
 FROM products p
 LEFT JOIN order_details od ON p.id = od.product_id
 LEFT JOIN orders o ON od.order_id = o.id
@@ -52,7 +52,6 @@ if (!empty($end_date)) {
 }
 
 $query .= " GROUP BY p.id, p.tensp, p.hinhanh, p.dongsp 
-            HAVING total_revenue > 0 
             ORDER BY total_revenue " . ($sort_order === 'asc' ? 'ASC' : 'DESC');
 
 $result = $conn->query($query);
@@ -60,12 +59,14 @@ $result = $conn->query($query);
 // Calculate totals
 $total_products = 0;
 $total_orders = 0;
+$total_quantity = 0;
 $total_revenue = 0;
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $total_products++;
         $total_orders += $row['total_orders'];
+        $total_quantity += $row['total_quantity'];
         $total_revenue += $row['total_revenue'];
     }
     $result->data_seek(0);
@@ -259,7 +260,7 @@ if ($detail_id > 0) {
                     <div class="order-statistical-item">
                         <div class="order-statistical-item-content">
                             <p class="order-statistical-item-content-desc">Tổng số lượng bán</p>
-                            <h4 class="order-statistical-item-content-h" id="quantity-order"><?php echo $total_orders; ?></h4>
+                            <h4 class="order-statistical-item-content-h" id="quantity-order"><?php echo $total_quantity; ?></h4>
                         </div>
                         <div class="order-statistical-item-icon">
                             <i class="fa-light fa-file-lines"></i>
@@ -300,7 +301,7 @@ if ($detail_id > 0) {
                                         <p><?php echo htmlspecialchars($row['tensp']); ?></p>
                                     </div>
                                 </td>
-                                <td><?php echo $row['total_orders']; ?></td>
+                                <td><?php echo $row['total_quantity']; ?></td>
                                 <td><?php echo number_format($row['total_revenue'], 0, ',', '.'); ?>đ</td>
                                 <td>
                                     <a href="?<?php 

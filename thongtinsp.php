@@ -58,41 +58,50 @@ if ($result->num_rows > 0) {
     <title>Kawakaki </title>
 </head>
 <style>
-    .form-inline .form-control {
-        border-radius: 25px;
-        padding: 8px 15px;
-        border: 1px solid #ccc;
+    :root {
+        --primary-color: #139b3a;
+        --secondary-color: #28a745;
+        --text-color: #333;
+        --light-gray: #f8f9fa;
+        --border-color: #ddd;
     }
 
-    .mua.in-cart {
-        background-color: #dc3545 !important;
-        /* Màu đỏ */
-    }
-
-    .cart-button {
-        transition: all 0.3s ease;
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
     }
 
     .card2 {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         margin-top: 30px;
         border: none;
-        border-radius: 10px;
+        border-radius: 15px;
         overflow: hidden;
+        background: white;
+        transition: transform 0.3s ease;
+    }
+
+    .card2:hover {
+        transform: translateY(-5px);
     }
 
     .wrapper {
         display: flex;
         flex-wrap: wrap;
-        padding: 20px;
+        padding: 30px;
+        gap: 20px;
     }
 
     .preview {
         flex: 1;
+        min-width: 300px;
         padding: 20px;
         display: flex;
         flex-direction: column;
         align-items: center;
+        background: var(--light-gray);
+        border-radius: 10px;
     }
 
     .main-image {
@@ -100,36 +109,8 @@ if ($result->num_rows > 0) {
         margin-bottom: 20px;
         position: relative;
         overflow: hidden;
-    }
-
-    .zoom-controls {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        z-index: 10;
-    }
-
-    .zoom-btn {
-        width: 30px;
-        height: 30px;
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #333;
-        transition: all 0.3s ease;
-    }
-
-    .zoom-btn:hover {
-        background: #139b3a;
-        color: white;
-        border-color: #139b3a;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .main-image img {
@@ -138,13 +119,12 @@ if ($result->num_rows > 0) {
         object-fit: contain;
         border-radius: 8px;
         transition: transform 0.3s ease;
-        transform-origin: center center;
     }
 
     .thumbnail-section {
         width: 100%;
         margin-top: 20px;
-        border-top: 1px dashed #ccc;
+        border-top: 1px solid var(--border-color);
         padding-top: 20px;
     }
 
@@ -153,105 +133,92 @@ if ($result->num_rows > 0) {
         font-size: 14px;
         color: #76767c;
         margin-bottom: 15px;
-        font-weight: 500;
-        position: relative;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 1px;
-    }
-
-    .thumbnail-title:before,
-    .thumbnail-title:after {
-        content: "―";
-        display: inline-block;
-        position: relative;
-        top: -3px;
-        padding: 0 10px;
-        color: #76767c;
     }
 
     .thumbnail-images {
         display: flex;
         gap: 15px;
         justify-content: center;
-        width: 100%;
-        padding: 10px;
+        flex-wrap: wrap;
     }
 
     .thumb {
-        width: 120px;
-        height: 80px;
+        width: 100px;
+        height: 70px;
         object-fit: cover;
         cursor: pointer;
-        border: 1px solid #ddd;
-        padding: 3px;
-        background: white;
+        border: 2px solid var(--border-color);
+        border-radius: 5px;
         transition: all 0.3s ease;
     }
 
     .thumb:hover {
-        border-color: #139b3a;
+        border-color: var(--primary-color);
+        transform: scale(1.05);
     }
 
     .thumb.active {
-        border-color: #139b3a;
+        border-color: var(--primary-color);
         border-width: 2px;
     }
 
     .details {
         flex: 1;
         padding: 20px;
+        min-width: 300px;
     }
 
     .product-title {
         font-size: 2.2em;
-        font-weight: bold;
-        color: #333;
+        font-weight: 700;
+        color: var(--text-color);
         margin-bottom: 15px;
+        line-height: 1.2;
+    }
+
+    .price {
+        font-size: 1.8em;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 25px;
     }
 
     .product-description {
         font-size: 1.1em;
         color: #555;
         margin-bottom: 25px;
+        line-height: 1.6;
     }
 
-    .price {
-        font-size: 1.6em;
-        font-weight: bold;
-        color: #e74c3c;
-        margin-bottom: 25px;
+    .mua {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
-    .vote {
-        font-size: 1.1em;
-        margin-bottom: 20px;
-        color: #2ecc71;
+    .mua:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    h4,
-    h5 {
-        font-weight: bold;
-        color: #333;
-        margin-top: 20px;
-        margin-bottom: 10px;
+    .mua.in-cart {
+        background-color: #dc3545;
     }
 
-    h3 {
-        font-size: 1.8em;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 5px;
-    }
-
-    h4 {
-        font-size: 1.5em;
-        margin-top: 15px;
-        color: #555;
-    }
-
-    h5 {
-        font-size: 1.3em;
-        margin-top: 10px;
-        color: #777;
+    .mua.in-cart:hover {
+        background-color: #c82333;
     }
 
     .product-details {
@@ -262,116 +229,72 @@ if ($result->num_rows > 0) {
 
     .product-details li {
         font-size: 1em;
-        margin: 8px 0;
+        margin: 12px 0;
+        padding-left: 20px;
+        position: relative;
     }
 
-    .product-details li strong {
+    .product-details li:before {
+        content: "•";
+        color: var(--primary-color);
+        position: absolute;
+        left: 0;
+    }
+
+    .zoom-controls {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 10;
+    }
+    h4,
+    h5 {
+        font-weight: bold;
         color: #333;
-    }
-
-    .form-group {
         margin-top: 20px;
+        margin-bottom: 10px;
+        font-size: 25px;
     }
-
-    #soluong {
-        width: 100px;
-        padding: 8px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-    }
-
-    .action button {
-        background-color: #28a745;
-        color: white;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 5px;
+    .zoom-btn {
+        width: 35px;
+        height: 35px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid var(--border-color);
+        border-radius: 50%;
         cursor: pointer;
-        margin-right: 10px;
-        font-size: 1.2em;
-        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-color);
+        transition: all 0.3s ease;
     }
 
-    .action button:hover {
-        background-color: #218838;
-    }
-
-    .like {
-        background-color: #f8f9fa;
-        border: 1px solid #ccc;
-        color: #333;
-        padding: 12px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1.3em;
-        transition: color 0.3s ease;
-    }
-
-    .like:hover {
-        color: #e74c3c;
-    }
-
-    .float-right a {
+    .zoom-btn:hover {
+        background: var(--primary-color);
         color: white;
-        font-size: 1em;
-    }
-
-    .mua {
-        background-color: #28a745;
-        /* Màu xanh lá cây */
-        color: white;
-        /* Màu chữ trắng */
-        border: none;
-        /* Bỏ viền */
-        padding: 10px 20px;
-        /* Khoảng cách bên trong nút */
-        border-radius: 5px;
-        /* Bo tròn góc */
-        cursor: pointer;
-        /* Đổi biểu tượng chuột thành hình tay */
-        font-size: 16px;
-        /* Kích thước chữ */
-        transition: background-color 0.3s ease;
-        /* Hiệu ứng chuyển màu khi hover */
-    }
-
-    .mua:hover {
-        background-color: #218838;
-        /* Màu xanh lá cây đậm hơn khi hover */
+        border-color: var(--primary-color);
     }
 
     @media (max-width: 768px) {
         .wrapper {
             flex-direction: column;
+            padding: 15px;
         }
 
-        .preview,
-        .details {
+        .preview, .details {
             width: 100%;
+            padding: 15px;
         }
 
         .product-title {
             font-size: 1.8em;
         }
 
-        .product-description {
-            font-size: 1em;
-        }
-
         .price {
-            font-size: 1.4em;
-        }
-
-        .vote {
-            font-size: 1.1em;
-        }
-
-        .form-group {
-            width: 100%;
-        }
-
-        .form-control {
-            width: 100%;
+            font-size: 1.5em;
         }
 
         .main-image img {
@@ -582,6 +505,7 @@ if ($result->num_rows > 0) {
                                         <?php echo $in_cart ? '- Xóa khỏi giỏ hàng' : '+ Thêm vào giỏ hàng'; ?>
                                     </button>
                                 </div>
+                                <h4>Giới thiệu sản phẩm</h4>
 
                                 <p class="vote"><?php echo $row["thongtinsp"]; ?></p>
                                 <h4>Thông số kỹ thuật</h4>

@@ -494,7 +494,7 @@ $sql .= " ORDER BY id DESC";
                             <input id="gia-ban" name="gia-ban" type="text" placeholder="Nhập giá bán" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="thong-tin-sp" class="form-label">Thông tin sản phẩm</label>
+                            <label for="thong-tin-sp" class="form-label">Giới thiệu sản phẩm</label>
                             <textarea name="thong-tin-sp" class="product-desc" id="thong-tin-sp" placeholder="Nhập thông tin sản phẩm" style="width:100%;height:185px;"></textarea>
                         </div>
                         <div class="form-group">
@@ -558,7 +558,7 @@ $sql .= " ORDER BY id DESC";
                                 <input id="edit-gia-ban" name="gia-ban" type="text" value="<?php echo htmlspecialchars($edit_product['giaban']); ?>" class="form-control" required>
                             </div>
                             <div class="form-group">
-                                <label for="edit-thong-tin-sp" class="form-label">Thông tin sản phẩm</label>
+                                <label for="edit-thong-tin-sp" class="form-label">Giới thiệu sản phẩm</label>
                                 <textarea name="thong-tin-sp" class="product-desc" id="edit-thong-tin-sp" style="width:100%;height:185px;"><?php echo htmlspecialchars($edit_product['thongtinsp']); ?></textarea>
                             </div>
                             <div class="form-group">
