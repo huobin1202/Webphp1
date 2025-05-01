@@ -12,6 +12,12 @@ if (!isset($_SESSION['customer_id'])) {
 
 $customer_id = $_SESSION['customer_id'];
 
+// Initialize address components
+$city_code = '';
+$district_code = '';
+$ward_code = '';
+$street_address = '';
+
 // Lấy thông tin địa chỉ của khách hàng
 $address_query = $conn->prepare("SELECT address FROM customer WHERE id = ?");
 $address_query->bind_param("i", $customer_id);
@@ -60,22 +66,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Initialize address components
-    $city_code = $_POST['city_new'] ?? '';
-    $district_code = $_POST['district_new'] ?? '';
-    $ward_code = $_POST['ward_new'] ?? '';
-    $street_address = $_POST['street_address_new'] ?? '';
+    $city_code = '';
+    $city_name = '';
+    $district_code = '';
+    $district_name = '';
+    $ward_code = '';
+    $ward_name = '';
+    $street_address = '';
     $order_address = '';
 
     // Handle address based on delivery mode
     if ($delivery_mode === 'Giao tận nơi') {
         if (isset($_POST['address_type']) && $_POST['address_type'] === 'saved') {
-            $order_address = $_POST['diachinhan'] ?? '';
+            // Get saved address details from customer table
+            $saved_address_query = $conn->prepare("SELECT city_code, city_name, district_code, district_name, ward_code, ward_name, street_address, address FROM customer WHERE id = ?");
+            $saved_address_query->bind_param("i", $customer_id);
+            $saved_address_query->execute();
+            $saved_address_result = $saved_address_query->get_result();
+            $saved_address = $saved_address_result->fetch_assoc();
+            
+            if ($saved_address) {
+                $city_code = $saved_address['city_code'];
+                $city_name = $saved_address['city_name'];
+                $district_code = $saved_address['district_code'];
+                $district_name = $saved_address['district_name'];
+                $ward_code = $saved_address['ward_code'];
+                $ward_name = $saved_address['ward_name'];
+                $street_address = $saved_address['street_address'];
+                $order_address = $saved_address['address'];
+            }
         } else {
-            $order_address = $_POST['diachinhan_new'] ?? '';
+            // Get new address details
             $city_code = $_POST['city_new'] ?? '';
             $district_code = $_POST['district_new'] ?? '';
             $ward_code = $_POST['ward_new'] ?? '';
             $street_address = $_POST['street_address_new'] ?? '';
+            
+            // Get address names from API
+            if ($city_code) {
+                $response = file_get_contents("https://provinces.open-api.vn/api/p/" . $city_code);
+                if ($response !== false) {
+                    $cityData = json_decode($response, true);
+                    $city_name = $cityData['name'];
+                }
+            }
+            
+            if ($district_code) {
+                $response = file_get_contents("https://provinces.open-api.vn/api/d/" . $district_code);
+                if ($response !== false) {
+                    $districtData = json_decode($response, true);
+                    $district_name = $districtData['name'];
+                }
+            }
+            
+            if ($ward_code) {
+                $response = file_get_contents("https://open.oapi.vn/location/wards/" . $district_code . "?page=0&size=30");
+                if ($response !== false) {
+                    $wardData = json_decode($response, true);
+                    if (isset($wardData['data']) && is_array($wardData['data'])) {
+                        foreach ($wardData['data'] as $ward) {
+                            if ($ward['id'] === $ward_code) {
+                                $ward_name = $ward['name'];
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Build full address
+            $order_address = $street_address;
+            if ($ward_name) $order_address .= ", " . $ward_name;
+            if ($district_name) $order_address .= ", " . $district_name;
+            if ($city_name) $order_address .= ", " . $city_name;
         }
     } else {
         // Khi chọn "Tự đến lấy", lấy địa chỉ chi nhánh được chọn
@@ -463,6 +526,32 @@ document.addEventListener('DOMContentLoaded', function() {
     if (selectedStreet) {
         streetInput.value = selectedStreet;
     }
+
+    // Get the radio buttons and address divs
+    const addressTypeRadios = document.querySelectorAll('input[name="address_type"]');
+    const savedAddressDiv = document.getElementById('saved-address');
+    const newAddressDiv = document.getElementById('new-address');
+    
+    // Add change event listener to radio buttons
+    addressTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'saved') {
+                savedAddressDiv.style.display = 'block';
+                newAddressDiv.style.display = 'none';
+                // Remove required attribute from new address fields
+                document.querySelectorAll('#new-address select, #new-address input').forEach(el => {
+                    el.removeAttribute('required');
+                });
+            } else {
+                savedAddressDiv.style.display = 'none';
+                newAddressDiv.style.display = 'block';
+                // Add required attribute to new address fields
+                document.querySelectorAll('#new-address select, #new-address input').forEach(el => {
+                    el.setAttribute('required', '');
+                });
+            }
+        });
+    });
 });
 </script>
 
