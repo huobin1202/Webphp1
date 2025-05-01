@@ -269,15 +269,15 @@ if ($result->num_rows > 0) {
                                 <div>
                                     <label for="time-start">Từ</label>
                                     <input type="date" name="start_date" class="form-control-date"
-                                        value="<?php echo isset($_GET['start_date']) ? $_GET['start_date'] : ''; ?>">
+                                        value="<?php echo isset($_GET['start_date']) && $_GET['start_date'] !== '0' ? $_GET['start_date'] : ''; ?>">
                                 </div>
                                 <div>
                                     <label for="time-end">Đến</label>
                                     <input type="date" name="end_date" class="form-control-date"
-                                        value="<?php echo isset($_GET['end_date']) ? $_GET['end_date'] : ''; ?>">
+                                        value="<?php echo isset($_GET['end_date']) && $_GET['end_date'] !== '0' ? $_GET['end_date'] : ''; ?>">
                                 </div>
                                 <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
-                                <button><a href="donhang.php?status=4&city=0&district=0&ward=0&search=0&start_date=0&end_date=0" class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></a></button>
+                                <button id="resetButton" class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></button>
                             </div>
                         </div>
                     </form>
@@ -507,6 +507,23 @@ if ($result->num_rows > 0) {
     // Load provinces when page loads
     document.addEventListener('DOMContentLoaded', function() {
         loadProvinces();
+
+        // Thêm sự kiện cho nút reset
+        document.getElementById('resetButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            // Xóa localStorage
+            localStorage.removeItem('orderSearchState');
+            // Reset form values
+            document.querySelector('select[name="status"]').value = '4';
+            document.querySelector('input[name="search"]').value = '';
+            document.querySelector('input[name="start_date"]').value = '';
+            document.querySelector('input[name="end_date"]').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('district').innerHTML = '<option value="">Chọn Quận/Huyện</option>';
+            document.getElementById('ward').innerHTML = '<option value="">Chọn Phường/Xã</option>';
+            // Chuyển hướng về trang chính
+            window.location.href = 'donhang.php';
+        });
 
         // Lưu trạng thái tìm kiếm vào localStorage
         function saveSearchState() {
