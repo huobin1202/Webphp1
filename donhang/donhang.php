@@ -277,7 +277,7 @@ if ($result->num_rows > 0) {
                                         value="<?php echo isset($_GET['end_date']) ? $_GET['end_date'] : ''; ?>">
                                 </div>
                                 <button type="submit" class="btn-reset-order"><i class="fa-light fa-filter"></i></button>
-                                <button><a href="donhang.php" class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></a></button>
+                                <button><a href="donhang.php?status=4&city=0&district=0&ward=0&search=0&start_date=0&end_date=0" class="btn-reset-order"><i class="fa-light fa-arrow-rotate-right"></i></a></button>
                             </div>
                         </div>
                     </form>

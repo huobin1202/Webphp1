@@ -240,7 +240,7 @@ if ($detail_id > 0) {
                             ?>" class="btn-reset-order">
                                 <i class="fa-regular fa-arrow-down-wide-short"></i>
                             </button>
-                            <button><a href="thongke.php" class="btn-reset-order">
+                            <button><a href="thongke.php?start_date=0&end_date=0&search=" class="btn-reset-order">
                                 <i class="fa-light fa-arrow-rotate-right"></i>
                             </a></button>
                         </form>
