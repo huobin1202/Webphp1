@@ -14,7 +14,7 @@ $search_term = isset($_GET['search']) ? trim($_GET['search']) : '';
 $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
 $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 $sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'desc';
-$limit = isset($_GET['limit']) ? ($_GET['limit'] === 'all' ? null : (int)$_GET['limit']) : 5; // Mặc định hiển thị top 5
+$limit = isset($_GET['limit']) ? ($_GET['limit'] === 'all' ? null : (int)$_GET['limit']) : 100; // Mặc định hiển thị 100 ng
 
 // Validate date range
 if ($start_date && $end_date && $start_date > $end_date) {
