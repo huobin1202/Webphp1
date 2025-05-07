@@ -1,4 +1,4 @@
-13/5 Bao cao
+13/5 Báo cáo
 
 **1. Các chức năng cho người dùng cuối (end-user) - 5.0 điểm**
 - Hiển thị sản phẩm theo phân loại (0.5) ✅
