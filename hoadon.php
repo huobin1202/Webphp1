@@ -213,7 +213,7 @@ if (isset($_POST['cancel_order'])) {
                     if (!$customer_id) {
                         echo "<p>Bạn cần đăng nhập để xem lịch sử đơn hàng!</p>";
                     } else {
-                        $sql_orders = "SELECT * FROM orders WHERE customer_id = ?";
+                        $sql_orders = "SELECT * FROM orders WHERE customer_id = ? ORDER BY created_at DESC";
                         $stmt_orders = $conn->prepare($sql_orders);
                         $stmt_orders->bind_param("i", $customer_id);
                         $stmt_orders->execute();
