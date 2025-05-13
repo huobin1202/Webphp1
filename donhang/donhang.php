@@ -2,6 +2,11 @@
 // File: donhang/donhang.php
 session_start();
 if (!isset($_SESSION['username'])) {
+    header("Location: ../dnurl.php");
+    exit();
+}
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: dnurl.php");
     exit();
 }
@@ -83,7 +88,7 @@ if (isset($_GET['start_date']) && !empty($_GET['start_date'])) {
 }
 
 if (isset($_GET['end_date']) && !empty($_GET['end_date'])) {
-    $sql .= " AND orders.created_at <= ?";
+    $sql .= " AND orders.created_at <= DATE_ADD(?, INTERVAL 1 DAY)";
     array_push($params, $_GET['end_date']);
 }
 

@@ -1,6 +1,11 @@
 <?php
 session_start();
 if (!isset($_SESSION['username'])) {
+    header("Location: ../dnurl.php");
+    exit();
+}
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: dnurl.php");
     exit();
 }
@@ -48,7 +53,7 @@ if (!empty($start_date)) {
     $query .= " AND DATE(o.created_at) >= '$start_date'";
 }
 if (!empty($end_date)) {
-    $query .= " AND DATE(o.created_at) <= '$end_date'";
+    $query .= " AND DATE(o.created_at) <= DATE_ADD('$end_date', INTERVAL 1 DAY)";
 }
 
 $query .= " GROUP BY p.id, p.tensp, p.hinhanh, p.dongsp 

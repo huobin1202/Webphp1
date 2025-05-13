@@ -2,7 +2,15 @@
 session_start();
 include("../database.php");
 include("../toast.php");
+if (!isset($_SESSION['username'])) {
+    header("Location: ../dnurl.php");
+    exit();
+}
 
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    header("Location: dnurl.php");
+    exit();
+}
 // Lấy thông tin sản phẩm cần sửa nếu có
 $edit_product = null;
 if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {

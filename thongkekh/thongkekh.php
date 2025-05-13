@@ -1,6 +1,11 @@
 <?php
 session_start();
 if (!isset($_SESSION['username'])) {
+    header("Location: ../dnurl.php");
+    exit();
+}
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: dnurl.php");
     exit();
 }
@@ -29,7 +34,7 @@ $query = "SELECT
     c.name as tenkh,
     COUNT(DISTINCT o.id) as total_orders,
     SUM(od.soluong) as total_quantity,
-    SUM(od.soluong * od.price) as total_revenue
+    SUM(CASE WHEN o.status IN ('dagiao', 'daxuly') THEN od.soluong * od.price ELSE 0 END) as total_revenue
 FROM customer c
 LEFT JOIN orders o ON c.id = o.customer_id
 LEFT JOIN order_details od ON o.id = od.order_id
@@ -46,7 +51,7 @@ if (!empty($start_date)) {
     $query .= " AND DATE(o.created_at) >= '$start_date'";
 }
 if (!empty($end_date)) {
-    $query .= " AND DATE(o.created_at) <= '$end_date'";
+    $query .= " AND DATE(o.created_at) <= DATE_ADD('$end_date', INTERVAL 1 DAY)";
 }
 
 // Group by và having để lọc ra khách hàng có doanh thu
@@ -83,7 +88,7 @@ if (isset($_GET['detail'])) {
         o.id as order_id,
         o.created_at,
         o.status,
-        o.total as order_total,
+        CASE WHEN o.status IN ('dagiao', 'daxuly') THEN o.total ELSE 0 END as order_total,
         GROUP_CONCAT(p.tensp SEPARATOR ', ') as products,
         SUM(od.soluong) as total_items
     FROM orders o

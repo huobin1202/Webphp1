@@ -330,6 +330,9 @@ if ($selected_category != '') {
             // Điều kiện lọc theo giá
             $conditions[] = "giaban BETWEEN $min_price AND $max_price";
 
+            // Thêm điều kiện chỉ hiển thị sản phẩm có status = 1
+            $conditions[] = "status = '1'";
+
             // Gộp các điều kiện lại
             $where_sql = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 

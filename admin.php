@@ -26,9 +26,30 @@ $orderCountResult = $conn->query($orderCountQuery);
 $orderCount = $orderCountResult->fetch_assoc()['order_count'];
 
 // Query to count doanh thu
-$revenueQuery = "SELECT SUM(soluong*price) as total_revenue FROM order_details";
-$revenueResult = $conn->query($revenueQuery);
+$query = "SELECT 
+    c.id,
+    c.name as tenkh,
+    COUNT(DISTINCT o.id) as total_orders,
+    SUM(od.soluong) as total_quantity,
+    SUM(CASE WHEN o.status = 'dagiao' THEN od.soluong * od.price ELSE 0 END) as total_revenue
+FROM customer c
+LEFT JOIN orders o ON c.id = o.customer_id
+LEFT JOIN order_details od ON o.id = od.order_id
+WHERE 1=1";
+$revenueResult = $conn->query($query);
 $revenue = $revenueResult->fetch_assoc()['total_revenue'];
+
+$detail_query = "SELECT 
+    o.id as order_id,
+    o.created_at,
+    o.status,
+    CASE WHEN o.status = 'dagiao' THEN o.total ELSE 0 END as order_total,
+    GROUP_CONCAT(p.tensp SEPARATOR ', ') as products,
+    SUM(od.soluong) as total_items
+FROM orders o
+LEFT JOIN order_details od ON o.id = od.order_id
+LEFT JOIN products p ON od.product_id = p.id
+WHERE o.customer_id = ?";
 ?>
 
 

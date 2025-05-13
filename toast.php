@@ -58,7 +58,7 @@ if (session_status() == PHP_SESSION_NONE) {
         toastMessage.appendChild(progressBar);
         toastContainer.appendChild(toastMessage);
         
-        let duration = 2000;
+        let duration = 4000;
         setTimeout(() => {
             toastMessage.remove();
         }, duration);
