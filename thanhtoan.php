@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $saved_address_result = $saved_address_query->get_result();
             $saved_address = $saved_address_result->fetch_assoc();
             
-            if ($saved_address) {
+            if ($saved_address && !empty($saved_address['address'])) {
                 $city_code = $saved_address['city_code'];
                 $city_name = $saved_address['city_name'];
                 $district_code = $saved_address['district_code'];
@@ -94,6 +94,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $ward_name = $saved_address['ward_name'];
                 $street_address = $saved_address['street_address'];
                 $order_address = $saved_address['address'];
+            } else {
+                $_SESSION['error'] = "Bạn chưa có địa chỉ đã lưu. Vui lòng nhập địa chỉ mới hoặc cập nhật địa chỉ trong tài khoản của bạn.";
+                header("Location: thanhtoan.php");
+                exit();
             }
         } else {
             // Get new address details
