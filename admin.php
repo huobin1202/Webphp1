@@ -4,10 +4,7 @@ if (!isset($_SESSION['username'])) {
     header("Location: dnurl.php");
     exit();
 }
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: dnurl.php");
-    exit();
-}
+
 
 include('database.php');
 // Query to count users

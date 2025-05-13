@@ -5,10 +5,7 @@ if (!isset($_SESSION['username'])) {
     exit();
 }
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    header("Location: dnurl.php");
-    exit();
-}
+
 
 // Database connection
 include('../database.php');

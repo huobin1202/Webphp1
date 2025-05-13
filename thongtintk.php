@@ -248,11 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                 <a href="index.php?logout=1" onclick="return confirm('Bạn có muốn đăng xuất?')">
                                                     <div class="hd"><i class="fa-light fa-right-from-bracket" style="font-size:20px"></i> Đăng xuất</div>
                                                 </a>
-                                                <?php if ($role === 'admin'): ?>
-                                                    <a href="dnurl.php">
-                                                        <div class="hd"><i class="fa-light fa-gear" style="font-size:20px"></i> Quản lý</div>
-                                                    </a>
-                                                <?php endif; ?>
+                                             
                                             <?php else: ?>
                                                 <a href="dn.php">
                                                     <div class="hd"><i class="fa-light fa-right-to-bracket" style="font-size:20px;color:green"></i> Đăng nhập</div>
