@@ -1,4 +1,6 @@
 <?php
+session_name('admin_session');
+
 session_start();
 include('database.php');
 include('toast.php');

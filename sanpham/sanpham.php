@@ -1,8 +1,10 @@
 <?php
+session_name('admin_session');
+
 session_start();
 include("../database.php");
 include("../toast.php");
-if (!isset($_SESSION['username'])) {
+if (!isset($_SESSION['username']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
     header("Location: ../dnurl.php");
     exit();
 }
