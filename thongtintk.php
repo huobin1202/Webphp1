@@ -347,12 +347,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <input class="form-control" type="text" name="infoaddress" id="infoaddress" placeholder="Số nhà, tên đường..." value="<?php echo htmlspecialchars($streetAddress); ?>" required>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="inforole" class="form-label">Vai trò</label>
-                        <span class="role-badge <?php echo $role === 'admin' ? 'admin-role' : 'user-role'; ?>">
-                            <?php echo htmlspecialchars($role === 'admin' ? 'Admin' : 'User'); ?>
-                        </span>
-                    </div>
+                 
                 </div>
                 <div class="main-account-body-col">
                     <div class="form-group">
